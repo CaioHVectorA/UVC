@@ -1,0 +1,370 @@
+[
+  {
+    "id": "beenie",
+    "nome": "Beenie (Telecinese)",
+    "equipe": "Guardiões",
+    "alinhamento": "Herói",
+    "escala": "TERRA",
+    "desc": "Principal superpoderoso dos Guardiões. Um astuto jovem que após manifestar seus poderes teve que amadurecer rapidamente para carregar a responsabilidade de proteger Glen e a Terra, sem perder sua curiosidade e energia juvenil.",
+    "poderes": [
+      "Telecinese de alta escala",
+      "Super-Força",
+      "Conjuração de raios de energia concentrada",
+      "Voo supersônico"
+    ],
+    "aparicoes": [
+      "Guardiões (Série)",
+      "Menino Resiliente"
+    ],
+    "img": "Guardioes.png"
+  },
+  {
+    "id": "kerry",
+    "nome": "Kerry",
+    "equipe": "Guardiões / Solo",
+    "alinhamento": "Anti-Herói",
+    "escala": "TERRA",
+    "desc": "O Guerreiro da Vingança. Teve sua vida pessoal desmantelada pela gangue dos Tineros. Foi acolhido e treinado por um mestre misterioso que despertou suas habilidades. Age como aliado pontual dos Guardiões, embora recuse a etiqueta de herói tradicional.",
+    "poderes": [
+      "Força Sobrenatural",
+      "Endurecimento epidérmico (Pele em aço maciço)",
+      "Mestre em combate corpo-a-corpo"
+    ],
+    "aparicoes": [
+      "Kerry (Solo)",
+      "Guardiões (Série)",
+      "Menino Resiliente"
+    ],
+    "img": "Kerry.png"
+  },
+  {
+    "id": "larry-mr",
+    "nome": "Larry (Menino Resiliente - MR)",
+    "equipe": "Independente / Aliado Guardiões",
+    "alinhamento": "Herói",
+    "escala": "TERRA",
+    "desc": "Protetor resiliente da cidade de Glen. Após um trágico acidente que quase custou sua vida e culminou em uma cirurgia médica experimental, adquiriu capacidade elástica sobrenatural. É o símbolo da superação contra todas as adversidades.",
+    "poderes": [
+      "Elasticidade e elongação de membros",
+      "Resistência a impactos contundentes e balísticos",
+      "Absorção de choque cinético"
+    ],
+    "aparicoes": [
+      "Menino Resiliente (Série - 12 Episódios)",
+      "Guardiões"
+    ],
+    "img": "MeninoResiliente.png"
+  },
+  {
+    "id": "ciecon",
+    "nome": "Ciecon",
+    "equipe": "Congregadores",
+    "alinhamento": "Herói / Líder Cósmico",
+    "escala": "UNIVERSAL",
+    "desc": "Líder dos Congregadores e justiceiro intergaláctico. Um jovem comum que, ao equipar o lendário Bracelete Divino, derrotou o Demônio. Consciente da imensidão de sua responsabilidade, cruza galáxias para libertar mundos escravizados.",
+    "poderes": [
+      "Conjuração de portais de dobra espacial para transporte de matéria",
+      "Subconsciente racional e falante (Guia tático cósmico)",
+      "Disparos de energia pelo Bracelete"
+    ],
+    "aparicoes": [
+      "Ciecon (Solo)",
+      "Congregadores (Série)"
+    ],
+    "img": "Ciecon.jpg"
+  },
+  {
+    "id": "rex",
+    "nome": "Rex",
+    "equipe": "Congregadores",
+    "alinhamento": "Herói",
+    "escala": "UNIVERSAL",
+    "desc": "Guerreiro mutante e braço-direito de Ciecon. Testemunhou o genocídio brutal de sua espécie nas mãos das forças imperialistas do Delimitador. Encontrou em Ciecon e nos Congregadores uma nova família e um propósito sagrado de luta.",
+    "poderes": [
+      "Garras hiper-afiadas capazes de rasgar blindagens",
+      "Fisiologia adaptada para velocidade extrema",
+      "Mandíbula com dentes perfurantes"
+    ],
+    "aparicoes": [
+      "Congregadores (Série)"
+    ],
+    "img": "Cong.png"
+  },
+  {
+    "id": "naok-pm",
+    "nome": "Naok (Punho Mortal)",
+    "equipe": "Congregadores / Solo",
+    "alinhamento": "Herói",
+    "escala": "UNIVERSAL",
+    "desc": "Sobrevivente obstinado cujo planeta natal foi devastado pela máquina de guerra da Red Right Hand. Conseguiu derrotar contingentes do Delimitador e empunha uma arma lendária forjada para quebrar qualquer defesa.",
+    "poderes": [
+      "Soco Inglês Cósmico (destrói matéria no ponto de impacto)",
+      "Reflexos de combate aprimorados",
+      "Vontade inquebrável"
+    ],
+    "aparicoes": [
+      "Punho Mortal (Solo)",
+      "Congregadores (Série)"
+    ],
+    "img": "Punho Mortal.png"
+  },
+  {
+    "id": "ormuz",
+    "nome": "Ormuz",
+    "equipe": "Divindade Suprema",
+    "alinhamento": "Guardião da Criação",
+    "escala": "UNIVERSAL",
+    "desc": "A entidade primordial e criador de todo o cosmos. Mantém o equilíbrio fundamental do universo e contorna os avanços corruptores de Hades, impedindo a ruína total da realidade.",
+    "poderes": [
+      "Onipresença cósmica",
+      "Manipulação de causalidades e linhas do destino",
+      "Controle da realidade e espaço primordial",
+      "Imortalidade absoluta"
+    ],
+    "aparicoes": [
+      "Mencionado em todas as obras maiores do UVC"
+    ],
+    "img": ""
+  },
+  {
+    "id": "hades",
+    "nome": "Hades (O Demônio / Soberano do Mal)",
+    "equipe": "Aliança Demoníaca / Universal",
+    "alinhamento": "Vilão Supremo",
+    "escala": "UNIVERSAL / TERRA",
+    "desc": "A antítese cósmica de Ormuz. Entidade divina do mal que assumiu encarnações físicas para dominar planeta por planeta. Tentou subjugar a Terra através da Aliança Demoníaca e trama incansavelmente tomar posse de toda a criação.",
+    "poderes": [
+      "Poder destrutivo inestimável",
+      "Absorção de energias vitais e poderes alheios (O Lampião)",
+      "Teletransporte dimensional",
+      "Manipulação mental e telecinese global"
+    ],
+    "aparicoes": [
+      "Hades (Solo)",
+      "Guardiões (Série)",
+      "Ciecon (Solo)"
+    ],
+    "img": "HADES.png"
+  },
+  {
+    "id": "arner",
+    "nome": "Arner",
+    "equipe": "Red Right Hand",
+    "alinhamento": "Líder Estrategista / Autoritário",
+    "escala": "UNIVERSAL",
+    "desc": "Fundador de Severum e Comandante-Geral da Red Right Hand (RRH). Homem de passado enigmático, frio, calculista e dotado de uma visão imperial expansionista para erguer Severum como o maior polo comercial e militar do universo.",
+    "poderes": [
+      "Mestre supremo em estratégia bélica e geopolítica intergaláctica",
+      "Intuição tática praticamente profética",
+      "Acesso a tecnologias e armamentos de ponta"
+    ],
+    "aparicoes": [
+      "Red Right Hand (Série)"
+    ],
+    "img": "RRH.png"
+  },
+  {
+    "id": "deroo-da",
+    "nome": "Deroo Da",
+    "equipe": "Red Right Hand",
+    "alinhamento": "Cientista Neutro",
+    "escala": "UNIVERSAL",
+    "desc": "Gênio científico da Red Right Hand. Mestre em cibernética, mecatrônica espacial e sistemas autônomos. Guarda segredos e planos tecnológicos que nem mesmo Arner é capaz de antecipar.",
+    "poderes": [
+      "Intelecto de nível superior em engenharia cibernética e veículos de dobra",
+      "Criação de armaduras, drones e implantes bio-mecânicos",
+      "Vasto domínio em ciências humanas e computação"
+    ],
+    "aparicoes": [
+      "Red Right Hand (Série)",
+      "Deroo Da no Espaço (Série)",
+      "Congregadores"
+    ],
+    "img": "Deroo Da em.png"
+  },
+  {
+    "id": "delimitador",
+    "nome": "Delimitador",
+    "equipe": "Red Right Hand",
+    "alinhamento": "Brutamontes / General Bélico",
+    "escala": "UNIVERSAL",
+    "desc": "Um colosso geneticamente reconstruído com mais de 3 metros de altura e cerca de 600 kg. Ex-guerreiro consumido pela ira, agora atua como o principal ponta-de-lança da RRH.",
+    "poderes": [
+      "Força física astronômica",
+      "Resistência a bombardeios e calor extremo",
+      "Massa muscular hiper-densa"
+    ],
+    "aparicoes": [
+      "Red Right Hand (Série)",
+      "Punho Mortal"
+    ],
+    "img": "delimitador.jpg"
+  },
+  {
+    "id": "tarlin",
+    "nome": "Tarlin",
+    "equipe": "RRH / Fingers",
+    "alinhamento": "Comandante Militar",
+    "escala": "UNIVERSAL",
+    "desc": "Líder do esquadrão de elite Fingers. Exímio atirador de elite com mira infalível e portador do rifle lendário Katharízo. Severo com seus soldados, mas protetor de sua equipe.",
+    "poderes": [
+      "Dilação temporal (habilidade de desacelerar o fluxo do tempo)",
+      "Porte do rifle sniper lendário Katharízo",
+      "Percepção sensorial ampliada"
+    ],
+    "aparicoes": [
+      "Red Right Hand (Série)"
+    ],
+    "img": "tarlin.jpg"
+  },
+  {
+    "id": "curtin",
+    "nome": "Curtin",
+    "equipe": "Fingers",
+    "alinhamento": "Soldado de Elite",
+    "escala": "UNIVERSAL",
+    "desc": "Subcomandante dos Fingers e parceiro inseparável de Tarlin. Rápido, preciso e tático, empunha suas famosas pistolas duplas customizadas chamadas Kayn & Abel.",
+    "poderes": [
+      "Propulsores turbo integrados ao traje de combate",
+      "Disparo de precisão com pistolas duplas Kayn & Abel",
+      "Manobras aerodinâmicas de alta agilidade"
+    ],
+    "aparicoes": [
+      "Red Right Hand (Série)"
+    ],
+    "img": "RRH.png"
+  },
+  {
+    "id": "mylon",
+    "nome": "Mylon",
+    "equipe": "Fingers",
+    "alinhamento": "Especialista em Fogo e Mente",
+    "escala": "UNIVERSAL",
+    "desc": "Ex-criminoso reabilitado por Tarlin. Combina poder de hipnose e coerção mental com rajadas pesadas de submetralhadoras.",
+    "poderes": [
+      "Emissão de pulso luminoso hipnótico para controle e confusão mental",
+      "Especialista em armas automáticas de cadência rápida"
+    ],
+    "aparicoes": [
+      "Red Right Hand (Série)"
+    ],
+    "img": "RRH.png"
+  },
+  {
+    "id": "chin",
+    "nome": "Chin",
+    "equipe": "Fingers",
+    "alinhamento": "Especialista em Demolição",
+    "escala": "UNIVERSAL",
+    "desc": "O elemento imprevisível dos Fingers. Amante de explosões com alta tolerância à dor. Possui a habilidade singular de transição de fase corporal.",
+    "poderes": [
+      "Habilidade de liquefação/fusão corporal para esquiva de projéteis",
+      "Imunidade à dor física",
+      "Maestria em explosivos e armamento pesado"
+    ],
+    "aparicoes": [
+      "Red Right Hand (Série)"
+    ],
+    "img": "RRH.png"
+  },
+  {
+    "id": "ellis",
+    "nome": "Ellis",
+    "equipe": "Fingers",
+    "alinhamento": "Infiltrador / Reconhecimento",
+    "escala": "UNIVERSAL",
+    "desc": "O novato e membro mais jovem dos Fingers. Silencioso, discreto e focado, carrega o rifle de longo alcance Nova Owl.",
+    "poderes": [
+      "Camuflagem ativa de invisibilidade óptica",
+      "Operações stealth e emboscada",
+      "Rifle de precisão Nova Owl"
+    ],
+    "aparicoes": [
+      "Red Right Hand (Série)"
+    ],
+    "img": "RRH.png"
+  },
+  {
+    "id": "irmaos-yaa",
+    "nome": "Irmãos Yaa (Masin & Tsuuya)",
+    "equipe": "Red Right Hand",
+    "alinhamento": "Guerreiros de Choque",
+    "escala": "UNIVERSAL",
+    "desc": "Dupla de jovens combatentes com passado trágico. Portam a misteriosa Maldição Enokití, que lhes permite materializar lâminas afiadíssimas diretamente de sua bioenergia.",
+    "poderes": [
+      "Maldição Enokití (conjuração instantânea de lâminas de energia)",
+      "Velocidade e acrobacia sobre-humanas",
+      "Sincronia perfeita de combate em dupla"
+    ],
+    "aparicoes": [
+      "Red Right Hand (Série)"
+    ],
+    "img": "RRH.png"
+  },
+  {
+    "id": "kevin",
+    "nome": "Kevin",
+    "equipe": "Aliança Demoníaca",
+    "alinhamento": "Vilão",
+    "escala": "TERRA",
+    "desc": "Principal antagonista dos Guardiões na Terra e primeiro grande desafio enfrentado por Beenie. Aliado de Hades, é uma figura sombria cujos mistérios ainda rondam o passado.",
+    "poderes": [
+      "Força e agilidade monstruosas",
+      "Disparos de energia destrutiva",
+      "Voo de alta velocidade"
+    ],
+    "aparicoes": [
+      "Guardiões (Série)"
+    ],
+    "img": ""
+  },
+  {
+    "id": "paw-froz",
+    "nome": "Paw Froz",
+    "equipe": "Aliança Demoníaca",
+    "alinhamento": "Vilão",
+    "escala": "TERRA",
+    "desc": "Introduzido inicialmente sob o disfarce de um inocente idoso em um mercado local. Era na verdade o braço-direito de Hades em solo terrestre.",
+    "poderes": [
+      "Crocinese (manipulação total e cristalização de gelo)",
+      "Criação de construtos de gelo",
+      "Voo"
+    ],
+    "aparicoes": [
+      "Guardiões (Série)"
+    ],
+    "img": ""
+  },
+  {
+    "id": "inera",
+    "nome": "Inera",
+    "equipe": "Guardiões",
+    "alinhamento": "Heróina",
+    "escala": "TERRA",
+    "desc": "Figura maternal e líder moral dos Guardiões. Após um sequestro traumático, despertou a habilidade de canalizar chamas vivas.",
+    "poderes": [
+      "Pirocinese (manipulação e emissão de fogo)",
+      "Voo rápido"
+    ],
+    "aparicoes": [
+      "Guardiões (Série)"
+    ],
+    "img": "Guardioes.png"
+  },
+  {
+    "id": "alero",
+    "nome": "Alero",
+    "equipe": "Guardiões",
+    "alinhamento": "Herói",
+    "escala": "TERRA",
+    "desc": "Homem corajoso, carismático e protetor da família. Absorveu poder bioelétrico para combater invasores alienígenas e demônios.",
+    "poderes": [
+      "Eletrocinese (manipulação de relâmpagos e eletricidade)",
+      "Voo rápido"
+    ],
+    "aparicoes": [
+      "Guardiões (Série)"
+    ],
+    "img": "Guardioes.png"
+  }
+]

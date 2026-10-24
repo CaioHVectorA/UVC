@@ -1,0 +1,68 @@
+[
+  {
+    "id": "guardioes",
+    "nome": "Os Guardiões",
+    "base": "Glen / Planeta Terra",
+    "lider": "Beenie & Inera",
+    "membros": [
+      "Beenie",
+      "Inera",
+      "Alero",
+      "Kerry (Aliado)",
+      "Larry/MR (Aliado)"
+    ],
+    "desc": "Coletivo de super-humanos da Terra formado para defender as cidades e a humanidade contra ameaças interdimensionais, facções criminosas (como os Tineros) e as incursões da Aliança Demoníaca."
+  },
+  {
+    "id": "red-right-hand",
+    "nome": "Red Right Hand (RRH)",
+    "base": "Severum (Metrópole Cósmica)",
+    "lider": "Arner",
+    "membros": [
+      "Arner",
+      "Deroo Da",
+      "Delimitador",
+      "Irmãos Yaa",
+      "Esquadrão Fingers"
+    ],
+    "desc": "Poderosa organização geopolítica, mercantil e militar sediada em Severum. Combina ambição capitalista com poder de fogo devastador para estabelecer controle sobre setores galácticos."
+  },
+  {
+    "id": "congregadores",
+    "nome": "Os Congregadores",
+    "base": "Nave Insígnia Intergaláctica",
+    "lider": "Ciecon",
+    "membros": [
+      "Ciecon",
+      "Rex",
+      "Naok (Punho Mortal)"
+    ],
+    "desc": "Aliança rebelde de sobreviventes e heróis cósmicos dedicada a libertar civilizações oprimidas, desmantelar o tráfico bélico de Severum e confrontar o poder sombrio de Hades."
+  },
+  {
+    "id": "fingers",
+    "nome": "Esquadrão Fingers",
+    "base": "Divisão Tática da RRH",
+    "lider": "Tarlin",
+    "membros": [
+      "Tarlin",
+      "Curtin",
+      "Mylon",
+      "Chin",
+      "Ellis"
+    ],
+    "desc": "Unidade de operações especiais e assassinatos da Red Right Hand. Especialistas em infiltração, sincronia tática e armamento experimental selado."
+  },
+  {
+    "id": "alianca-demoniaca",
+    "nome": "Aliança Demoníaca",
+    "base": "Setor Obscuro / Incursão Terrestre",
+    "lider": "Hades",
+    "membros": [
+      "Hades",
+      "Kevin",
+      "Paw Froz"
+    ],
+    "desc": "Facção corrompida liderada pela manifestação terrena de Hades com o objetivo de colher energias, quebrar defesas planetárias e abrir portas cósmicas."
+  }
+]

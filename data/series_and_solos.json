@@ -1,0 +1,67 @@
+[
+  {
+    "titulo": "Guardiões",
+    "tipo": "SÉRIE",
+    "local": "TERRA",
+    "sinopse": "Beenie e sua família se mudam para Glen em busca de recomeço, mas eventos cósmicos e experimentos despertam poderes que os colocam na linha de frente contra a destruição da humanidade.",
+    "arcos": [
+      "Metamorfoses (Mudanças, Dificuldades, Poderes)",
+      "Apocalipse (Más Sensações, Lutas Mentais, O Apocalipse)"
+    ]
+  },
+  {
+    "titulo": "Menino Resiliente (Part I)",
+    "tipo": "SÉRIE",
+    "local": "TERRA",
+    "sinopse": "Larry é um jovem humilde cuja vida é abalada por um trágico incidente que resulta em uma operação cirúrgica arriscada. Ao sobreviver, ganha habilidades elásticas e se torna o protetor vigilante de Glen.",
+    "arcos": [
+      "Uma Nova Luz",
+      "Resiliência e Persistência",
+      "Persistência e Ascensão",
+      "Ascensão e Vitória!"
+    ]
+  },
+  {
+    "titulo": "Congregadores",
+    "tipo": "SÉRIE",
+    "local": "UNIVERSAL",
+    "sinopse": "Ao empunhar o misterioso Bracelete Divino, Ciecon adquire o poder de abrir fendas espaciais. Em sua jornada, reúne os últimos guerreiros de espécies exterminadas para combater impérios galácticos.",
+    "arcos": [
+      "Selvagem (A Extinção, Uma Nova Amizade, O Futuro Incerto)",
+      "Tirania e Soberania (Escravidão, A Barbárie, Áurea)"
+    ]
+  },
+  {
+    "titulo": "Red Right Hand",
+    "tipo": "SÉRIE",
+    "local": "UNIVERSAL",
+    "sinopse": "A ascensão de Severum sob a liderança implacável de Arner, os experimentos cibernéticos de Deroo Da e as missões sangrentas do Esquadrão Fingers para dominar os mercados e rotas estelares.",
+    "arcos": [
+      "Primeiros Passos (A Reunião, Corrida Capitalista, Invasões, Brechas do Passado, Veredicto)"
+    ]
+  },
+  {
+    "titulo": "Hades",
+    "tipo": "SOLO",
+    "local": "UNIVERSAL",
+    "sinopse": "A descida do deus tirânico do mal que assumiu carne mortal para pilhar galáxias e acumular o poder necessário para travar a batalha final contra Ormuz."
+  },
+  {
+    "titulo": "Ciecon",
+    "tipo": "SOLO",
+    "local": "UNIVERSAL",
+    "sinopse": "A infância difícil de Ciecon, sua conexão primordial com a voz de seu subconsciente cósmico e o momento em que vestiu o Bracelete Divino pela primeira vez."
+  },
+  {
+    "titulo": "Kerry, o Guerreiro da Vingança",
+    "tipo": "SOLO",
+    "local": "TERRA",
+    "sinopse": "A cruzada solitária de Kerry contra a gangue dos Tineros e o custo pessoal de transformar o próprio corpo em metal."
+  },
+  {
+    "titulo": "Naok: Punho Mortal",
+    "tipo": "SOLO",
+    "local": "UNIVERSAL",
+    "sinopse": "O embate titânico de Naok contra o Delimitador em meio às ruínas flamejantes de seu povo."
+  }
+]
