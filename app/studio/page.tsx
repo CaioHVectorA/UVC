@@ -1,33 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  BookOpen, 
-  Smartphone, 
-  Tablet, 
-  Monitor, 
-  Download, 
-  Sparkles, 
-  Check, 
-  Copy, 
-  Lock, 
-  FileText, 
-  User, 
-  ChevronRight, 
-  Sliders, 
-  Printer, 
-  HelpCircle 
-} from "lucide-react";
 import bookData from "@/books/red-right-hand/book.json";
 import charactersData from "@/data/characters.json";
 
-// Conteúdo dos capítulos para leitura e teste no visualizador
 const CHAPTER_TEXTS: Record<number, string> = {
   0: `# Capítulo 00: A Reunião
 
 Num dia ensolarado de manhã no planeta de Severum, Arner — que dormia — escuta batidas na porta. Ele desperta, assustado, e diz:
 
-— *Diga.*
+— Diga.
 
 — Arner! Se apresse, ou irá se atrasar!
 
@@ -37,11 +19,11 @@ Ele entra no edifício e vai até a sala de reuniões. Para sua surpresa, todos 
 
 ---
 
-### *1ª Reunião Red Right Hand*
+### 1ª Reunião Red Right Hand
 
 — Bom dia a todos. Já vejo que todos chegaram antes mesmo de mim, devem estar ansiosos assim como eu. Antes de tudo, devo tirar as perguntas que vocês têm em suas cabeças. Primeiramente: o que é a Red Right Hand?
 
-Arner caminha até a ponta da mesa envidraçada que reflete a luz solar avermelhada de Severum.
+Arner caminha até a ponta da mesa que reflete a luz solar de Severum.
 
 — Somos mais que uma equipe, muito mais que um governo. Somos uma potência, somos a autoridade, a ordem. Conquistamos, urbanizamos e povoamos Severum e a faremos ser o planeta mais rico de todos.
 
@@ -51,10 +33,10 @@ Ele olha nos olhos de cada um dos presentes:
 
 Arner aponta calmamente para cada canto da mesa:
 
-— **Delimitador**, a força bruta.
-— **Tarlin** e sua equipe, o poder de fogo de alta potência.
-— **Irmãos Yaa**, a agilidade e o corte fatal.
-— **Deroo Da**, a mente científica suprema.
+— Delimitador, a força bruta.
+— Tarlin e sua equipe, o poder de fogo de alta potência.
+— Irmãos Yaa, a agilidade e o corte fatal.
+— Deroo Da, a mente científica suprema.
 
 E assim, a primeira engrenagem de Severum começou a girar.`,
 
@@ -148,10 +130,10 @@ Delimitador desceu sobre as plantações e cidades de Iutania com força devasta
 
 export default function StudioPage() {
   const [selectedChapter, setSelectedChapter] = useState<number>(0);
-  const [previewDevice, setPreviewDevice] = useState<"kindle" | "mobile" | "desktop" | "print">("kindle");
+  const [previewDevice, setPreviewDevice] = useState<"kindle" | "mobile" | "impresso">("kindle");
   const [selectedCharacterId, setSelectedCharacterId] = useState<string>("arner");
   const [copiedPrompt, setCopiedPrompt] = useState(false);
-  const [fontSize, setFontSize] = useState<number>(18);
+  const [fontSize, setFontSize] = useState<number>(17);
 
   const capitulos = bookData.capitulos;
   const currentChapter = capitulos.find((c) => c.numero === selectedChapter) || capitulos[0];
@@ -174,159 +156,133 @@ Verifique:
 
   return (
     <div className="space-y-6">
-      {/* Top Studio Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0b0e17] border border-slate-800">
+      {/* Barra Superior do Studio */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#27272a] pb-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono text-[#ff2a54]">
-            <BookOpen className="w-4 h-4" />
-            <span>KINDLE CREATE STUDIO & PREVIEWER</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-black text-white">
-            {bookData.titulo} <span className="text-slate-400 font-normal text-sm">({bookData.subtitulo})</span>
+          <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+            Writing Studio & Leitor KDP
+          </span>
+          <h1 className="text-xl font-semibold text-white">
+            {bookData.titulo} <span className="text-zinc-500 text-sm font-normal">— {bookData.subtitulo}</span>
           </h1>
         </div>
 
-        {/* Device Switcher & Actions */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center bg-slate-900 border border-slate-800 p-1 rounded-xl">
+        {/* Seleção de Visualizador */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center bg-[#18181b] border border-[#27272a] rounded-md p-0.5 text-xs font-mono">
             <button
               onClick={() => setPreviewDevice("kindle")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
-                previewDevice === "kindle"
-                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
-                  : "text-slate-400 hover:text-slate-200"
+              className={`px-3 py-1 rounded transition-colors ${
+                previewDevice === "kindle" ? "bg-white text-black font-medium" : "text-zinc-400 hover:text-white"
               }`}
             >
-              <Tablet className="w-3.5 h-3.5" />
-              <span>Kindle E-ink</span>
+              Kindle
             </button>
-
             <button
               onClick={() => setPreviewDevice("mobile")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
-                previewDevice === "mobile"
-                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                  : "text-slate-400 hover:text-slate-200"
+              className={`px-3 py-1 rounded transition-colors ${
+                previewDevice === "mobile" ? "bg-white text-black font-medium" : "text-zinc-400 hover:text-white"
               }`}
             >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>Celular</span>
+              Celular
             </button>
-
             <button
-              onClick={() => setPreviewDevice("print")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
-                previewDevice === "print"
-                  ? "bg-purple-500/20 text-purple-300 border border-purple-500/40"
-                  : "text-slate-400 hover:text-slate-200"
+              onClick={() => setPreviewDevice("impresso")}
+              className={`px-3 py-1 rounded transition-colors ${
+                previewDevice === "impresso" ? "bg-white text-black font-medium" : "text-zinc-400 hover:text-white"
               }`}
             >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Impresso</span>
+              Impresso
             </button>
           </div>
 
           <button
             onClick={handleCopyLoreGuard}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-sky-700 hover:from-cyan-500 hover:to-sky-600 text-white font-mono text-xs font-bold shadow-[0_0_15px_rgba(0,242,254,0.3)] transition-all"
+            className="px-3 py-1.5 rounded-md bg-[#18181b] hover:bg-zinc-800 border border-[#27272a] text-zinc-200 text-xs font-mono transition-colors"
           >
-            {copiedPrompt ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-300" />
-                <span>Prompt Copiado!</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Auditar no Antigravity</span>
-              </>
-            )}
+            {copiedPrompt ? "Prompt Copiado!" : "Auditar no Antigravity"}
           </button>
         </div>
       </div>
 
-      {/* Main Studio Grid */}
+      {/* Grid Principal */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Sidebar: Book Hierarchy */}
+        {/* Painel Esquerdo: Capítulos */}
         <div className="lg:col-span-3 space-y-4">
-          <div className="p-4 rounded-xl bg-[#0a0d16] border border-slate-800 space-y-3">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block font-bold">
-              Sumário de Capítulos (KDP)
+          <div className="p-4 rounded-lg bg-[#18181b] border border-[#27272a] space-y-3">
+            <span className="text-[11px] font-mono uppercase text-zinc-400 block font-semibold">
+              Sumário de Capítulos
             </span>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               {capitulos.map((cap) => (
                 <button
                   key={cap.numero}
                   onClick={() => setSelectedChapter(cap.numero)}
-                  className={`w-full text-left p-2.5 rounded-lg text-xs font-mono transition-all flex items-center justify-between ${
+                  className={`w-full text-left p-2 rounded text-xs font-mono transition-colors flex items-center justify-between ${
                     selectedChapter === cap.numero
-                      ? "bg-red-950/60 border border-[#ff2a54]/50 text-white font-bold"
-                      : "bg-slate-900/60 border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                      ? "bg-zinc-800 text-white font-semibold"
+                      : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40"
                   }`}
                 >
-                  <div className="truncate">
-                    <span className="text-slate-500 mr-1.5">#{cap.numero}</span>
-                    <span>{cap.titulo}</span>
-                  </div>
-                  {cap.status === "CANONE_TRAVADO" ? (
-                    <Lock className="w-3 h-3 text-emerald-400 shrink-0 ml-1" />
-                  ) : (
-                    <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0 ml-1" />
-                  )}
+                  <span className="truncate">
+                    #{cap.numero} {cap.titulo}
+                  </span>
+                  <span className="text-[10px] text-zinc-500 ml-2">
+                    {cap.status === "CANONE_TRAVADO" ? "Travado" : "Revisão"}
+                  </span>
                 </button>
               ))}
             </div>
 
-            <div className="pt-3 border-t border-slate-800/80 space-y-2 text-[11px] font-mono text-slate-400">
+            <div className="pt-3 border-t border-[#27272a] text-[11px] font-mono text-zinc-400 space-y-1">
               <div className="flex justify-between">
                 <span>Total de Palavras:</span>
-                <span className="text-white font-bold">~14.100</span>
+                <span className="text-zinc-200">~14.100</span>
               </div>
               <div className="flex justify-between">
-                <span>Status KDP:</span>
-                <span className="text-amber-400 font-bold">Pronto para Revisão</span>
+                <span>Formato de Saída:</span>
+                <span className="text-zinc-200">EPUB 3 / KDP</span>
               </div>
             </div>
           </div>
 
-          {/* Front Matter Box */}
-          <div className="p-4 rounded-xl bg-[#0a0d16] border border-slate-800 space-y-2 text-xs">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block font-bold">
-              Epígrafe Oficial
+          <div className="p-4 rounded-lg bg-[#18181b] border border-[#27272a] space-y-1.5 text-xs">
+            <span className="text-[10px] font-mono uppercase text-zinc-400 font-semibold block">
+              Epígrafe
             </span>
-            <p className="text-slate-300 italic text-[11px] leading-relaxed">
+            <p className="text-zinc-300 italic text-[11px] leading-relaxed">
               {bookData.frontMatter.epigrafe}
             </p>
           </div>
         </div>
 
-        {/* Center: Device Reader / Preview */}
+        {/* Centro: Visualizador de Livro */}
         <div className="lg:col-span-6 flex justify-center">
           <div
-            className={`w-full transition-all duration-300 ${
+            className={`w-full transition-all duration-200 ${
               previewDevice === "kindle"
-                ? "max-w-[560px] bg-[#fbf9f5] text-[#1a1a1a] rounded-[24px] p-8 sm:p-12 shadow-[0_0_40px_rgba(0,0,0,0.8)] border-[10px] border-[#1e1e1e]"
+                ? "max-w-[540px] bg-[#fbf9f5] text-[#1c1c1c] rounded-lg p-8 sm:p-12 shadow-md border border-[#e5dfd5]"
                 : previewDevice === "mobile"
-                ? "max-w-[360px] bg-[#0c101b] text-slate-100 rounded-[36px] p-6 shadow-2xl border-[8px] border-[#1f293d]"
-                : "w-full bg-[#fcfcfc] text-[#111] rounded-xl p-10 sm:p-14 shadow-2xl border border-slate-300"
+                ? "max-w-[340px] bg-[#18181b] text-zinc-200 rounded-2xl p-6 shadow-md border border-[#27272a]"
+                : "w-full bg-[#fdfdfd] text-[#111] rounded-lg p-10 sm:p-14 shadow-md border border-zinc-300"
             }`}
           >
-            {/* Kindle Device Header Mock */}
+            {/* Header de Livro */}
             {previewDevice === "kindle" && (
-              <div className="border-b border-[#e5dfd5] pb-3 mb-6 flex items-center justify-between text-[11px] font-serif text-[#666]">
+              <div className="border-b border-[#e5dfd5] pb-2.5 mb-6 flex items-center justify-between text-[11px] font-book text-[#777]">
                 <span>{bookData.titulo}</span>
                 <span>Capítulo {selectedChapter}</span>
               </div>
             )}
 
-            {/* Book Body */}
+            {/* Texto */}
             <article
-              className={`book-font leading-relaxed whitespace-pre-wrap ${
+              className={`font-book leading-relaxed whitespace-pre-wrap ${
                 previewDevice === "kindle"
-                  ? "text-[#1a1a1a] text-justify"
+                  ? "text-[#1c1c1c] text-justify"
                   : previewDevice === "mobile"
-                  ? "text-slate-200 text-left text-sm"
+                  ? "text-zinc-200 text-left text-sm"
                   : "text-[#111] text-justify"
               }`}
               style={{ fontSize: `${fontSize}px` }}
@@ -334,31 +290,31 @@ Verifique:
               {chapterText}
             </article>
 
-            {/* Kindle Footer Mock */}
+            {/* Rodapé Kindle */}
             {previewDevice === "kindle" && (
-              <div className="border-t border-[#e5dfd5] pt-4 mt-8 flex items-center justify-between text-[10px] font-mono text-[#888]">
+              <div className="border-t border-[#e5dfd5] pt-3 mt-8 flex items-center justify-between text-[10px] font-mono text-[#888]">
                 <span>Capítulo {selectedChapter} de 5</span>
-                <span>Página 14 de 128 • 2 min restantes no capítulo</span>
+                <span>Página 14 de 128</span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Right Sidebar: Lore Inspector Drawer */}
+        {/* Painel Direito: Lore Inspector */}
         <div className="lg:col-span-3 space-y-4">
-          <div className="p-4 rounded-xl bg-[#0a0d16] border border-slate-800 space-y-3">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-cyan-400 flex items-center gap-1.5 font-bold">
-              <User className="w-3.5 h-3.5" /> Lore Inspector (Cânone)
+          <div className="p-4 rounded-lg bg-[#18181b] border border-[#27272a] space-y-3">
+            <span className="text-[11px] font-mono uppercase text-zinc-400 font-semibold block">
+              Lore Inspector (Cânone)
             </span>
 
             <select
               value={selectedCharacterId}
               onChange={(e) => setSelectedCharacterId(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg text-xs text-white p-2 font-mono focus:border-cyan-500 focus:outline-none"
+              className="w-full bg-[#121214] border border-[#27272a] rounded p-2 text-xs text-zinc-200 font-mono focus:outline-none focus:border-zinc-500"
             >
               <option value="arner">Arner (Severum)</option>
               <option value="deroo-da">Deroo Da (Cientista)</option>
-              <option value="tarlin">Tarlin (Fingers / Tempo)</option>
+              <option value="tarlin">Tarlin (Fingers)</option>
               <option value="delimitador">Delimitador (Força)</option>
               <option value="irmaos-yaa">Irmãos Yaa (Lâminas)</option>
             </select>
@@ -366,24 +322,24 @@ Verifique:
             {selectedCharacter && (
               <div className="space-y-3 pt-2 text-xs">
                 <div>
-                  <span className="text-[10px] font-mono text-slate-400 uppercase">Nome & Alinhamento</span>
-                  <p className="font-bold text-white text-sm">{selectedCharacter.nome}</p>
-                  <span className="text-[11px] font-mono text-[#ff2a54]">{selectedCharacter.alinhamento}</span>
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase">Nome & Alinhamento</span>
+                  <p className="font-semibold text-white text-sm">{selectedCharacter.nome}</p>
+                  <span className="text-[11px] font-mono text-zinc-400">{selectedCharacter.alinhamento}</span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-mono text-slate-400 uppercase">Psicologia & Cânone</span>
-                  <p className="text-slate-300 leading-relaxed text-[11px] mt-1 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase">Psicologia Canônica</span>
+                  <p className="text-zinc-300 leading-relaxed text-[11px] mt-1 p-2.5 rounded bg-[#121214] border border-[#27272a]">
                     {selectedCharacter.desc}
                   </p>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-mono text-slate-400 uppercase">Poderes Registrados</span>
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase">Poderes Registrados</span>
                   <ul className="mt-1 space-y-1">
                     {selectedCharacter.poderes.map((pod, i) => (
-                      <li key={i} className="text-[11px] text-cyan-300 font-mono flex items-start gap-1">
-                        <span className="text-cyan-500">•</span>
+                      <li key={i} className="text-[11px] text-zinc-300 font-mono flex items-start gap-1">
+                        <span className="text-zinc-500">•</span>
                         <span>{pod}</span>
                       </li>
                     ))}
@@ -393,22 +349,19 @@ Verifique:
             )}
           </div>
 
-          {/* Typography Controls */}
-          <div className="p-4 rounded-xl bg-[#0a0d16] border border-slate-800 space-y-3">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1.5 font-bold">
-              <Sliders className="w-3.5 h-3.5" /> Ajuste de Leitura
-            </span>
+          {/* Ajuste de Leitura */}
+          <div className="p-4 rounded-lg bg-[#18181b] border border-[#27272a] space-y-2">
             <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-slate-400">Tamanho da Fonte:</span>
-              <span className="text-white font-bold">{fontSize}px</span>
+              <span className="text-zinc-400">Tamanho da Fonte:</span>
+              <span className="text-zinc-200 font-medium">{fontSize}px</span>
             </div>
             <input
               type="range"
               min="14"
-              max="24"
+              max="22"
               value={fontSize}
               onChange={(e) => setFontSize(Number(e.target.value))}
-              className="w-full accent-cyan-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer"
+              className="w-full accent-zinc-400 bg-zinc-800 h-1.5 rounded cursor-pointer"
             />
           </div>
         </div>

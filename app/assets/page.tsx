@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Image as ImageIcon, Network, Sparkles, Folder, Eye } from "lucide-react";
 
 export default function AssetsPage() {
   const [activeTab, setActiveTab] = useState<"mindmap" | "gallery">("mindmap");
@@ -12,133 +11,112 @@ export default function AssetsPage() {
       categoria: "PLANETA & ESTADO",
       titulo: "Severum (O Empório Cósmico)",
       detalhes: "Planeta transformado de rocha morta em polo comercial hegemônico via fornalhas geotérmicas e 35 Teses de Arner.",
-      conexoes: ["Arner (Governante)", "Deroo Da (Fornalhas & Dutovias)", "Red Right Hand (Exército Estatal)"],
-      cor: "#ff2a54"
+      conexoes: ["Arner (Governante)", "Deroo Da (Fornalhas & Dutovias)", "Red Right Hand (Exército Estatal)"]
     },
     {
-      "id": "rrh",
-      "categoria": "CORPORAÇÃO MILITAR",
-      "titulo": "Red Right Hand (RRH)",
-      "detalhes": "Elite de imposição bélica, mercantil e diplomática de Severum. Conquistou monopólios e combateu os Ethosthianos.",
-      "conexoes": ["Arner (Comandante)", "Delimitador (Força Bruta)", "Tarlin / Esquadrão Fingers (Atiradores)", "Irmãos Yaa (Lâminas Dérmicas)"],
-      "cor": "#ff2a54"
+      id: "rrh",
+      categoria: "CORPORAÇÃO MILITAR",
+      titulo: "Red Right Hand (RRH)",
+      detalhes: "Elite de imposição bélica, mercantil e diplomática de Severum. Conquistou monopólios e combateu os Ethosthianos.",
+      conexoes: ["Arner (Comandante)", "Delimitador (Força Bruta)", "Tarlin / Esquadrão Fingers (Atiradores)", "Irmãos Yaa (Lâminas Dérmicas)"]
     },
     {
-      "id": "fingers",
-      "categoria": "DIVISÃO TÁTICA",
-      "titulo": "Esquadrão Fingers",
-      "detalhes": "Célula cirúrgica armada com rifles selados e táticas de infiltração. Liderada por Tarlin com seu poder de dilação temporal.",
-      "conexoes": ["Tarlin (Líder)", "Curtin (Pistolas Turbo)", "Mylon (Munição)", "Chin (Batedor)", "Ellis (Camuflagem Óptica)"],
-      "cor": "#ffb800"
+      id: "fingers",
+      categoria: "DIVISÃO TÁTICA",
+      titulo: "Esquadrão Fingers",
+      detalhes: "Célula cirúrgica armada com rifles selados e dilação temporal liderada por Tarlin.",
+      conexoes: ["Tarlin (Líder)", "Curtin (Pistolas Turbo)", "Mylon (Munição)", "Chin (Batedor)", "Ellis (Camuflagem Óptica)"]
     },
     {
-      "id": "iutania",
-      "categoria": "PLANETA INVADIDO",
-      "titulo": "Planeta Iutania & Aedificantes",
-      "detalhes": "Mundo verdejante de cooperação simbiótica entre Aedificantes (físico titânico) e Mures (telepatia racional). Alvo da invasão do Delimitador.",
-      "conexoes": ["Aedificantes (Vigor)", "Mures (Telepatia & Ciência)", "Delimitador (Invasor)", "Naok (Punho Mortal)"],
-      "cor": "#ec4899"
+      id: "iutania",
+      categoria: "PLANETA INVADIDO",
+      titulo: "Planeta Iutania & Aedificantes",
+      detalhes: "Mundo verdejante de simbiose entre Aedificantes (físico titânico) e Mures (telepatia racional). Alvo de invasão de Severum.",
+      conexoes: ["Aedificantes (Vigor)", "Mures (Telepatia & Ciência)", "Delimitador (Invasor)", "Naok (Punho Mortal)"]
     },
     {
-      "id": "ormuz-hades",
-      "categoria": "COSMOLOGIA SUPREMA",
-      "titulo": "Dicotomia Ormuz vs Hades",
-      "detalhes": "A Mente da Criação e casualidade cósmica (Ormuz) em conflito eterno com a encarnação do mal e da entropia (Hades).",
-      "conexoes": ["Bracelete Divino (Ciecon)", "O Lampião (Hades)", "Aliança Demoníaca"],
-      "cor": "#00f2fe"
+      id: "ormuz-hades",
+      categoria: "COSMOLOGIA SUPREMA",
+      titulo: "Dicotomia Ormuz vs Hades",
+      detalhes: "A Mente da Criação (Ormuz) em conflito eterno com a encarnação do mal e da entropia (Hades).",
+      conexoes: ["Bracelete Divino (Ciecon)", "O Lampião (Hades)", "Aliança Demoníaca"]
     },
     {
-      "id": "glen-terra",
-      "categoria": "ESFERA TERRESTRE",
-      "titulo": "Glen & Os Guardiões",
-      "detalhes": "Heroísmo urbano e amadurecimento juvenil na Terra defendendo a humanidade contra gangues e invasões cósmicas.",
-      "conexoes": ["Beenie (Telecinese)", "Larry (Menino Resiliente)", "Kerry (Corpo de Aço)", "Inera", "Alero"],
-      "cor": "#3b82f6"
+      id: "glen-terra",
+      categoria: "ESFERA TERRESTRE",
+      titulo: "Glen & Os Guardiões",
+      detalhes: "Heroísmo urbano e amadurecimento juvenil na Terra defendendo a humanidade contra gangues e incursões cósmicas.",
+      conexoes: ["Beenie (Telecinese)", "Larry (Menino Resiliente)", "Kerry (Corpo de Aço)", "Inera", "Alero"]
     }
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
-        <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full border border-purple-500/30 bg-purple-950/40 text-purple-300 text-xs font-mono mb-2">
-            <Network className="w-3.5 h-3.5 text-purple-400" />
-            <span>Mapa Mental & Acervo Visual</span>
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Grafo de Conexões & Biblioteca de Assets
+    <div className="space-y-6">
+      {/* Cabeçalho */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#27272a] pb-5">
+        <div className="space-y-1">
+          <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+            Estrutura Narrativa
+          </span>
+          <h1 className="text-2xl font-semibold text-white tracking-tight">
+            Mapa Mental & Galeria de Mídias
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Mapeamento relacional de Severum, Iutania e Glen para manter a coerência visual e conceitual em toda a saga.
+          <p className="text-xs text-zinc-400">
+            Grafo relacional de Severum, Iutania e Glen para coerência conceitual da saga.
           </p>
         </div>
 
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-slate-800 self-start sm:self-auto">
+        <div className="flex items-center gap-1 p-1 rounded-md bg-[#18181b] border border-[#27272a] self-start sm:self-auto text-xs font-mono">
           <button
             onClick={() => setActiveTab("mindmap")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
-              activeTab === "mindmap"
-                ? "bg-purple-600 text-white font-bold shadow-[0_0_12px_rgba(168,85,247,0.4)]"
-                : "text-slate-400 hover:text-slate-200"
+            className={`px-3 py-1.5 rounded transition-colors ${
+              activeTab === "mindmap" ? "bg-white text-black font-semibold" : "text-zinc-400 hover:text-white"
             }`}
           >
-            <Network className="w-3.5 h-3.5" />
-            <span>Mapa Mental do Universo</span>
+            Mapa Mental
           </button>
           <button
             onClick={() => setActiveTab("gallery")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
-              activeTab === "gallery"
-                ? "bg-cyan-500 text-slate-950 font-bold shadow-[0_0_12px_rgba(0,242,254,0.4)]"
-                : "text-slate-400 hover:text-slate-200"
+            className={`px-3 py-1.5 rounded transition-colors ${
+              activeTab === "gallery" ? "bg-white text-black font-semibold" : "text-zinc-400 hover:text-white"
             }`}
           >
-            <ImageIcon className="w-3.5 h-3.5" />
-            <span>Acervo de Imagens & Logos</span>
+            Acervo de Arquivos
           </button>
         </div>
       </div>
 
-      {/* Mind Map Section */}
+      {/* Mapa Mental */}
       {activeTab === "mindmap" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {nodes.map((node) => (
             <div
               key={node.id}
-              className="rounded-2xl border border-slate-800 bg-[#0c101c] p-6 space-y-4 hover:border-purple-500/40 transition-all flex flex-col justify-between relative overflow-hidden"
+              className="p-5 rounded-lg border border-[#27272a] bg-[#18181b] space-y-3 flex flex-col justify-between hover:border-zinc-500 transition-colors"
             >
-              <div
-                className="absolute top-0 left-0 right-0 h-1.5"
-                style={{ backgroundColor: node.cor }}
-              />
-              <div className="space-y-3">
-                <span
-                  className="text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-slate-900 border border-slate-800"
-                  style={{ color: node.cor }}
-                >
+              <div className="space-y-2">
+                <span className="text-[10px] font-mono text-zinc-500 uppercase block font-medium">
                   {node.categoria}
                 </span>
 
-                <h3 className="text-xl font-extrabold text-white">
+                <h3 className="text-base font-semibold text-white">
                   {node.titulo}
                 </h3>
 
-                <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/60 p-3 rounded-lg border border-slate-800/80">
+                <p className="text-xs text-zinc-300 leading-relaxed p-2.5 rounded bg-[#121214] border border-[#27272a]">
                   {node.detalhes}
                 </p>
 
-                <div>
-                  <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 block mb-2 font-bold">
-                    Nós Conectados no Cânone:
+                <div className="pt-1">
+                  <span className="text-[10px] uppercase font-mono text-zinc-500 block mb-1.5 font-medium">
+                    Conexões Canônicas:
                   </span>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-1">
                     {node.conexoes.map((c, i) => (
                       <span
                         key={i}
-                        className="text-[11px] font-mono px-2 py-1 rounded bg-slate-900 text-slate-200 border border-slate-800 flex items-center gap-1"
+                        className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#121214] text-zinc-300 border border-[#27272a]"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: node.cor }} />
                         {c}
                       </span>
                     ))}
@@ -150,15 +128,15 @@ export default function AssetsPage() {
         </div>
       )}
 
-      {/* Gallery Section */}
+      {/* Galeria */}
       {activeTab === "gallery" && (
-        <div className="space-y-6">
-          <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300 font-mono flex items-center justify-between">
-            <span>📁 Acervo localizado no repositório: <strong>/assets/</strong> (80+ arquivos minerados e preservados)</span>
-            <span className="text-cyan-400 font-bold">Logos • Capas • Personagens • Cenários</span>
+        <div className="space-y-4">
+          <div className="p-3 rounded bg-[#18181b] border border-[#27272a] text-xs text-zinc-400 font-mono flex items-center justify-between">
+            <span>Diretório: <strong>/assets/</strong> (80+ arquivos minerados e preservados no repositório)</span>
+            <span className="text-zinc-300 font-medium">Logos • Capas • Personagens • Cenários</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {[
               { nome: "Torre & Insígnia RRH", pasta: "logos/RRH vermelha.png", cat: "Logotipo Severum" },
               { nome: "Selo Congregadores", pasta: "logos/congregadores mão.png", cat: "Símbolo Rebelde" },
@@ -171,17 +149,14 @@ export default function AssetsPage() {
             ].map((item, idx) => (
               <div
                 key={idx}
-                className="rounded-xl border border-slate-800 bg-[#0a0d16] p-4 space-y-2 hover:border-cyan-500/40 transition-colors"
+                className="p-3 rounded-lg border border-[#27272a] bg-[#18181b] space-y-1.5 text-xs font-mono"
               >
-                <div className="aspect-square bg-slate-950 rounded-lg border border-slate-800/80 flex flex-col items-center justify-center p-3 text-center">
-                  <ImageIcon className="w-8 h-8 text-slate-600 mb-2" />
-                  <span className="text-[11px] font-mono text-cyan-300 font-semibold truncate max-w-full">
-                    {item.nome}
-                  </span>
+                <div className="aspect-square bg-[#121214] rounded border border-[#27272a] flex items-center justify-center p-2 text-center text-zinc-500">
+                  <span className="text-[11px] text-zinc-300 font-medium">{item.nome}</span>
                 </div>
-                <div className="text-[10px] font-mono flex justify-between text-slate-400">
+                <div className="flex justify-between text-[10px] text-zinc-500 pt-1">
                   <span>{item.cat}</span>
-                  <span className="text-slate-500 truncate max-w-[100px]">{item.pasta}</span>
+                  <span className="text-zinc-600 truncate max-w-[90px]">{item.pasta}</span>
                 </div>
               </div>
             ))}
