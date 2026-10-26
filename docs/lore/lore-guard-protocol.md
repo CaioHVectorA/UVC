@@ -7,8 +7,8 @@ Este documento define como o autor Caio Henrique pode utilizar o **Antigravity**
 ## 🎯 1. O Que é o Lore Guard?
 
 O **Lore Guard** é uma instrução operacional para o agente de IA que atua como **Guardião Absoluto do Cânone do UVC**. Ele impede o temido "loop eterno de reescrita" ao verificar se as alterações no texto violam:
-1. As regras cósmicas estabelecidas em [`data/timeline.json`](file:///home/usuario/Documents/antigravity/charming-noether/data/timeline.json).
-2. As fichas de poderes e psicologia em [`data/characters.json`](file:///home/usuario/Documents/antigravity/charming-noether/data/characters.json).
+1. As regras cósmicas estabelecidas em [`data/timeline.json`](../../data/timeline.json).
+2. As fichas de poderes e psicologia em [`data/characters.json`](../../data/characters.json).
 3. A cronologia dos beats já marcados como `CANONE_TRAVADO`.
 
 ### Como Acionar no Chat do Antigravity
@@ -39,5 +39,5 @@ Basta dizer:
 
 1. **Escrever ou Modificar:** O autor escreve uma nova cena no arquivo do capítulo (`books/red-right-hand/capitulos/...`).
 2. **Auditoria Instantânea no Antigravity:** Abre o chat e pede a checagem do Lore Guard.
-3. **Aprovação do Cânone:** Se aprovado sem contradições, o status do Beat em [`data/timeline.json`](file:///home/usuario/Documents/antigravity/charming-noether/data/timeline.json) é atualizado para `CANONE_TRAVADO`.
+3. **Aprovação do Cânone:** Se aprovado sem contradições, o status do Beat em [`data/timeline.json`](../../data/timeline.json) é atualizado para `CANONE_TRAVADO`.
 4. **Visualização no Studio Web:** A Linha do Tempo e o visualizador Kindle refletem o capítulo pronto automaticamente!

@@ -1,3 +1,5 @@
+> **Planejamento histórico.** Os diagramas e capacidades abaixo não descrevem todos o produto implementado. O estado atual, publicação por Git e limites do Studio estão no [fluxo editorial](editorial-workflow.md) e no [README](../../README.md). Editor com salvamento, exportação KDP e auditoria automática permanecem evoluções futuras.
+
 # Blueprint Arquitetural: O Site UVC Absoluto
 
 Este documento detalha as especificações técnicas, arquitetura de software e design de produto para a construção da plataforma definitiva do **Universo UVC**.

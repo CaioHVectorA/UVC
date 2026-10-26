@@ -1,3 +1,5 @@
+> **Planejamento histórico.** Os diagramas e capacidades abaixo não descrevem todos o produto implementado. O estado atual, publicação por Git e limites do Studio estão no [fluxo editorial](editorial-workflow.md) e no [README](../../README.md). Editor com salvamento, exportação KDP e auditoria automática permanecem evoluções futuras.
+
 # Guia Definitivo da Plataforma E2E & UVC Studio 🌌📖
 
 Este documento é o manual oficial da **Plataforma E2E do Universo Virtual de Caio (UVC)**, integrando a ferramenta de criação literária, o sistema de canonização com IA, a Linha do Tempo Universal e a preparação editorial para publicação na **Amazon KDP**.
@@ -24,7 +26,7 @@ A plataforma foi desenhada em duas frentes complementares:
 
 ## ⏱️ 2. A Linha do Tempo Universal em 3 Camadas
 
-Para eliminar a desorientação e manter a consistência entre obras independentes, a cronologia divide-se em 3 níveis hierárquicos dentro de [`data/timeline.json`](file:///home/usuario/Documents/antigravity/charming-noether/data/timeline.json):
+Para eliminar a desorientação e manter a consistência entre obras independentes, a cronologia divide-se em 3 níveis hierárquicos dentro de [`data/timeline.json`](../../data/timeline.json):
 
 ### Camada 1: As 5 Grandes Eras Cósmicas (Macro)
 1. **Pré-Universal:** A formação das leis físicas por Ormuz e o florescer da vida estelar.
@@ -61,7 +63,7 @@ Localizado em `/studio`, o editor foi projetado com os padrões de diagramação
    - **Smartphone:** Leitura contínua vertical para revisão rápida.
    - **Impresso:** Diagramação de páginas com cabeçalho e rodapé.
 2. **Inspetor de Cânone Lateral:** Enquanto redige uma cena, consulte em tempo real a psicologia de Arner, a dilação temporal de Tarlin ou as lâminas dérmicas dos Irmãos Yaa sem mudar de aba.
-3. **Capítulos Canônicos em Markdown:** Os textos estão salvos em [`books/red-right-hand/capitulos/`](file:///home/usuario/Documents/antigravity/charming-noether/books/red-right-hand/capitulos), prontos para exportação direta em `.epub` e `.pdf`.
+3. **Capítulos Canônicos em Markdown:** Os textos estão salvos em [`books/red-right-hand/capitulos/`](../../books/red-right-hand/capitulos), prontos para exportação direta em `.epub` e `.pdf`.
 
 ---
 

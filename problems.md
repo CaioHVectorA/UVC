@@ -1,199 +1,153 @@
-# Problemas técnicos e de produto do UVC
+# Correções técnicas e pendências do UVC
 
-Revisão: 26/10/2026. Base inspecionada: `03a85bb`. Este registro acompanha a reformulação visual; não representa uma auditoria exaustiva de segurança nem confirma as condições do deploy remoto. As evidências abaixo vêm do código, da execução local de produção e dos comandos citados.
+Atualizado em 26/10/2026. Diagnóstico original: `03a85bb`; redesenho: `a1e7c78`. Esta revisão implementa as correções de sistema descritas abaixo. O documento distingue problemas corrigidos de decisões editoriais e serviços ainda inexistentes. Resultados locais não comprovam o estado do deploy remoto.
 
-## Como interpretar
+## Decisão de arquitetura
 
-- **P0**: pode permitir alteração indevida do conteúdo; resolver antes de expor escrita publicamente.
-- **P1**: afeta integridade, segurança, privacidade ou persistência; próxima prioridade técnica.
-- **P2**: afeta coerência, manutenção, acessibilidade ou descoberta do conteúdo.
-- **P3**: evolução de produto/editorial, sem bloquear a navegação atual.
-- **Aberto** significa que o redesenho não implementou a solução. Recomendação não significa funcionalidade existente.
+O produto publicado usa **Git → validação → build → deploy**. O Studio é um espaço **público de leitura/revisão**, não um editor persistente. Nenhum endpoint aceita alterações de manuscritos ou cronologia. A desativação removeu uma capacidade insegura que não era usada pelo Studio; não há login, banco ou cache de manuscritos fingidos.
 
-## Pendências abertas
+Conteúdo e histórico persistem no Git. Uma alteração só chega ao site depois de novo build/deploy. Um futuro editor remoto exigirá outro fluxo de autenticação, armazenamento e concorrência, descrito no [fluxo editorial](docs/architecture/editorial-workflow.md).
 
-### UVC-001 — P0 — APIs de escrita sem autenticação e autorização
+## Situação por problema
 
-**Evidência:** `app/api/chapters/route.ts`, função `POST`; `app/api/timeline/route.ts`, função `POST`. Não há verificação de sessão, papel ou proprietário nessas funções, nem middleware de autenticação no repositório.
-
-**Impacto:** quem alcançar as rotas pode enviar alterações. Num ambiente com filesystem gravável, é possível sobrescrever capítulos e cronologia. O fato de o Studio ser destinado ao autor não restringe o endpoint. Uma proteção adicional na hospedagem não foi verificada.
-
-**Correção proposta:** autenticar no servidor, autorizar cada operação de escrita e manter leitura pública separada. Até existir esse fluxo, desabilitar escrita em produção. Para sessões baseadas em cookies, implementar proteção contra requisições de origem indevida.
-
-**Aceite:** POST anônimo retorna 401, usuário sem papel retorna 403, somente o autor consegue gravar; registrar identidade e alterações. Não usar CORS como autenticação.
-
-### UVC-002 — P1 — Persistência incompatível com o modelo serverless
-
-**Evidência:** as duas APIs escrevem em arquivos do código-fonte usando `fs.writeFileSync`. A timeline usa uma variável global `dynamicTimeline` como fallback.
-
-**Impacto:** arquivos da aplicação normalmente são somente leitura no ambiente serverless. Memória de uma instância é temporária e não é compartilhada entre instâncias. Reinícios, concorrência e novo deploy podem perder alterações. O GET de timeline relê o arquivo e pode substituir até o estado alterado em memória. Em ambiente gravável, dois POST concorrentes podem causar atualização perdida.
-
-**Correção proposta:** banco ou armazenamento persistente com controle de versão e transações; para fluxo editorial baseado em Git, usar commits autenticados no servidor e rebuild explícito. Escolher uma fonte de verdade, sem fallback silencioso para memória.
-
-**Aceite:** salvar, reiniciar, consultar em outra instância e confirmar o mesmo conteúdo; alterações concorrentes devem gerar conflito controlado ou merge definido.
-
-### UVC-003 — P1 — Respostas de sucesso sem gravação
-
-**Evidência:** capítulos devolvem `{ success: true, status: 'cached' }` quando não encontram arquivo/diretório, sem realmente criar cache. Timeline devolve sucesso mesmo quando `writeFileSync` lança exceção.
-
-**Impacto:** um futuro editor pode informar “salvo” e perder trabalho. O novo Studio não apresenta botão de salvar e não depende desses endpoints.
-
-**Correção proposta:** responder 404 para capítulo inexistente, 400 para conteúdo inválido e erro de servidor/armazenamento para falhas reais. Somente devolver sucesso após confirmação durável.
-
-**Aceite:** induzir falha de armazenamento e confirmar resposta não-2xx; jamais declarar cache ou persistência inexistente.
-
-### UVC-004 — P1 — Falta validação dos contratos de API
-
-**Evidência:** o POST da timeline espalha qualquer JSON recebido sobre o objeto (`{ ...dynamicTimeline, ...body }`). Capítulos usam `startsWith` para escolher arquivo e recebem `content` sem validar tipo, tamanho ou estado de cânone.
-
-**Impacto:** objetos com estrutura incorreta podem quebrar leitores posteriores; entradas ambíguas podem selecionar capítulos indevidos; capítulos classificados como travados não têm proteção de servidor. Não foi demonstrado path traversal: o caminho final é escolhido entre arquivos existentes no diretório, e não diretamente do parâmetro.
-
-**Correção proposta:** schemas explícitos, limites de tamanho, números de capítulo válidos, associação exata ao manifesto `book.json`, allowlist de campos e regra de alteração do cânone no servidor.
-
-**Aceite:** entradas malformadas, números inválidos e alterações de campos não permitidos retornam 400/422; regras de bloqueio são verificadas independentemente da UI.
-
-### UVC-005 — P1 — CORS amplo e ausência de limites operacionais
-
-**Evidência:** APIs permitem origem `*` e métodos de escrita. Não há limitação de frequência ou trilha de auditoria nas rotas. Leituras/escritas são síncronas nas APIs antigas.
-
-**Impacto:** qualquer origem pode consumir as respostas públicas; POST permitido amplia a superfície acessível a sites externos. Escrita sem autenticação é o problema principal (UVC-001). I/O síncrono e ausência de limites também prejudicam disponibilidade sob carga.
-
-**Correção proposta:** definir quais clientes precisam acessar as rotas; restringir origem quando apropriado, autenticar escrita, limitar tamanho/frequência e usar I/O assíncrono ou armazenamento apropriado. Adicionar logs sem registrar manuscritos ou segredos indiscriminadamente.
-
-**Aceite:** testar origem permitida e não permitida, carga, payload excessivo e respostas 413/429; preservar leitura pública deliberadamente escolhida.
-
-### UVC-006 — P1 — Versão do Next.js com alertas de segurança
-
-**Evidência:** `npm ls` identifica Next.js 15.3.9. `npm audit --omit=dev --json` nesta revisão registrou **3 pacotes afetados: 1 crítico e 2 altos**, incluindo Next.js e suas dependências transitivas PostCSS e Sharp. Exemplos de avisos: [GHSA-2464-fhr4-w9xw](https://github.com/advisories/GHSA-2464-fhr4-w9xw), [GHSA-p3m5-59mp-jv5r](https://github.com/advisories/GHSA-p3m5-59mp-jv5r), [GHSA-fxqj-rqcc-2cmp](https://github.com/advisories/GHSA-fxqj-rqcc-2cmp), [GHSA-wq5f-xc86-pv6w](https://github.com/advisories/GHSA-wq5f-xc86-pv6w).
-
-**Limites:** classificação do audit não comprova que todas as falhas sejam exploráveis nesta aplicação. Algumas dependem de configuração/funcionalidade específica. `images.unoptimized` está habilitado; o Sharp usado diretamente na preparação das imagens é 0.35.5, mas Next mantém sua própria versão transitiva 0.34.5. O PostCSS direto foi resolvido em 8.5.31; Next ainda inclui 8.4.31.
-
-**Correção proposta:** atualizar para uma versão corrigida e suportada do Next, revisar o lockfile transitivo e rodar novamente build, testes de navegação e auditoria. Não aplicar atualização major automaticamente sem verificar compatibilidade.
-
-**Aceite:** ausência dos avisos aplicáveis ou justificativa documentada para cada exceção; confirmar deploy com o lockfile corrigido. A migração do framework ficou fora da alteração visual.
-
-### UVC-007 — P1 — Visibilidade editorial não equivale a controle de acesso
-
-**Evidência:** o Codex filtra dados no cliente; o JSON completo faz parte do bundle. A opção de acervo completo é acessível a todos. `/studio`, cronologia completa e APIs GET também são públicas pelo código. As novas páginas de leitura publicam os seis capítulos já presentes no repositório público, identificando revisão/rascunho.
-
-**Impacto:** um filtro não mantém texto ou personagens secretos. A nova interface explicita spoilers e não chama essa opção de área protegida. A publicação de cada capítulo ainda precisa de política editorial própria.
-
-**Correção proposta:** decidir quais obras e capítulos podem ser lidos publicamente. Para manuscritos privados, autenticar no servidor e nunca incluir conteúdo reservado em páginas estáticas, props públicas ou bundles. Manter os arquivos privados fora de um repositório público, se confidencialidade for necessária.
-
-**Aceite:** usuário anônimo não recebe nenhum campo reservado no HTML, RSC, JS nem API. Documentar claramente o que é conteúdo público, rascunho compartilhado e manuscrito privado.
-
-### UVC-008 — P2 — APIs dinâmicas e páginas estáticas não estão integradas
-
-**Evidência:** home/Codex/cronologia importam JSON; catálogo usa `data/series_and_solos.json`; leitor/Studio carregam Markdown via `lib/chapters.ts`. As páginas de leitura são geradas no build e não fazem POST nas APIs.
-
-**Impacto:** alterar um arquivo por uma API não atualiza automaticamente os dados já incorporados ao build ou bundle. O Studio é leitor/revisor, não editor persistente. Seu texto é fiel aos Markdown do build, sem o objeto duplicado `CHAPTER_TEXTS` da versão anterior.
-
-**Correção proposta:** escolher geração estática com revisão por Git e novo deploy, ou leitura dinâmica/revalidação com armazenamento persistente. Não misturar os modelos sem definir invalidação de cache.
-
-**Aceite:** salvar conteúdo e confirmar quando/como aparece em todas as telas, inclusive em nova sessão; UI deve comunicar publicação pendente quando exigir build.
-
-### UVC-009 — P2 — Dados canônicos com contratos e classificações incompletos
-
-**Evidência:** vários personagens não têm `statusVisibilidade`; alguns só têm símbolo e outros não têm imagem. A seleção pública possui Arner, Deroo Da e Irmãos Yaa, enquanto a documentação descreve um grupo público maior. Séries aparecem em `series_and_solos.json` e também em `timeline.json`; sinopses e títulos não possuem um identificador comum obrigatório.
-
-**Impacto:** filtros podem ocultar personagens esperados e fontes podem divergir. Não se deve completar status ou alterar o cânone por inferência de frontend.
-
-**Correção proposta:** criar schemas e IDs estáveis, validar os JSON no CI e revisar classificação editorial com o autor. O mapeamento de apresentação em `lib/catalog.ts` usa os títulos atuais e falha explicitamente quando uma entrada não está mapeada; IDs estáveis no dataset evitariam acoplamento a renomeações editoriais.
-
-**Aceite:** datasets passam por validação; novos registros não somem silenciosamente; cada entrada tem estado editorial, ID e relação definida com as demais fontes.
-
-### UVC-010 — P2 — Proveniência, acessibilidade e resolução das artes
-
-**Evidência:** o arquivo histórico possui duplicatas, nomes com acentos/espaços, ícones de aplicações e imagens heterogêneas. Algumas são símbolos, não retratos; há referências visuais sem ficha de crédito/licença no dataset. Algumas capas têm resolução pequena ou texto com pouco contraste incorporado à imagem.
-
-**Impacto:** não é possível afirmar autoria/licença de cada arquivo apenas por estar no repositório. Cortes e ampliação podem prejudicar texto de capas; uma imagem não deve ser usada para inventar a aparência canônica de um personagem.
-
-**Tratamento nesta alteração:** seleção explícita de arquivos existentes, textos alternativos como “arte ou símbolo”, derivados WebP em `public/media`, preservação integral de `/assets` e `/legacy`. Nenhuma arte de DC/Marvel/Image foi incorporada.
-
-**Correção proposta:** manifesto com arquivo original, autoria, licença, descrição, finalidade, foco/corte e dimensões; novos retratos aprovados pelo autor. Derivados atuais devem ser regenerados com `npm run media:prepare` quando os originais selecionados mudarem.
-
-**Aceite:** cada imagem publicada tem proveniência e descrição verificadas; arquivos de baixa qualidade possuem substituto ou uso adequado, sem atribuição inventada.
-
-### UVC-011 — P2 — Lint ainda não configurado e ausência de CI de regressão
-
-**Evidência:** `npm run lint` executa `next lint`, mas sem configuração ESLint abre o assistente interativo e não conclui em execução não interativa. Não há workflow de CI no repositório. Build e TypeScript são verificações diferentes de lint.
-
-**Impacto:** lint não é uma barreira reprodutível de qualidade. Typecheck e build aprovados não validam automaticamente acessibilidade, contrastes, navegação nem comportamento.
-
-**Correção proposta:** configurar ESLint explicitamente e executar lint, `npm run typecheck`, build e testes relevantes no CI. Adicionar testes de autenticação/armazenamento quando UVC-001 a UVC-004 forem implementados; manter regressões de menu, filtros e leitor.
-
-**Aceite:** `npm run lint` termina sem prompts, CI roda em cada mudança e falha em regressões relevantes. Nesta alteração foram feitos testes de navegador; não há suite E2E permanente adicionada.
-
-### UVC-012 — P2 — Migração do design system ainda parcial na cronologia
-
-**Evidência:** `components/ui.tsx`, cabeçalho, catálogo, leitor, galeria e Codex usam os novos padrões. A cronologia foi adaptada para nova tipografia/paleta e responsividade, mas conserva utilitários e estruturas antigas com uma camada CSS de migração.
-
-**Impacto:** há duas formas de estilizar superfícies e abas; manutenção futura pode introduzir divergência. A visualização é uma lista de eventos/eras, não um canvas arrastável ou grafo interativo.
-
-**Correção proposta:** migrar cronologia para os mesmos componentes semânticos; definir estados de cenas com dados validados e separar a visão pública das notas de escrita. Construir grafo/canvas somente com requisito de interação definido.
-
-**Aceite:** remover overrides transitórios, compartilhar componentes/estados e testar teclado, foco e filtros. Não anunciar drag-and-drop ou grafo que não existem.
-
-### UVC-013 — P2 — Acessibilidade e desempenho precisam de medição contínua
-
-**Evidência:** esta alteração inclui skip-link, foco visível, labels, navegação por teclado, menu com `aria-expanded`, estados de seleção e `prefers-reduced-motion`. Imagens usam dimensões e WebP. Fontes são locais do sistema, sem pedido obrigatório a Google Fonts. A otimização dinâmica do Next permanece desativada em `next.config.ts`.
-
-**Limites:** não houve auditoria completa WCAG com leitores de tela, dispositivos físicos ou medição de Core Web Vitals em produção. As imagens são pré-dimensionadas, porém não há múltiplas resoluções geradas por dispositivo; dependências do renderer Markdown aumentam o JS do leitor.
-
-**Correção proposta:** medir contraste, zoom a 200%, VoiceOver/NVDA, LCP/CLS/INP e conexão lenta. Ajustar variantes de imagens e avaliar Markdown renderizado no servidor caso o custo de JS se mostre relevante.
-
-**Aceite:** navegação completa por teclado/leitor de tela, sem perda de conteúdo em zoom, orçamento de desempenho documentado com dados reais. Não declarar nota Lighthouse ou conformidade que não foi medida.
-
-### UVC-014 — P3 — Publicação KDP/EPUB e edição ainda não implementadas
-
-**Evidência:** `book.json` não possui ISBN/ASIN preenchidos. Não há pipeline de exportação EPUB/PDF, validação EPUBCheck ou confirmação de publicação. Não há editor, salvamento, histórico/undo, bloqueio transacional de cânone ou auditoria automática de Lore Guard.
-
-**Tratamento nesta alteração:** removidas paginação fixa e alegações de prontidão/serviço ativo da apresentação. O Studio identifica sua função de leitura/revisão; copiar prompt não é executar auditoria. O catálogo diferencia leitura disponível de sinopse sem capítulos.
-
-**Correção proposta:** definir fluxo de manuscrito → revisão → arte/capa → exportação → validação → publicação, com metadados verdadeiros e links somente quando existirem. Priorizar integridade de salvamento antes de um editor visual.
-
-**Aceite:** arquivos exportados passam por validação e revisão nos dispositivos-alvo; compra/publicação só aparece com destino real. Nenhuma integração KDP é pressuposta nesta versão.
-
-### UVC-015 — P3 — Documentação histórica e descoberta das histórias
-
-**Evidência:** README/documentos antigos ainda descrevem etapas futuras como se fossem atuais, contêm links `file:///home/usuario/...` e números/status aproximados. As páginas de catálogo agora têm metadados próprios, mas não há sitemap, robots, Open Graph específico por obra nem URLs de leitura para as demais histórias.
-
-**Correção proposta:** atualizar documentação antiga distinguindo plano de implementação, corrigir links locais e definir plano de publicação das demais obras. Adicionar sitemap/metadata social após escolher domínio canônico e conteúdo autorizado.
-
-**Aceite:** documentação coincide com funcionalidades verificáveis; prévias sociais usam artes permitidas; nenhuma obra sem capítulo oferece botão de leitura enganoso.
-
-## Problemas corrigidos no redesenho
-
-| Problema anterior | Solução implementada | Evidência |
+| ID | Situação atual | Resultado |
 | --- | --- | --- |
-| Cabeçalho espremido no celular | Menu dedicado, controle de expansão e links com área de toque adequada | `components/site-header.tsx` |
-| Identidade reduzida a painéis cinza | Direção editorial indie, símbolo histórico, capas, cenários e cores com papéis definidos | `app/page.tsx`, `app/globals.css` |
-| Galeria sem imagens | Imagens reais, filtros por categoria e abertura para ampliar | `app/assets/page.tsx`, `public/media` |
-| Histórias sem destino | Oito páginas de história e seis páginas de capítulo, com disponibilidade explícita | `app/historias/[slug]`, `app/ler/[chapter]` |
-| Markdown exibido literalmente | Renderização com `react-markdown` e `remark-gfm`, sem HTML arbitrário habilitado | `components/reader.tsx` |
-| Textos de capítulos duplicados em TypeScript | Fonte de verdade nos Markdown oficiais, carregados no servidor | `lib/chapters.ts` |
-| Paginação e palavras fixas | Removida paginação inventada; duração/palavras calculadas do arquivo | `components/reader.tsx` |
-| “Auditoria ativa” sem serviço | Ação descrita como copiar prompt, com tratamento de falha | leitor e cronologia |
-| Filtro sem retorno vazio | Mensagem e ação de limpar filtros | Codex e cronologia |
-| Controle de visibilidade apresentado como proteção | Acervo completo explicitamente marcado com spoilers | Codex |
-| Numeração de beats mudava ao filtrar | Identidade posicional mantida no conjunto original | cronologia |
+| UVC-001 | Corrigido para o modelo atual | Escrita HTTP desabilitada em todas as rotas antigas |
+| UVC-002 | Corrigido para o modelo atual | Removidos filesystem gravável e fallback em memória como persistência |
+| UVC-003 | Corrigido | Não há sucesso/cached fictício; escrita retorna 405 |
+| UVC-004 | Corrigido | Schemas, referências e consulta exata de capítulos validados |
+| UVC-005 | Corrigido na aplicação; operação contínua | Sem CORS universal, sem parsing/escrita de payload; limites de tráfego dependem da hospedagem |
+| UVC-006 | Corrigido na revisão | Next 15.5.28, transitivas corrigidas e auditoria sem avisos conhecidos |
+| UVC-007 | Corrigido no contrato público | Política explícita de leitura, spoilers e Studio público; não oferece sigilo |
+| UVC-008 | Corrigido | Páginas e APIs usam o snapshot do mesmo commit/build |
+| UVC-009 | Contrato corrigido; revisão editorial pendente | IDs estáveis, schemas e normalização; 18 personagens continuam sem classificação editorial explícita |
+| UVC-010 | Manifesto implementado; créditos pendentes | Fonte/dimensões/finalidade registradas; aprovação de direitos permanece humana |
+| UVC-011 | Corrigido no repositório | Lint não interativo, testes permanentes e workflow de CI |
+| UVC-012 | Corrigido | Cronologia migrada; overrides CSS antigos removidos |
+| UVC-013 | Melhorado e testado; medição contínua | Axe, reflow, fonte ampliada, renderer no servidor e imagens responsivas; avaliação humana/produção ainda necessária |
+| UVC-014 | Evolução futura delimitada | Edição, EPUB/PDF/KDP e IA automática não são anunciadas como implementadas |
+| UVC-015 | Documentação/SEO implementados; domínio pendente | Guias atuais, links corrigidos, sitemap/robots/OG; configurar origem real para canonical/sitemap |
 
-## Validação e limites desta entrega
+## UVC-001 a UVC-005 — Integridade e APIs
 
-- Compilação de produção: `npm run build` (inclui geração das páginas de histórias e leitura).
-- Tipos: `npm run typecheck`.
-- Navegador: rotas, links internos, imagens, larguras mobile/tablet/desktop, menu, filtros, expansão de habilidades, capítulo seguinte/anterior, tema de leitura e Studio.
-- `npm run lint`: pendente conforme UVC-011; não foi declarado aprovado.
-- `npm audit --omit=dev`: pendências conforme UVC-006; não foi declarado limpo.
-- Nenhum POST foi enviado às APIs de manuscritos/cronologia durante a revisão; riscos de escrita foram avaliados pelo código, sem sobrescrever o cânone.
-- Nenhum arquivo original de `/assets`, `/legacy`, `/books` ou `/data` foi reescrito por esta alteração.
-- As verificações locais não comprovam o comportamento do deploy de produção, de proteções externas ou de serviços não presentes no repositório.
+### Falhas anteriores
 
-## Ordem de trabalho recomendada
+As rotas POST aceitavam escrita sem autenticação/validação, usavam `writeFileSync` no servidor e podiam responder `{success:true}` sem gravar. A timeline fazia merge de qualquer JSON e usava memória temporária como fallback. Capítulos eram escolhidos por prefixo. CORS liberava escrita para qualquer origem.
 
-1. Restringir escrita e decidir política de manuscritos públicos (001, 007).
-2. Armazenamento durável, contratos e respostas corretas (002–005).
-3. Atualizar framework/dependências com validação (006).
-4. Definir fonte de verdade, schemas e fluxo de publicação (008–010, 014).
-5. CI, acessibilidade/desempenho medidos e migração final dos componentes (011–013).
-6. Atualização editorial/documental e descoberta (015).
+### Correção implementada
+
+- `lib/read-only-api.ts` centraliza resposta **405 / READ_ONLY** e `Allow: GET, HEAD, OPTIONS` para POST, PUT, PATCH e DELETE, sem ler corpo nem chamar armazenamento.
+- As duas APIs não têm mais escrita, armazenamento mutável ou fallback. Não existe opção de reativar POST apenas por definir uma variável/token.
+- OPTIONS informa métodos de leitura sem `Access-Control-Allow-Origin: *` nem preflight de escrita.
+- Capítulos são buscados pelo número exato no manifesto e pela allowlist de publicação. Queries desconhecidas, duplicadas, negativas, decimais, vazias ou com caminhos são rejeitadas com **400**; capítulo ausente/não compartilhado retorna **404**; falha real de arquivo retorna **500** sem stack/caminhos no JSON.
+- `lib/chapters.ts` usa leitura assíncrona, valida contenção no diretório e calcula estatísticas reais. `lib/schemas.ts` confere correspondência de número/arquivo.
+- `lib/content.ts` oferece os mesmos dados às páginas/APIs. A publicação tem semântica explícita de snapshot Git, sem alegar atualização em tempo real.
+- Respostas incluem `nosniff`; a aplicação também define política de referência, bloqueio de iframe e permissões não utilizadas.
+
+### Evidência de teste
+
+A suite HTTP envia métodos de escrita com JSON e corpo inválido, compara hashes dos seis manuscritos e da timeline antes/depois e confirma que os GET permanecem iguais. Testa também HEAD, OPTIONS, ausência de wildcard CORS, respostas 400/404 e leitura exata de todos os capítulos. Testes unitários rejeitam caminhos e referências inválidos.
+
+### Limites restantes
+
+As APIs GET são públicas deliberadamente. CORS/robots não são autenticação. Limitação distribuída de tráfego e alertas precisam ser configurados na hospedagem; não foi introduzido rate limiter em memória que ofereceria uma garantia falsa em serverless. Um editor remoto exige autenticação e autorização de servidor, validação de escrita, armazenamento durável, controle de versão/conflitos e respostas reais de falha antes de reintroduzir escrita.
+
+## UVC-006 — Dependências
+
+**Implementado:** Next.js atualizado de 15.3.9 para **15.5.28**, dentro da stack permitida pelo projeto. PostCSS direto e transitivo resolvem para **8.5.31** por override compatível dentro do major 8. Sharp direto e transitivo resolvem para **0.35.5**. Lockfile atualizado e verificado pelo build.
+
+`npm audit --audit-level=moderate` reportou **zero vulnerabilidades conhecidas em todas as dependências**, incluindo desenvolvimento, nesta revisão. O CI repete a auditoria; isso não garante ausência de vulnerabilidades ainda não publicadas. Manter atualizações e revisão de avisos como rotina. Não foi feita migração major arbitrária do Next.
+
+## UVC-007 — Disponibilidade, spoilers e privacidade
+
+**Implementado:** `data/publication.json` declara `git-static`, revisão pública e os seis capítulos já compartilhados. A mesma lista governa as páginas geradas, leitor, Studio, links de capítulos, sitemap e API. Se todos forem removidos da lista, o Studio apresenta estado vazio; o catálogo não oferece leitura inexistente.
+
+O Studio informa que é público e não salva alterações. O acervo completo do Codex avisa sobre spoilers. Ausência de `statusVisibilidade` é normalizada como `NAO_CLASSIFICADO`, sem alegar publicação/privacidade. A classificação pública existente não foi expandida por suposição. O build bloqueia registros explicitamente marcados como `RESERVADO`, em vez de enviá-los silenciosamente no snapshot público; essa barreira não remove informação já colocada no Git público.
+
+**Limite editorial:** este repositório e seu histórico são públicos. Tirar um capítulo da UI não o apaga do Git. Não há área privada e não devem ser enviados manuscritos confidenciais a ela. Migrar material realmente reservado para fonte privada e arquitetura autenticada exige decisão do autor; não é possível obter sigilo retroativo com um filtro cliente.
+
+## UVC-008 e UVC-009 — Fonte de verdade e contratos
+
+**Implementado:** `lib/content.ts`, schemas estritos e `scripts/validate-content.ts`. A validação roda em `predev`, `prebuild` e CI e rejeita:
+
+- IDs duplicados, registros incompletos, campos desconhecidos e estados não suportados;
+- capítulos/arquivos duplicados, caminhos inadequados ou números que não correspondem ao arquivo;
+- referências a eras/séries/livros/capítulos inexistentes;
+- arquivos de capítulo vazios e imagens ausentes/dimensões incorretas;
+- arte sem registro ou vinculada a personagem inexistente;
+- publicação de número que não existe no manifesto.
+
+Foram adicionados **apenas IDs estáveis** às oito histórias, sem mudar títulos, sinopses ou arcos. `lib/catalog.ts` usa IDs, não posição/título. A escala híbrida original de Hades e o campo `livroIds` foram preservados no contrato. O filtro Terra agora também inclui o personagem híbrido.
+
+**Pendência humana:** 18 personagens não possuem classificação editorial explícita. O build informa essa situação em vez de inventar status. Há texto descritivo da mesma saga em documentos e cronologia: são contextos diferentes e nenhuma reescrita automática foi feita para forçar equivalência. Revisão literária/canônica continua responsabilidade do autor.
+
+## UVC-010 — Arquivo visual
+
+**Implementado:** `data/media.json` registra as 20 imagens selecionadas com ID, arquivo original, dimensões, finalidade, descrição e campos de crédito/licença. O script de geração consome esse único manifesto. A validação confere fontes, dimensões reais, derivados e associações. O estado `verified` exige crédito e licença preenchidos. Os originais de `assets/` e `legacy/` permanecem intactos.
+
+**Pendência humana:** créditos/licenças não demonstrados ficam `null` e `review-needed`. O registro não os aprova nem inventa autoria. Capas de baixa resolução precisam de novos arquivos fornecidos/aprovados pelo autor; o software não recupera detalhe inexistente. Símbolos continuam descritos como símbolos, não retratos oficiais.
+
+## UVC-011 — Qualidade reprodutível
+
+**Implementado:** ESLint flat config (Next/TypeScript), sem assistente interativo, e Prettier como verificação explícita. Foram adicionados **9 testes unitários** e **17 testes de integração/navegador** cobrindo contratos, integridade de arquivos, APIs, filtros, navegação, clipboard com falha, leitor, rotas, cabeçalhos, SEO e acessibilidade.
+
+Workflow `.github/workflows/ci.yml`: instalação pelo lockfile, validação, formatação, lint, tipos, unitários, auditoria, build e navegador. Usa Node 22, permissão de repositório somente leitura, timeout e artefatos de falha. Não exige segredos nem manda conteúdo para ferramentas externas.
+
+**Limite:** adicionar o workflow não configura branch protection nem garante sua execução no GitHub antes de o commit ser publicado. Alterar regras administrativas da `main` não foi feito; a preferência atual do autor é commit direto na branch.
+
+## UVC-012 — Componentes e cronologia
+
+**Implementado:** cronologia reescrita usando tokens semânticos e controles compartilhados (`PageIntro`, `SegmentedControl`, `StatusBadge`). Removidos todos os seletores/overrides `.timeline-page` e os valores antigos de paleta da página. Eras têm contexto expandível; cenas mantêm identidade ao filtrar, estado vazio, notas recolhidas e contexto de personagem/local. Copiar prompt trata sucesso/erro real de clipboard. Séries com catálogo têm links reais.
+
+A cronologia é uma lista explorável, não um canvas ou grafo arrastável. Essa nova interação não foi inventada para satisfazer um rótulo antigo.
+
+## UVC-013 — Acessibilidade e desempenho
+
+**Implementado e medido localmente:**
+
+- Axe/WCAG 2A, 2AA e 2.1AA nas seis páginas principais, sem violações detectadas nos estados iniciais testados.
+- Testes de reflow em 320, 390, 768 e 1440 px, e aumento do tamanho-base de fonte. Sem overflow horizontal nesses cenários.
+- Menu e estados de filtro têm nomes/estados acessíveis; leitor tem fonte/noturno e sumário recolhido no celular; feedback usa região de status; há foco visível, skip-link e respeito a movimento reduzido.
+- Markdown agora é renderizado no servidor (`lib/render-chapters.tsx`), sem parser Markdown no bundle do leitor e sem HTML arbitrário habilitado. JavaScript inicial de `/ler` caiu de aproximadamente **157 KB para 119 KB** no relatório do build.
+- Otimizador local de imagens do Next habilitado, formatos/tamanhos definidos e `sizes` nos cards/galeria/retratos. Não há domínios remotos de imagem liberados. As fontes seguem locais do sistema.
+
+**Pendências contínuas:** leitores de tela em dispositivos reais, zoom completo de navegador e Core Web Vitals com tráfego real não foram certificados. Teste de fonte-base não equivale a auditoria manual integral de zoom. Axe não determina contraste de texto incorporado em imagens nem comprova conformidade WCAG total. Métricas de produção/alertas dependem da hospedagem e tráfego.
+
+## UVC-014 — Edição, exportação e publicação
+
+A falha de comunicação foi corrigida: documentação diferencia o que existe de planejamento. Não há botão de salvar, exportação/ISBN/ASIN inventado, serviço de Lore Guard “ativo” ou compra sem destino.
+
+**Evoluções futuras:** editor remoto privado, EPUB/PDF validado, auditoria de IA e integração KDP exigem implementação e decisões editoriais próprias. O [fluxo editorial](docs/architecture/editorial-workflow.md) explica pré-condições. Não foram construídos um banco, login ou serviço de publicação fictícios apenas para marcar essa linha como concluída.
+
+## UVC-015 — Documentação e descoberta
+
+**Implementado:** README e contratos atualizados; guia editorial novo; blueprints antigos identificados como planejamento; links locais `file://` substituídos. Há `robots.txt`, sitemap e metadados Open Graph específicos de história, além dos títulos/descrições próprios.
+
+**Configuração restante:** definir **`UVC_SITE_URL` com o domínio HTTPS real antes do build**. Sem isso o site funciona, mas não inventa domínio e não publica URLs no sitemap; a decisão não usa automaticamente o endereço antigo de referência. A origem é validada, rejeitando caminho, credenciais, parâmetros e protocolos inadequados. Testes cobrem sitemap com e sem origem.
+
+`robots.txt` pede para não indexar Studio/API, mas não bloqueia acesso público. Não declara datas de atualização ou publicações que não foram verificadas.
+
+## Verificação desta revisão
+
+Executados localmente, com a aplicação de produção:
+
+```bash
+npm run validate:content
+npm run format:check
+npm run lint
+npm run typecheck
+npm test
+npm audit --audit-level=moderate
+npm run build
+npm run test:e2e
+```
+
+Conteúdo: 21 personagens, 5 facções, 8 histórias, 6 capítulos e 20 imagens. Testes de escrita fazem POST deliberadamente **às rotas locais já somente leitura**, confirmam 405 e hashes inalterados. Nenhuma requisição de escrita foi enviada ao deploy remoto. Textos canônicos, artes originais e arquivo legado não foram reescritos; no dataset de histórias foram adicionados IDs técnicos.
+
+## Próximos passos externos/editoriais
+
+1. Configurar domínio real no deploy e confirmar build/CI remoto.
+2. Revisar classificações de personagens e créditos/licenças das imagens com o autor.
+3. Medir tráfego/acessibilidade real e configurar limites/alertas de hospedagem.
+4. Se for desejado um editor privado, escolher identidade e armazenamento, implementar autorização/conflitos/backup e só então introduzir escrita HTTP.
+5. Quando a obra estiver pronta editorialmente, implementar/validar o pipeline EPUB/KDP com metadados reais.

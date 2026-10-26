@@ -36,11 +36,11 @@ Espaçamento principal segue múltiplos de 4/8 px, com seções de 40–64 px. C
 - `/studio`: leitura/revisão e consulta de personagens. Não promete edição, salvamento, auditoria ou exportação implementados.
 - `/codex`: seleção pública e acervo completo com aviso de spoilers, busca, filtros e expansão de habilidades.
 - `/assets`: seleção visual real, categorias e conexões de facções.
-- `/timeline`: eras como entrada padrão; cenas e séries disponíveis em abas. Conserva uma camada de migração descrita em `problems.md`.
+- `/timeline`: eras, cenas e séries usam os mesmos tokens e controles compartilhados. A camada CSS antiga foi removida.
 
 ## Mídia e manutenção
 
-`npm run media:prepare` executa `scripts/prepare-media.mjs` com Sharp e cria WebP em `public/media`. Os arquivos originais são preservados. O cenário urbano é limitado a 1400 px, o espaço a 1000 px e as demais imagens a 900 px, sem ampliar originais pequenos. A seleção inteira ocupa aproximadamente 876 KB. O navegador carrega imagens fora da primeira dobra sob demanda.
+`npm run media:prepare` executa `scripts/prepare-media.mjs` com Sharp e cria WebP em `public/media`. A seleção vem de `data/media.json`; os arquivos originais são preservados. O cenário urbano é limitado a 1400 px, o espaço a 1000 px e as demais imagens a 900 px, sem ampliar originais pequenos. A seleção inteira ocupa aproximadamente 876 KB. O navegador carrega imagens fora da primeira dobra sob demanda, e o otimizador local do Next gera resoluções apropriadas para os tamanhos declarados.
 
 Adicionar uma imagem requer registrar a origem no script e aprovar sua proveniência. O nome “arte ou símbolo” evita apresentar logotipos como retratos oficiais. A reformulação não estabelece licença/autoria dos itens históricos por inferência.
 
@@ -48,4 +48,4 @@ Adicionar uma imagem requer registrar a origem no script e aprovar sua proveniê
 
 Executar `npm run typecheck` e `npm run build`. Conferir menu, foco, busca sem resultados, categorias, links de histórias, capítulos anterior/seguinte, tema noturno e tamanhos de texto. Incluir larguras de 320, 390, 768 e 1440 px e não depender apenas de screenshot da primeira dobra para conferir imagens lazy.
 
-Pendências de APIs, autenticação, auditoria de dependências, publicação, CI e acessibilidade contínua estão em [`../../problems.md`](../../problems.md).
+Estado das correções e pendências editoriais/operacionais estão em [`../../problems.md`](../../problems.md).
