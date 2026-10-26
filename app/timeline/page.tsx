@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import timelineData from "@/data/timeline.json";
+import { PageIntro } from "@/components/ui";
 
 export default function TimelinePage() {
-  const [activeTab, setActiveTab] = useState<"beats-rrh" | "eras" | "series">("beats-rrh");
+  const [activeTab, setActiveTab] = useState<"beats-rrh" | "eras" | "series">(
+    "eras",
+  );
   const [filterStatus, setFilterStatus] = useState<string>("TODOS");
   const [filterPov, setFilterPov] = useState<string>("TODOS");
   const [copiedPrompt, setCopiedPrompt] = useState<string | null>(null);
@@ -25,30 +28,29 @@ export default function TimelinePage() {
 "${beatTitle}":
 ${beatResumo}
 Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmãos Yaa e a cronologia cósmica.`;
-    navigator.clipboard.writeText(prompt);
-    setCopiedPrompt(beatTitle);
+    navigator.clipboard
+      .writeText(prompt)
+      .then(() => setCopiedPrompt(beatTitle))
+      .catch(() => setCopiedPrompt("ERRO"));
     setTimeout(() => setCopiedPrompt(null), 3000);
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 timeline-page">
       {/* Cabeçalho */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#27272a] pb-5">
-        <div className="space-y-1">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">
-            Cronologia Canônica
-          </span>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">
-            Linha do Tempo Modular
-          </h1>
-          <p className="text-xs text-zinc-400">
-            Mapeamento de causa e efeito para controle de linearidade e beats de cena.
-          </p>
-        </div>
+        <PageIntro
+          label="Tudo se conecta"
+          title="Entre o primeiro passo e o infinito."
+        >
+          Explore as eras que atravessam o universo e as histórias que acontecem
+          pelo caminho. A cronologia completa contém spoilers.
+        </PageIntro>
 
         {/* Abas */}
         <div className="flex items-center gap-1 p-1 rounded-md bg-[#18181b] border border-[#27272a] self-start sm:self-auto">
           <button
+            aria-pressed={activeTab === "beats-rrh"}
             onClick={() => setActiveTab("beats-rrh")}
             className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
               activeTab === "beats-rrh"
@@ -59,6 +61,7 @@ Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmã
             Beats: Red Right Hand I
           </button>
           <button
+            aria-pressed={activeTab === "eras"}
             onClick={() => setActiveTab("eras")}
             className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
               activeTab === "eras"
@@ -69,6 +72,7 @@ Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmã
             5 Eras Cósmicas
           </button>
           <button
+            aria-pressed={activeTab === "series"}
             onClick={() => setActiveTab("series")}
             className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
               activeTab === "series"
@@ -89,6 +93,7 @@ Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmã
             <div className="flex items-center gap-3">
               <span className="text-zinc-400">Filtros:</span>
               <select
+                aria-label="Filtrar por status"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="bg-[#121214] border border-[#27272a] rounded px-2.5 py-1 text-zinc-200 focus:outline-none focus:border-zinc-500"
@@ -100,6 +105,7 @@ Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmã
               </select>
 
               <select
+                aria-label="Filtrar por ponto de vista"
                 value={filterPov}
                 onChange={(e) => setFilterPov(e.target.value)}
                 className="bg-[#121214] border border-[#27272a] rounded px-2.5 py-1 text-zinc-200 focus:outline-none focus:border-zinc-500"
@@ -111,24 +117,49 @@ Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmã
             </div>
 
             <div className="flex items-center gap-3 text-zinc-500">
-              <span>{beats.filter((b) => b.status === "CANONE_TRAVADO").length} Travados</span>
+              <span>
+                {beats.filter((b) => b.status === "CANONE_TRAVADO").length}{" "}
+                Travados
+              </span>
               <span>•</span>
-              <span>{beats.filter((b) => b.status === "EM_REVISAO").length} Em Revisão</span>
+              <span>
+                {beats.filter((b) => b.status === "EM_REVISAO").length} Em
+                Revisão
+              </span>
               <span>•</span>
-              <span>{beats.filter((b) => b.status === "RASCUNHO").length} Rascunhos</span>
+              <span>
+                {beats.filter((b) => b.status === "RASCUNHO").length} Rascunhos
+              </span>
             </div>
           </div>
 
           {/* Lista de Beats */}
           <div className="space-y-3">
-            {filteredBeats.map((beat, idx) => (
+            {filteredBeats.length === 0 && (
+              <div className="empty-state">
+                <h2>Nenhuma cena encontrada.</h2>
+                <p>Tente outra combinação de filtros.</p>
+                <button
+                  className="button button-secondary"
+                  onClick={() => {
+                    setFilterStatus("TODOS");
+                    setFilterPov("TODOS");
+                  }}
+                >
+                  Limpar filtros
+                </button>
+              </div>
+            )}
+            {filteredBeats.map((beat) => (
               <div
                 key={beat.id}
                 className="p-5 rounded-lg border border-[#27272a] bg-[#18181b] space-y-3 hover:border-zinc-600 transition-colors"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
                   <div className="flex items-center gap-2">
-                    <span className="text-zinc-500">Beat #{idx + 1}</span>
+                    <span className="text-zinc-500">
+                      Beat #{beats.findIndex((b) => b.id === beat.id) + 1}
+                    </span>
                     <span className="text-zinc-600">•</span>
                     <span className="text-zinc-400">Cap. {beat.capitulo}</span>
                     <span className="text-zinc-600">•</span>
@@ -136,16 +167,22 @@ Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmã
                       {beat.status === "CANONE_TRAVADO"
                         ? "Cânone Travado"
                         : beat.status === "EM_REVISAO"
-                        ? "Em Revisão"
-                        : "Rascunho"}
+                          ? "Em Revisão"
+                          : "Rascunho"}
                     </span>
                   </div>
 
                   <button
-                    onClick={() => copyLoreGuardPrompt(beat.titulo, beat.resumo)}
+                    onClick={() =>
+                      copyLoreGuardPrompt(beat.titulo, beat.resumo)
+                    }
                     className="px-2.5 py-1 rounded bg-[#121214] hover:bg-zinc-800 border border-[#27272a] hover:border-zinc-500 text-zinc-300 text-[11px] transition-colors"
                   >
-                    {copiedPrompt === beat.titulo ? "Prompt Copiado!" : "Copiar Auditoria (Lore Guard)"}
+                    {copiedPrompt === beat.titulo
+                      ? "Prompt Copiado!"
+                      : copiedPrompt === "ERRO"
+                        ? "Não foi possível copiar. Tentar novamente"
+                        : "Copiar prompt de revisão"}
                   </button>
                 </div>
 
@@ -166,12 +203,20 @@ Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmã
 
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#27272a] text-xs font-mono text-zinc-400">
                   <div className="flex items-center gap-4">
-                    <span>POV: <strong className="text-zinc-200">{beat.pov}</strong></span>
-                    <span>Local: <strong className="text-zinc-200">{beat.local}</strong></span>
+                    <span>
+                      POV: <strong className="text-zinc-200">{beat.pov}</strong>
+                    </span>
+                    <span>
+                      Local:{" "}
+                      <strong className="text-zinc-200">{beat.local}</strong>
+                    </span>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {beat.personagens.map((p) => (
-                      <span key={p} className="px-2 py-0.5 rounded bg-[#121214] text-zinc-400 text-[10px] border border-[#27272a]">
+                      <span
+                        key={p}
+                        className="px-2 py-0.5 rounded bg-[#121214] text-zinc-400 text-[10px] border border-[#27272a]"
+                      >
                         {p}
                       </span>
                     ))}
@@ -195,9 +240,7 @@ Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmã
                 <span className="text-zinc-500">Era #{era.ordem}</span>
                 <span className="text-zinc-400 uppercase">{era.id}</span>
               </div>
-              <h3 className="text-base font-semibold text-white">
-                {era.nome}
-              </h3>
+              <h3 className="text-base font-semibold text-white">{era.nome}</h3>
               <p className="text-xs text-zinc-300 leading-relaxed">
                 {era.resumo}
               </p>
@@ -228,7 +271,8 @@ Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmã
                 {item.descricao}
               </p>
               <div className="text-xs font-mono text-zinc-400 pt-1">
-                Protagonista: <span className="text-zinc-200">{item.protagonista}</span>
+                Protagonista:{" "}
+                <span className="text-zinc-200">{item.protagonista}</span>
               </div>
             </div>
           ))}

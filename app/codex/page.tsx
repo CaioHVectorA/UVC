@@ -1,145 +1,139 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Search, Users } from "lucide-react";
 import charactersData from "@/data/characters.json";
+import { characterArt, mediaUrl } from "@/lib/catalog";
+import { PageIntro } from "@/components/ui";
 
 export default function CodexPage() {
   const [search, setSearch] = useState("");
-  const [filterScale, setFilterScale] = useState("TODOS");
-  const [visibilityMode, setVisibilityMode] = useState<"PUBLICO_LEITORES" | "STUDIO_AUTOR">("PUBLICO_LEITORES");
-
-  const characters = charactersData.filter((c) => {
-    if (visibilityMode === "PUBLICO_LEITORES" && c.statusVisibilidade !== "PUBLICO") {
-      return false;
+  const [scale, setScale] = useState("TODOS");
+  const [complete, setComplete] = useState(false);
+  useEffect(() => {
+    const team = new URLSearchParams(window.location.search).get("equipe");
+    if (team) {
+      setSearch(team);
+      setComplete(true);
     }
-    if (filterScale !== "TODOS" && c.escala !== filterScale) {
-      return false;
-    }
-    if (search.trim() !== "") {
-      const q = search.toLowerCase();
-      const matchName = c.nome.toLowerCase().includes(q);
-      const matchEquipe = c.equipe.toLowerCase().includes(q);
-      const matchPoderes = c.poderes.some((p) => p.toLowerCase().includes(q));
-      return matchName || matchEquipe || matchPoderes;
-    }
-    return true;
-  });
-
+  }, []);
+  const characters = charactersData.filter(
+    (c) =>
+      (complete || c.statusVisibilidade === "PUBLICO") &&
+      (scale === "TODOS" || c.escala === scale) &&
+      [c.nome, c.equipe, ...c.poderes].some((value) =>
+        value
+          .toLocaleLowerCase("pt-BR")
+          .includes(search.trim().toLocaleLowerCase("pt-BR")),
+      ),
+  );
   return (
-    <div className="space-y-6">
-      {/* Cabeçalho */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#27272a] pb-5">
-        <div className="space-y-1">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">
-            Enciclopédia Canônica
+    <>
+      <PageIntro
+        label="Pessoas, poderes e outras possibilidades"
+        title="Todo universo tem seus personagens."
+      >
+        Heróis, anti-heróis e as forças que movem suas histórias. Conheça as
+        alianças, os poderes e os conflitos do UVC.
+      </PageIntro>
+      <div className="segmented" aria-label="Visibilidade do acervo">
+        <button aria-pressed={!complete} onClick={() => setComplete(false)}>
+          Seleção sem spoilers
+        </button>
+        <button aria-pressed={complete} onClick={() => setComplete(true)}>
+          Acervo completo · spoilers
+        </button>
+      </div>
+      <div className="toolbar">
+        <label className="search-field">
+          <Search size={19} aria-hidden />
+          <span className="sr-only">
+            Buscar por personagem, equipe ou poder
           </span>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">
-            Codex de Personagens
-          </h1>
-          <p className="text-xs text-zinc-400">
-            Fichas técnicas oficiais e poderes registrados.
-          </p>
-        </div>
-
-        {/* Alternador de Visibilidade */}
-        <div className="flex items-center gap-1 p-1 rounded-md bg-[#18181b] border border-[#27272a] self-start sm:self-auto text-xs font-mono">
-          <button
-            onClick={() => setVisibilityMode("PUBLICO_LEITORES")}
-            className={`px-3 py-1.5 rounded transition-colors ${
-              visibilityMode === "PUBLICO_LEITORES"
-                ? "bg-white text-black font-semibold"
-                : "text-zinc-400 hover:text-white"
-            }`}
-          >
-            Visão Pública (Livros Lançados)
-          </button>
-          <button
-            onClick={() => setVisibilityMode("STUDIO_AUTOR")}
-            className={`px-3 py-1.5 rounded transition-colors ${
-              visibilityMode === "STUDIO_AUTOR"
-                ? "bg-white text-black font-semibold"
-                : "text-zinc-400 hover:text-white"
-            }`}
-          >
-            Visão Studio (Todos os Registros)
-          </button>
-        </div>
-      </div>
-
-      {/* Barra de Busca e Filtro */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-md bg-[#18181b] border border-[#27272a]">
-        <input
-          type="text"
-          placeholder="Buscar personagem, facção ou poder..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-[200px] px-3 py-1.5 rounded bg-[#121214] border border-[#27272a] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 font-mono"
-        />
-
-        <div className="flex items-center gap-2 text-xs font-mono">
-          <span className="text-zinc-400">Escala:</span>
-          <select
-            value={filterScale}
-            onChange={(e) => setFilterScale(e.target.value)}
-            className="bg-[#121214] border border-[#27272a] rounded px-2.5 py-1.5 text-zinc-200 focus:outline-none focus:border-zinc-500"
-          >
-            <option value="TODOS">Todas</option>
-            <option value="UNIVERSAL">Universal (Severum / Cosmos)</option>
-            <option value="TERRA">Terra (Glen)</option>
+          <input
+            type="search"
+            placeholder="Um nome, uma equipe, um poder…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </label>
+        <label className="filter-label">
+          Explorar por mundo
+          <select value={scale} onChange={(e) => setScale(e.target.value)}>
+            <option value="TODOS">Todos os mundos</option>
+            <option value="TERRA">Terra / Glen</option>
+            <option value="UNIVERSAL">Universo / Severum</option>
           </select>
+        </label>
+      </div>
+      <div className="results-label" role="status">
+        <span>{characters.length} personagens encontrados</span>
+        <span>
+          {complete
+            ? "O acervo completo pode revelar acontecimentos das histórias."
+            : "Seleção conforme a classificação pública do acervo."}
+        </span>
+      </div>
+      {characters.length ? (
+        <div className="character-grid">
+          {characters.map((c) => (
+            <article className="character-card" key={c.id} id={c.id}>
+              <div
+                className={`character-portrait ${["arner", "deroo-da", "tarlin", "delimitador"].includes(c.id) ? "is-art" : ""}`}
+              >
+                {characterArt[c.id] ? (
+                  <Image
+                    src={mediaUrl(characterArt[c.id])}
+                    alt={`Arte ou símbolo associado a ${c.nome}`}
+                    width={500}
+                    height={300}
+                  />
+                ) : (
+                  <span className="portrait-initial" aria-hidden>
+                    {c.nome.slice(0, 1)}
+                  </span>
+                )}
+                <span>
+                  {c.escala === "TERRA" ? "TERRA / GLEN" : "ESCALA UNIVERSAL"}
+                </span>
+              </div>
+              <div className="character-body">
+                <h2>{c.nome}</h2>
+                <p className="character-team">
+                  {c.equipe} · {c.alinhamento}
+                </p>
+                <p>{c.desc}</p>
+                <details>
+                  <summary>Habilidades e aparições</summary>
+                  <ul>
+                    {c.poderes.map((p) => (
+                      <li key={p}>{p}</li>
+                    ))}
+                  </ul>
+                  <p className="character-appearances">
+                    Aparições: {c.aparicoes.join(" · ")}
+                  </p>
+                </details>
+              </div>
+            </article>
+          ))}
         </div>
-      </div>
-
-      {/* Grid de Personagens */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {characters.map((char) => (
-          <div
-            key={char.id}
-            className="p-5 rounded-lg border border-[#27272a] bg-[#18181b] space-y-3 flex flex-col justify-between hover:border-zinc-500 transition-colors"
+      ) : (
+        <div className="empty-state">
+          <Users size={28} className="mx-auto" aria-hidden />
+          <h2>Nenhum personagem por aqui.</h2>
+          <p>Tente outro nome ou explore todos os mundos.</p>
+          <button
+            className="button button-secondary"
+            onClick={() => {
+              setSearch("");
+              setScale("TODOS");
+            }}
           >
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-zinc-500">{char.escala}</span>
-                <span className="text-[11px] text-zinc-400">
-                  {char.statusVisibilidade === "PUBLICO" ? "Livro Publicado" : "Arquivo Reservado"}
-                </span>
-              </div>
-
-              <div>
-                <h3 className="text-base font-semibold text-white">
-                  {char.nome}
-                </h3>
-                <span className="text-xs font-mono text-zinc-400">
-                  {char.equipe} • {char.alinhamento}
-                </span>
-              </div>
-
-              <p className="text-xs text-zinc-300 leading-relaxed p-2.5 rounded bg-[#121214] border border-[#27272a]">
-                {char.desc}
-              </p>
-
-              <div>
-                <span className="text-[10px] uppercase font-mono text-zinc-500 block mb-1 font-semibold">
-                  Poderes:
-                </span>
-                <ul className="space-y-0.5 text-xs text-zinc-300 font-mono">
-                  {char.poderes.map((p, i) => (
-                    <li key={i} className="text-[11px] flex items-start gap-1">
-                      <span className="text-zinc-500">•</span>
-                      <span>{p}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-[#27272a] text-[10px] font-mono text-zinc-500 flex justify-between">
-              <span>Aparições:</span>
-              <span className="text-zinc-300 truncate max-w-[200px]">{char.aparicoes.join(", ")}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+            Limpar filtros
+          </button>
+        </div>
+      )}
+    </>
   );
 }

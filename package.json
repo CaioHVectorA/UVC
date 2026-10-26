@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "media:prepare": "node scripts/prepare-media.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -14,6 +16,9 @@
     "next": "^15.3.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "sharp": "^0.35.5",
     "tailwind-merge": "^3.0.1"
   },
   "devDependencies": {
