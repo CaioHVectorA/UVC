@@ -6,28 +6,45 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "media:prepare": "node scripts/prepare-media.mjs"
+    "media:prepare": "node scripts/prepare-media.mjs",
+    "predev": "npm run validate:content",
+    "prebuild": "npm run validate:content",
+    "validate:content": "tsx scripts/validate-content.ts",
+    "test": "tsx --test tests/unit/*.test.ts",
+    "test:e2e": "playwright test",
+    "format:check": "prettier --check app components lib scripts tests *.ts *.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
-    "next": "^15.3.9",
+    "next": "^15.5.28",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "sharp": "^0.35.5",
-    "tailwind-merge": "^3.0.1"
+    "tailwind-merge": "^3.0.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/eslintrc": "^3.3.7",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4.0.7",
     "@types/node": "^22.13.4",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "postcss": "^8.5.2",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^15.5.28",
+    "postcss": "^8.5.31",
+    "prettier": "^3.9.10",
     "tailwindcss": "^4.0.7",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "postcss": "$postcss"
   }
 }

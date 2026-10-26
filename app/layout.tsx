@@ -3,7 +3,18 @@ import Link from "next/link";
 import { ArrowUpRight, Orbit } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
+import { getSiteUrl } from "@/lib/site-url";
+const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
+  ...(siteUrl ? { metadataBase: siteUrl } : {}),
+  openGraph: {
+    title: "UVC — Histórias de um universo independente",
+    description:
+      "Ficção independente brasileira. Explore as histórias e personagens do Universo Virtual de Caio.",
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
   title: {
     default: "UVC — Histórias de um universo independente",
     template: "%s | UVC",

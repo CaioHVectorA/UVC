@@ -1,0 +1,222 @@
+[
+  {
+    "id": "space",
+    "source": "assets/backgrounds/espaço.jpg",
+    "kind": "scenery",
+    "description": "Arquivo histórico UVC: espaço.jpg",
+    "width": 5412,
+    "height": 3594,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "city",
+    "source": "assets/backgrounds/cidade.jpg",
+    "kind": "scenery",
+    "description": "Arquivo histórico UVC: cidade.jpg",
+    "width": 1918,
+    "height": 1414,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "uvc",
+    "source": "assets/logos/UVC transparente.png",
+    "kind": "symbol",
+    "description": "Arquivo histórico UVC: UVC transparente.png",
+    "width": 512,
+    "height": 512,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "rrh",
+    "source": "assets/logos/rrhcapa.png",
+    "kind": "cover",
+    "description": "Arquivo histórico UVC: rrhcapa.png",
+    "width": 523,
+    "height": 721,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "rrh-art",
+    "source": "assets/logos/rrh_slide.png",
+    "kind": "illustration",
+    "description": "Arquivo histórico UVC: rrh_slide.png",
+    "width": 750,
+    "height": 500,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "congregadores",
+    "source": "assets/logos/CONGREGADores.png",
+    "kind": "cover",
+    "description": "Arquivo histórico UVC: CONGREGADores.png",
+    "width": 1748,
+    "height": 2480,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "guardioes",
+    "source": "assets/characters/guardiões capa.png",
+    "kind": "cover",
+    "description": "Arquivo histórico UVC: guardiões capa.png",
+    "width": 350,
+    "height": 470,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "mr",
+    "source": "assets/characters/mrcapa.png",
+    "kind": "cover",
+    "description": "Arquivo histórico UVC: mrcapa.png",
+    "width": 1748,
+    "height": 2480,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "ciecon",
+    "source": "assets/characters/Ciecon.jpg",
+    "kind": "cover",
+    "description": "Arquivo histórico UVC: Ciecon.jpg",
+    "width": 834,
+    "height": 834,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "kerry",
+    "source": "assets/characters/Kerry.png",
+    "kind": "symbol",
+    "description": "Arquivo histórico UVC: Kerry.png",
+    "width": 408,
+    "height": 460,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "hades",
+    "source": "assets/characters/HADES.png",
+    "kind": "symbol",
+    "description": "Arquivo histórico UVC: HADES.png",
+    "width": 325,
+    "height": 325,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "deroo",
+    "source": "assets/characters/DerooDa.png",
+    "kind": "symbol",
+    "description": "Arquivo histórico UVC: DerooDa.png",
+    "width": 762,
+    "height": 506,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "deroo-art",
+    "source": "assets/characters/deroo.jpg",
+    "kind": "illustration",
+    "description": "Arquivo histórico UVC: deroo.jpg",
+    "width": 1024,
+    "height": 1024,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "tarlin",
+    "source": "assets/characters/tarlin.jpg",
+    "kind": "illustration",
+    "description": "Arquivo histórico UVC: tarlin.jpg",
+    "width": 1024,
+    "height": 1024,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "delimitador",
+    "source": "assets/characters/delimitador.jpg",
+    "kind": "illustration",
+    "description": "Arquivo histórico UVC: delimitador.jpg",
+    "width": 3120,
+    "height": 2336,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "rrh-logo",
+    "source": "assets/logos/RRH.png",
+    "kind": "symbol",
+    "description": "Arquivo histórico UVC: RRH.png",
+    "width": 512,
+    "height": 512,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "guardioes-logo",
+    "source": "assets/characters/Guardioes.png",
+    "kind": "symbol",
+    "description": "Arquivo histórico UVC: Guardioes.png",
+    "width": 300,
+    "height": 300,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "mr-logo",
+    "source": "assets/characters/MeninoResiliente.png",
+    "kind": "symbol",
+    "description": "Arquivo histórico UVC: MeninoResiliente.png",
+    "width": 300,
+    "height": 300,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "congregadores-logo",
+    "source": "assets/logos/Cong.png",
+    "kind": "symbol",
+    "description": "Arquivo histórico UVC: Cong.png",
+    "width": 1000,
+    "height": 706,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  },
+  {
+    "id": "punho-logo",
+    "source": "assets/logos/Punho Mortal.png",
+    "kind": "symbol",
+    "description": "Arquivo histórico UVC: Punho Mortal.png",
+    "width": 325,
+    "height": 325,
+    "credit": null,
+    "license": null,
+    "rightsStatus": "review-needed"
+  }
+]

@@ -1,33 +1,34 @@
-import series from "@/data/series_and_solos.json";
+import { series } from "@/lib/content";
+import media from "@/data/media.json";
 
 const editions: Record<string, { slug: string; art: string; color: string }> = {
-  Guardiões: { slug: "guardioes", art: "guardioes", color: "#f3bd62" },
-  "Menino Resiliente (Part I)": {
+  guardioes: { slug: "guardioes", art: "guardioes", color: "#f3bd62" },
+  "menino-resiliente": {
     slug: "menino-resiliente",
     art: "mr",
     color: "#d9f36b",
   },
-  Congregadores: {
+  congregadores: {
     slug: "congregadores",
     art: "congregadores",
     color: "#75e3d8",
   },
-  "Red Right Hand": { slug: "red-right-hand", art: "rrh", color: "#ff7269" },
-  Hades: { slug: "hades", art: "hades", color: "#d69cb3" },
-  Ciecon: { slug: "ciecon", art: "ciecon", color: "#b0bee6" },
-  "Kerry, o Guerreiro da Vingança": {
+  "red-right-hand": { slug: "red-right-hand", art: "rrh", color: "#ff7269" },
+  hades: { slug: "hades", art: "hades", color: "#d69cb3" },
+  ciecon: { slug: "ciecon", art: "ciecon", color: "#b0bee6" },
+  kerry: {
     slug: "kerry",
     art: "kerry",
     color: "#c4c3ca",
   },
-  "Naok: Punho Mortal": {
+  "punho-mortal": {
     slug: "punho-mortal",
     art: "punho-logo",
     color: "#e5bd91",
   },
 };
 export const stories = series.map((story) => {
-  const edition = editions[story.titulo];
+  const edition = editions[story.id];
   if (!edition)
     throw new Error(
       `Configuração de apresentação ausente para: ${story.titulo}`,
@@ -54,4 +55,8 @@ export const characterArt: Record<string, string> = {
   inera: "guardioes-logo",
   alero: "guardioes-logo",
 };
-export const mediaUrl = (name: string) => `/media/${name}.webp`;
+export const mediaUrl = (name: string) => {
+  if (!media.some((item) => item.id === name))
+    throw new Error(`Imagem não registrada: ${name}`);
+  return `/media/${name}.webp`;
+};

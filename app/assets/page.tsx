@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { PageIntro } from "@/components/ui";
 import { mediaUrl } from "@/lib/catalog";
-import factions from "@/data/factions.json";
+import { factions } from "@/lib/content";
 const items = [
   { art: "rrh-art", name: "Red Right Hand", category: "Artes" },
   { art: "guardioes", name: "Guardiões", category: "Capas" },
@@ -86,6 +86,7 @@ export default function AssetsPage() {
                       alt={item.name}
                       width={650}
                       height={500}
+                      sizes="(max-width:760px) 45vw, 400px"
                     />
                   </div>
                   <div className="gallery-caption">

@@ -42,6 +42,7 @@ export function StoryCard({ story }: { story: (typeof stories)[number] }) {
           alt={`Capa ou símbolo de ${story.titulo}`}
           width={500}
           height={680}
+          sizes="(max-width: 760px) 45vw, (max-width: 1280px) 23vw, 300px"
         />
         <span className="story-arrow">
           <ArrowUpRight size={20} aria-hidden />

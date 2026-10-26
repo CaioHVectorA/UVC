@@ -1,0 +1,7 @@
+{
+  "mode": "git-static",
+  "publicReview": true,
+  "books": {
+    "rrh-1": { "chapters": [0, 1, 2, 3, 4, 5] }
+  }
+}

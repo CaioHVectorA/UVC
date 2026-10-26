@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Search, Users } from "lucide-react";
-import charactersData from "@/data/characters.json";
+import { characters as charactersData } from "@/lib/content";
 import { characterArt, mediaUrl } from "@/lib/catalog";
 import { PageIntro } from "@/components/ui";
 
@@ -20,7 +20,7 @@ export default function CodexPage() {
   const characters = charactersData.filter(
     (c) =>
       (complete || c.statusVisibilidade === "PUBLICO") &&
-      (scale === "TODOS" || c.escala === scale) &&
+      (scale === "TODOS" || c.escala.includes(scale)) &&
       [c.nome, c.equipe, ...c.poderes].some((value) =>
         value
           .toLocaleLowerCase("pt-BR")
@@ -87,6 +87,7 @@ export default function CodexPage() {
                     alt={`Arte ou símbolo associado a ${c.nome}`}
                     width={500}
                     height={300}
+                    sizes="(max-width:760px) 90vw, (max-width:1000px) 45vw, 380px"
                   />
                 ) : (
                   <span className="portrait-initial" aria-hidden>

@@ -1,281 +1,193 @@
 "use client";
-
 import { useState } from "react";
-import timelineData from "@/data/timeline.json";
+import Link from "next/link";
+import { ArrowUpRight, Copy } from "lucide-react";
+import { timeline } from "@/lib/content";
+import { stories } from "@/lib/catalog";
 import { PageIntro } from "@/components/ui";
-
+import { SegmentedControl } from "@/components/segmented-control";
+import { StatusBadge } from "@/components/status-badge";
+const options = [
+  { value: "eras", label: "5 Eras Cósmicas" },
+  { value: "beats-rrh", label: "Cenas de Red Right Hand" },
+  { value: "series", label: "Séries paralelas" },
+] as const;
+type View = (typeof options)[number]["value"];
 export default function TimelinePage() {
-  const [activeTab, setActiveTab] = useState<"beats-rrh" | "eras" | "series">(
-    "eras",
+  const [view, setView] = useState<View>("eras");
+  const [status, setStatus] = useState("TODOS");
+  const [pov, setPov] = useState("TODOS");
+  const [feedback, setFeedback] = useState("");
+  const beats = timeline.livros.find((b) => b.id === "rrh-1")!.beats;
+  const filtered = beats.filter(
+    (beat) =>
+      (status === "TODOS" || status === beat.status) &&
+      (pov === "TODOS" || pov === beat.pov),
   );
-  const [filterStatus, setFilterStatus] = useState<string>("TODOS");
-  const [filterPov, setFilterPov] = useState<string>("TODOS");
-  const [copiedPrompt, setCopiedPrompt] = useState<string | null>(null);
-
-  const eras = timelineData.erasCosmicas;
-  const series = timelineData.seriesParalelas;
-  const bookRRH = timelineData.livros.find((b) => b.id === "rrh-1");
-  const beats = bookRRH ? bookRRH.beats : [];
-
-  const filteredBeats = beats.filter((b) => {
-    if (filterStatus !== "TODOS" && b.status !== filterStatus) return false;
-    if (filterPov !== "TODOS" && b.pov !== filterPov) return false;
-    return true;
-  });
-
-  const copyLoreGuardPrompt = (beatTitle: string, beatResumo: string) => {
-    const prompt = `Atue como Lore Guard do Universo UVC. Audite a consistência canônica deste beat:
-"${beatTitle}":
-${beatResumo}
-Considere: As 35 Teses de Severum, a psicologia de Arner, a rivalidade dos Irmãos Yaa e a cronologia cósmica.`;
-    navigator.clipboard
-      .writeText(prompt)
-      .then(() => setCopiedPrompt(beatTitle))
-      .catch(() => setCopiedPrompt("ERRO"));
-    setTimeout(() => setCopiedPrompt(null), 3000);
-  };
-
+  async function copyPrompt(beat: (typeof beats)[number]) {
+    try {
+      await navigator.clipboard.writeText(
+        `Audite a consistência canônica desta cena de Red Right Hand: ${beat.titulo}.\n${beat.resumo}\nConsidere as 35 Teses de Severum, a psicologia dos personagens e a cronologia. Não reescreva o texto.`,
+      );
+      setFeedback(`Prompt de “${beat.titulo}” copiado.`);
+    } catch {
+      setFeedback(
+        "Não foi possível copiar. Verifique a permissão do navegador e tente novamente.",
+      );
+    }
+  }
   return (
-    <div className="space-y-8 timeline-page">
-      {/* Cabeçalho */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#27272a] pb-5">
-        <PageIntro
-          label="Tudo se conecta"
-          title="Entre o primeiro passo e o infinito."
-        >
-          Explore as eras que atravessam o universo e as histórias que acontecem
-          pelo caminho. A cronologia completa contém spoilers.
-        </PageIntro>
-
-        {/* Abas */}
-        <div className="flex items-center gap-1 p-1 rounded-md bg-[#18181b] border border-[#27272a] self-start sm:self-auto">
-          <button
-            aria-pressed={activeTab === "beats-rrh"}
-            onClick={() => setActiveTab("beats-rrh")}
-            className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
-              activeTab === "beats-rrh"
-                ? "bg-white text-black font-semibold"
-                : "text-zinc-400 hover:text-white"
-            }`}
-          >
-            Beats: Red Right Hand I
-          </button>
-          <button
-            aria-pressed={activeTab === "eras"}
-            onClick={() => setActiveTab("eras")}
-            className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
-              activeTab === "eras"
-                ? "bg-white text-black font-semibold"
-                : "text-zinc-400 hover:text-white"
-            }`}
-          >
-            5 Eras Cósmicas
-          </button>
-          <button
-            aria-pressed={activeTab === "series"}
-            onClick={() => setActiveTab("series")}
-            className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
-              activeTab === "series"
-                ? "bg-white text-black font-semibold"
-                : "text-zinc-400 hover:text-white"
-            }`}
-          >
-            Séries Paralelas
-          </button>
+    <div className="chronology-page">
+      <PageIntro
+        label="Tudo se conecta"
+        title="Entre o primeiro passo e o infinito."
+      >
+        Explore as eras que atravessam o universo e as histórias que acontecem
+        pelo caminho. A cronologia completa contém spoilers.
+      </PageIntro>
+      <SegmentedControl
+        label="Visão da cronologia"
+        value={view}
+        options={options}
+        onChange={setView}
+      />
+      {view === "eras" && (
+        <div className="era-grid">
+          {timeline.erasCosmicas.map((era) => (
+            <article
+              key={era.id}
+              className="era-card"
+              style={{ "--era-color": era.cor } as React.CSSProperties}
+            >
+              <p className="eyebrow">
+                Era {String(era.ordem).padStart(2, "0")}
+              </p>
+              <h2>{era.nome}</h2>
+              <p>{era.resumo}</p>
+              <details>
+                <summary>Explorar esta era</summary>
+                <p>{era.descricao}</p>
+              </details>
+            </article>
+          ))}
         </div>
-      </div>
-
-      {/* Beats de Red Right Hand I */}
-      {activeTab === "beats-rrh" && (
-        <div className="space-y-5">
-          {/* Barra de Filtros */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-md bg-[#18181b] border border-[#27272a] text-xs font-mono">
-            <div className="flex items-center gap-3">
-              <span className="text-zinc-400">Filtros:</span>
+      )}
+      {view === "beats-rrh" && (
+        <>
+          <div className="toolbar">
+            <label className="filter-label">
+              Estado da cena
               <select
-                aria-label="Filtrar por status"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-[#121214] border border-[#27272a] rounded px-2.5 py-1 text-zinc-200 focus:outline-none focus:border-zinc-500"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
               >
-                <option value="TODOS">Todos os Status</option>
-                <option value="CANONE_TRAVADO">Cânone Travado</option>
-                <option value="EM_REVISAO">Em Revisão</option>
+                <option value="TODOS">Todos os estados</option>
+                <option value="CANONE_TRAVADO">Cânone consolidado</option>
+                <option value="EM_REVISAO">Em revisão</option>
                 <option value="RASCUNHO">Rascunho</option>
               </select>
-
-              <select
-                aria-label="Filtrar por ponto de vista"
-                value={filterPov}
-                onChange={(e) => setFilterPov(e.target.value)}
-                className="bg-[#121214] border border-[#27272a] rounded px-2.5 py-1 text-zinc-200 focus:outline-none focus:border-zinc-500"
-              >
-                <option value="TODOS">Todos os POVs</option>
-                <option value="Arner">POV: Arner</option>
-                <option value="Deroo Da">POV: Deroo Da</option>
+            </label>
+            <label className="filter-label">
+              Ponto de vista
+              <select value={pov} onChange={(e) => setPov(e.target.value)}>
+                <option value="TODOS">Todos os personagens</option>
+                {Array.from(new Set(beats.map((b) => b.pov))).map((name) => (
+                  <option key={name}>{name}</option>
+                ))}
               </select>
-            </div>
-
-            <div className="flex items-center gap-3 text-zinc-500">
-              <span>
-                {beats.filter((b) => b.status === "CANONE_TRAVADO").length}{" "}
-                Travados
-              </span>
-              <span>•</span>
-              <span>
-                {beats.filter((b) => b.status === "EM_REVISAO").length} Em
-                Revisão
-              </span>
-              <span>•</span>
-              <span>
-                {beats.filter((b) => b.status === "RASCUNHO").length} Rascunhos
-              </span>
-            </div>
+            </label>
           </div>
-
-          {/* Lista de Beats */}
-          <div className="space-y-3">
-            {filteredBeats.length === 0 && (
-              <div className="empty-state">
-                <h2>Nenhuma cena encontrada.</h2>
-                <p>Tente outra combinação de filtros.</p>
-                <button
-                  className="button button-secondary"
-                  onClick={() => {
-                    setFilterStatus("TODOS");
-                    setFilterPov("TODOS");
-                  }}
-                >
-                  Limpar filtros
-                </button>
-              </div>
-            )}
-            {filteredBeats.map((beat) => (
-              <div
-                key={beat.id}
-                className="p-5 rounded-lg border border-[#27272a] bg-[#18181b] space-y-3 hover:border-zinc-600 transition-colors"
+          <p className="results-label" role="status">
+            {filtered.length} de {beats.length} cenas · versão de trabalho
+          </p>
+          <p role="status" className="clipboard-feedback">
+            {feedback}
+          </p>
+          {filtered.length === 0 ? (
+            <div className="empty-state">
+              <h2>Nenhuma cena encontrada.</h2>
+              <p>Tente outra combinação de filtros.</p>
+              <button
+                className="button button-secondary"
+                onClick={() => {
+                  setStatus("TODOS");
+                  setPov("TODOS");
+                }}
               >
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-                  <div className="flex items-center gap-2">
-                    <span className="text-zinc-500">
-                      Beat #{beats.findIndex((b) => b.id === beat.id) + 1}
+                Limpar filtros
+              </button>
+            </div>
+          ) : (
+            <div className="scene-list">
+              {filtered.map((beat) => (
+                <article className="scene-card" key={beat.id}>
+                  <div className="scene-meta">
+                    <span>
+                      Cena{" "}
+                      {String(
+                        beats.findIndex((b) => b.id === beat.id) + 1,
+                      ).padStart(2, "0")}{" "}
+                      · Capítulo {beat.capitulo}
                     </span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="text-zinc-400">Cap. {beat.capitulo}</span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="px-2 py-0.5 rounded bg-[#121214] border border-[#27272a] text-zinc-300">
-                      {beat.status === "CANONE_TRAVADO"
-                        ? "Cânone Travado"
-                        : beat.status === "EM_REVISAO"
-                          ? "Em Revisão"
-                          : "Rascunho"}
+                    <StatusBadge status={beat.status} />
+                  </div>
+                  <h2>{beat.titulo}</h2>
+                  <p>{beat.resumo}</p>
+                  <div className="scene-context">
+                    <span>
+                      Ponto de vista: <strong>{beat.pov}</strong>
+                    </span>
+                    <span>
+                      Local: <strong>{beat.local}</strong>
                     </span>
                   </div>
-
-                  <button
-                    onClick={() =>
-                      copyLoreGuardPrompt(beat.titulo, beat.resumo)
-                    }
-                    className="px-2.5 py-1 rounded bg-[#121214] hover:bg-zinc-800 border border-[#27272a] hover:border-zinc-500 text-zinc-300 text-[11px] transition-colors"
-                  >
-                    {copiedPrompt === beat.titulo
-                      ? "Prompt Copiado!"
-                      : copiedPrompt === "ERRO"
-                        ? "Não foi possível copiar. Tentar novamente"
-                        : "Copiar prompt de revisão"}
-                  </button>
-                </div>
-
-                <h3 className="text-base font-semibold text-white">
-                  {beat.titulo}
-                </h3>
-
-                <p className="text-xs text-zinc-300 leading-relaxed">
-                  {beat.resumo}
+                  {beat.notas && (
+                    <details>
+                      <summary>Notas de revisão</summary>
+                      <p>{beat.notas}</p>
+                    </details>
+                  )}
+                  <div className="scene-footer">
+                    <ul aria-label="Personagens da cena">
+                      {beat.personagens.map((name) => (
+                        <li key={name}>{name}</li>
+                      ))}
+                    </ul>
+                    <button
+                      className="button button-secondary"
+                      onClick={() => copyPrompt(beat)}
+                    >
+                      <Copy size={15} aria-hidden />
+                      Copiar prompt de revisão
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+      {view === "series" && (
+        <div className="faction-grid chronology-series">
+          {timeline.seriesParalelas.map((series) => {
+            const story = stories.find((s) => s.id === series.id);
+            return (
+              <article className="faction-card" key={series.id}>
+                <p className="eyebrow">
+                  {series.escala} / {series.localPrincipal}
                 </p>
-
-                {beat.notas && (
-                  <div className="p-2.5 rounded bg-[#121214] border border-[#27272a] text-[11px] text-zinc-400 font-mono">
-                    <span className="text-zinc-300 font-medium">Nota: </span>
-                    {beat.notas}
-                  </div>
+                <h2>{series.titulo}</h2>
+                <p>{series.descricao}</p>
+                <p>Protagonista: {series.protagonista}</p>
+                {story && (
+                  <Link href={`/historias/${story.slug}`} className="text-link">
+                    Conhecer a história
+                    <ArrowUpRight size={16} aria-hidden />
+                  </Link>
                 )}
-
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#27272a] text-xs font-mono text-zinc-400">
-                  <div className="flex items-center gap-4">
-                    <span>
-                      POV: <strong className="text-zinc-200">{beat.pov}</strong>
-                    </span>
-                    <span>
-                      Local:{" "}
-                      <strong className="text-zinc-200">{beat.local}</strong>
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {beat.personagens.map((p) => (
-                      <span
-                        key={p}
-                        className="px-2 py-0.5 rounded bg-[#121214] text-zinc-400 text-[10px] border border-[#27272a]"
-                      >
-                        {p}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 5 Eras Cósmicas */}
-      {activeTab === "eras" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {eras.map((era) => (
-            <div
-              key={era.id}
-              className="p-5 rounded-lg border border-[#27272a] bg-[#18181b] space-y-3"
-            >
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-zinc-500">Era #{era.ordem}</span>
-                <span className="text-zinc-400 uppercase">{era.id}</span>
-              </div>
-              <h3 className="text-base font-semibold text-white">{era.nome}</h3>
-              <p className="text-xs text-zinc-300 leading-relaxed">
-                {era.resumo}
-              </p>
-              <p className="text-[11px] text-zinc-400 leading-relaxed pt-2 border-t border-[#27272a]">
-                {era.descricao}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Séries Paralelas */}
-      {activeTab === "series" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {series.map((item) => (
-            <div
-              key={item.id}
-              className="p-4 rounded-lg border border-[#27272a] bg-[#18181b] space-y-2"
-            >
-              <div className="text-[10px] font-mono text-zinc-500 uppercase flex justify-between">
-                <span>{item.escala}</span>
-                <span>{item.localPrincipal}</span>
-              </div>
-              <h3 className="text-sm font-semibold text-white">
-                {item.titulo}
-              </h3>
-              <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2">
-                {item.descricao}
-              </p>
-              <div className="text-xs font-mono text-zinc-400 pt-1">
-                Protagonista:{" "}
-                <span className="text-zinc-200">{item.protagonista}</span>
-              </div>
-            </div>
-          ))}
+              </article>
+            );
+          })}
         </div>
       )}
     </div>

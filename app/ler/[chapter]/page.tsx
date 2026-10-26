@@ -2,10 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getChapters } from "@/lib/chapters";
+import { renderChapters } from "@/lib/render-chapters";
 import { Reader } from "@/components/reader";
-import book from "@/books/red-right-hand/book.json";
+import { book, isPublicChapter } from "@/lib/content";
 export function generateStaticParams() {
-  return book.capitulos.map((c) => ({ chapter: String(c.numero) }));
+  return book.capitulos
+    .filter((c) => isPublicChapter(c.numero))
+    .map((c) => ({ chapter: String(c.numero) }));
 }
 export async function generateMetadata({
   params,
@@ -23,8 +26,15 @@ export default async function ReadingPage({
   params: Promise<{ chapter: string }>;
 }) {
   const { chapter } = await params;
-  if (!book.capitulos.some((c) => String(c.numero) === chapter)) notFound();
-  const chapters = await getChapters();
+  if (
+    !book.capitulos.some(
+      (c) => String(c.numero) === chapter && isPublicChapter(c.numero),
+    )
+  )
+    notFound();
+  const chapters = (await getChapters()).filter((c) =>
+    isPublicChapter(c.numero),
+  );
   return (
     <>
       <Link href="/historias/red-right-hand" className="breadcrumb mt-8">
@@ -33,10 +43,7 @@ export default async function ReadingPage({
       </Link>
       <Reader
         key={chapter}
-        chapters={chapters.map((c) => ({
-          ...c,
-          text: c.numero === Number(chapter) ? c.text : "",
-        }))}
+        chapters={renderChapters(chapters, Number(chapter))}
         initialChapter={Number(chapter)}
       />
     </>

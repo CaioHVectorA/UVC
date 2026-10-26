@@ -1,3 +1,4 @@
+import { getSiteUrl } from "@/lib/site-url";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
@@ -5,7 +6,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen } from "lucide-react";
 import { stories, mediaUrl } from "@/lib/catalog";
 import { SectionHeading, StoryCard } from "@/components/ui";
-import book from "@/books/red-right-hand/book.json";
+import { publicChapters } from "@/lib/content";
 export function generateStaticParams() {
   return stories.map((s) => ({ slug: s.slug }));
 }
@@ -16,7 +17,27 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const story = stories.find((s) => s.slug === slug);
-  return { title: story?.titulo, description: story?.sinopse };
+  const origin = getSiteUrl();
+  return {
+    title: story?.titulo,
+    description: story?.sinopse,
+    ...(origin ? { alternates: { canonical: `/historias/${slug}` } } : {}),
+    openGraph: {
+      title: story?.titulo,
+      description: story?.sinopse,
+      type: "article",
+      ...(story && origin
+        ? {
+            images: [
+              {
+                url: new URL(mediaUrl(story.art), origin).href,
+                alt: `Arte de ${story.titulo}`,
+              },
+            ],
+          }
+        : {}),
+    },
+  };
 }
 export default async function StoryPage({
   params,
@@ -26,7 +47,7 @@ export default async function StoryPage({
   const { slug } = await params;
   const story = stories.find((s) => s.slug === slug);
   if (!story) notFound();
-  const readable = slug === "red-right-hand";
+  const readable = slug === "red-right-hand" && publicChapters.length > 0;
   return (
     <>
       <section className="story-detail">
@@ -53,7 +74,10 @@ export default async function StoryPage({
           <p>{story.sinopse}</p>
           <div className="hero-actions">
             {readable ? (
-              <Link href="/ler/0" className="button button-primary">
+              <Link
+                href={`/ler/${publicChapters[0].numero}`}
+                className="button button-primary"
+              >
                 <BookOpen size={17} aria-hidden />
                 Ler o primeiro capítulo
                 <ArrowRight size={17} aria-hidden />
@@ -76,10 +100,10 @@ export default async function StoryPage({
         <section className="mb-16">
           <SectionHeading
             eyebrow="Red Right Hand / Ato I"
-            title="Uma ambição. Seis capítulos."
+            title={`Uma ambição. ${publicChapters.length} capítulos.`}
           />
           <div>
-            {book.capitulos.map((c, i) => (
+            {publicChapters.map((c, i) => (
               <Link
                 className="chapter-link"
                 href={`/ler/${c.numero}`}

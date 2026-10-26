@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { SectionHeading, StoryCard } from "@/components/ui";
 import { stories, mediaUrl } from "@/lib/catalog";
-import factions from "@/data/factions.json";
+import { factions, publicChapters } from "@/lib/content";
 
 export default function HomePage() {
   const featured = [
@@ -114,7 +114,9 @@ export default function HomePage() {
         </div>
         <p className="collection-note">
           <BookOpen size={15} aria-hidden /> Explore as sinopses e conheça cada
-          saga. Red Right Hand também tem capítulos disponíveis para leitura.
+          saga.{" "}
+          {publicChapters.length > 0 &&
+            "Red Right Hand também tem capítulos disponíveis para leitura."}
         </p>
       </section>
       <section className="world-feature">

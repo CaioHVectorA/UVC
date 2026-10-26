@@ -1,18 +1,16 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { ArrowLeft, ArrowRight, Copy, Check } from "lucide-react";
-import type { Chapter } from "@/lib/chapters";
-import characters from "@/data/characters.json";
+import type { RenderedChapter } from "@/lib/render-chapters";
+import { characters } from "@/lib/content";
 
 export function Reader({
   chapters,
   initialChapter = 0,
   studio = false,
 }: {
-  chapters: Chapter[];
+  chapters: RenderedChapter[];
   initialChapter?: number;
   studio?: boolean;
 }) {
@@ -25,6 +23,7 @@ export function Reader({
   const [size, setSize] = useState(18);
   const [night, setNight] = useState(false);
   const [characterId, setCharacterId] = useState("arner");
+  const [copying, setCopying] = useState(false);
   const [feedback, setFeedback] = useState("");
   const index = chapters.findIndex(
     (c) => c.numero === (studio ? selected : initialChapter),
@@ -33,6 +32,8 @@ export function Reader({
   const character = characters.find((c) => c.id === characterId);
   const totalWords = chapters.reduce((sum, c) => sum + c.words, 0);
   async function copyPrompt() {
+    if (copying) return;
+    setCopying(true);
     try {
       await navigator.clipboard.writeText(
         `Audite a consistência canônica do capítulo ${chapter.numero} de Red Right Hand: ${chapter.titulo}. Verifique os poderes, a psicologia dos personagens e a cronologia, sem reescrever o texto.\n\n${chapter.text}`,
@@ -42,6 +43,8 @@ export function Reader({
       setFeedback(
         "Não foi possível copiar. Verifique a permissão do navegador.",
       );
+    } finally {
+      setCopying(false);
     }
   }
   return (
@@ -120,7 +123,7 @@ export function Reader({
           className={`reading-paper ${night ? "reader-night" : ""}`}
           style={{ fontSize: `${size}px` }}
         >
-          <Markdown remarkPlugins={[remarkGfm]}>{chapter.text}</Markdown>
+          {chapter.rendered}
         </article>
         <nav className="reader-pagination" aria-label="Continuar leitura">
           {index > 0 ? (
@@ -203,7 +206,11 @@ export function Reader({
               </details>
             </>
           )}
-          <button className="button button-secondary" onClick={copyPrompt}>
+          <button
+            className="button button-secondary"
+            disabled={copying}
+            onClick={copyPrompt}
+          >
             {feedback === "Prompt copiado." ? (
               <Check size={15} aria-hidden />
             ) : (
