@@ -1,0 +1,260 @@
+{
+  "erasCosmicas": [
+    {
+      "id": "pre-universal",
+      "nome": "Pré-Universal",
+      "ordem": 1,
+      "resumo": "Formação do Universo: os planetas começam a se formar e a vida cósmica floresce a partir da luz de Ormuz.",
+      "descricao": "O período primordial da criação. A Mente de Ormuz tece as leis da física, as dimensões e a casualidade cósmica.",
+      "cor": "#00F2FE"
+    },
+    {
+      "id": "formacao",
+      "nome": "Formação",
+      "ordem": 2,
+      "resumo": "Formação da Terra, criação da dicotomia Beenie-Kevin e o início do cataclismo universal.",
+      "descricao": "A esfera planetária da Terra começa a se conectar às energias cósmicas. Surge a rivalidade seminal que ecoará pelos séculos.",
+      "cor": "#3B82F6"
+    },
+    {
+      "id": "ascensao",
+      "nome": "Ascensão",
+      "ordem": 3,
+      "resumo": "Sodoma e Gomorra Cósmica: civilizações alcançam o ápice de riqueza e corrupção moral.",
+      "descricao": "Mundos florescem através do comércio interestelar e da tirania. As brechas espirituais começam a se alargar.",
+      "cor": "#FFB800"
+    },
+    {
+      "id": "redencao",
+      "nome": "Redenção",
+      "ordem": 4,
+      "resumo": "Redenção — A Grande Guerra Cósmica e os sacrifícios por liberdade.",
+      "descricao": "Revoltas de mundos escravizados, surgimento dos primeiros mártires e a união de rebeldes contra grandes impérios.",
+      "cor": "#10B981"
+    },
+    {
+      "id": "renegacao",
+      "nome": "Renegação",
+      "ordem": 5,
+      "resumo": "Apresentação do conflito que dita o universo e a encarnação do maior antagonista: Hades.",
+      "descricao": "Hades assume forma corpórea, forja o Lampião para consumir a energia dos astros e marchar em direção ao trono de Ormuz.",
+      "cor": "#FF2A54"
+    }
+  ],
+  "seriesParalelas": [
+    {
+      "id": "red-right-hand",
+      "titulo": "Red Right Hand",
+      "escala": "UNIVERSAL",
+      "localPrincipal": "Severum",
+      "protagonista": "Arner",
+      "descricao": "A transformação de um planeta morto em um império comercial, a criação da elite militar e a ganância sem limites.",
+      "cor": "#FF2A54"
+    },
+    {
+      "id": "congregadores",
+      "titulo": "Congregadores",
+      "escala": "UNIVERSAL",
+      "localPrincipal": "Espaço Profundo",
+      "protagonista": "Ciecon",
+      "descricao": "A resistência rebelde dos últimos sobreviventes de mundos aniquilados, armados com o Bracelete Divino de Ormuz.",
+      "cor": "#00F2FE"
+    },
+    {
+      "id": "guardioes",
+      "titulo": "Guardiões",
+      "escala": "TERRA",
+      "localPrincipal": "Glen",
+      "protagonista": "Beenie",
+      "descricao": "Os jovens superpoderosos que descobrem suas habilidades e defendem Glen contra invasões extraterrenas e demoníacas.",
+      "cor": "#3B82F6"
+    },
+    {
+      "id": "deroo-da-no-espaco",
+      "titulo": "Aventuras de Deroo Da no Espaço",
+      "escala": "UNIVERSAL",
+      "localPrincipal": "Cosmos / Naves Científicas",
+      "protagonista": "Deroo Da",
+      "descricao": "As explorações científicas e segredos cibernéticos do cientista mais brilhante e arrogante do cosmos após deixar Severum.",
+      "cor": "#A855F7"
+    },
+    {
+      "id": "menino-resiliente",
+      "titulo": "Menino Resiliente",
+      "escala": "TERRA",
+      "localPrincipal": "Glen",
+      "protagonista": "Larry",
+      "descricao": "A jornada de superação de um jovem humilde que passa por cirurgia experimental e ganha dons de resiliência e elasticidade.",
+      "cor": "#F59E0B"
+    },
+    {
+      "id": "marginal",
+      "titulo": "Marginal",
+      "escala": "TERRA",
+      "localPrincipal": "Subúrbios de Glen",
+      "protagonista": "Marginal",
+      "descricao": "As lutas e tensões das ruas, gangues urbanas e o peso social de viver à margem dos grandes heróis.",
+      "cor": "#64748B"
+    },
+    {
+      "id": "punho-mortal",
+      "titulo": "Punho Mortal",
+      "escala": "UNIVERSAL",
+      "localPrincipal": "Planeta Iutania",
+      "protagonista": "Naok",
+      "descricao": "A simbiose mútua entre os fortes Aedificantes e os racionais Mures, e a tragédia da invasão militar por Severum.",
+      "cor": "#EC4899"
+    },
+    {
+      "id": "solos",
+      "titulo": "Solos Canônicos",
+      "escala": "HÍBRIDA",
+      "localPrincipal": "Vários",
+      "protagonista": "Kerry, Hades, Ciecon, Arner",
+      "descricao": "Contos e origens focadas no desenvolvimento psicológico profundo dos personagens centrais.",
+      "cor": "#E2E8F0"
+    }
+  ],
+  "livros": [
+    {
+      "id": "rrh-1",
+      "serieId": "red-right-hand",
+      "titulo": "Red Right Hand (Volume I: Primeiros Passos)",
+      "autor": "Caio Henrique Oliveira Brasil",
+      "status": "EM_REVISAO",
+      "sinopse": "Muitos anos antes de se tornar um grande império, Severum não passava de poeira e solidez cinza. Arner dedicou sua fortuna e juventude para transformar essa rocha morta em um centro econômico universal. Ao recrutar o gênio científico de Deroo Da, forjar a temida Red Right Hand e reunir monstros, atiradores que desaceleram o tempo e assassinos armados com lâminas dérmicas, Arner dá início à mais implacável campanha mercantil do cosmos.",
+      "beats": [
+        {
+          "id": "rrh1-b01",
+          "capitulo": 0,
+          "titulo": "Origem de Severum e a Aliança Arner-Deroo Da",
+          "eraId": "ascensao",
+          "local": "Severum (Rocha Morta)",
+          "pov": "Arner",
+          "personagens": ["Arner", "Deroo Da"],
+          "status": "CANONE_TRAVADO",
+          "resumo": "Arner estuda o cosmos, reúne fortuna por meios escusos e encontra o planeta inóspito. Convence o arrogante cientista Deroo Da a unir ciência à sua gestão. Criação das fornalhas subterrâneas e dutovias térmicas.",
+          "notas": "Deroo aceita por curiosidade científica experimental. Arner redige as 35 Teses de Severum."
+        },
+        {
+          "id": "rrh1-b02",
+          "capitulo": 0,
+          "titulo": "Recrutamento dos Irmãos Yaa (Masin e Tsuuya)",
+          "eraId": "ascensao",
+          "local": "Planeta Sucateado",
+          "pov": "Arner",
+          "personagens": ["Arner", "Masin Yaa", "Tsuuya Yaa"],
+          "status": "CANONE_TRAVADO",
+          "resumo": "Arner encontra os gêmeos órfãos sobrevivendo na miséria. Leva-os a uma feiticeira para receberem um elo inquebrável de lâminas que brotam da pele: Masin vulnerabiliza e Tsuuya desmembra.",
+          "notas": "Masin vê Severum como o paraíso; Tsuuya desconfia desde a maldição, criando tensão constante entre os dois."
+        },
+        {
+          "id": "rrh1-b03",
+          "capitulo": 0,
+          "titulo": "Recrutamento do Delimitador",
+          "eraId": "ascensao",
+          "local": "Províncias em Ruínas",
+          "pov": "Arner",
+          "personagens": ["Arner", "Delimitador"],
+          "status": "CANONE_TRAVADO",
+          "resumo": "Arner rastreia o brutamonte que destrói províncias por puro ódio. Arner não se intimida com as ameaças e o seduz com a promessa de enriquecer e subjugar de forma estruturada.",
+          "notas": "Delimitador precisa de remédios para controle de surtos. Ganância supera o rancor."
+        },
+        {
+          "id": "rrh1-b04",
+          "capitulo": 0,
+          "titulo": "Recrutamento de Tarlin e os Fingers",
+          "eraId": "ascensao",
+          "local": "Império do Sudoeste",
+          "pov": "Arner",
+          "personagens": ["Arner", "Tarlin", "Curtin", "Mylon", "Chin", "Ellis"],
+          "status": "CANONE_TRAVADO",
+          "resumo": "Arner encontra Tarlin e seus 4 soldados no meio de um sequestro de rei. Os mercenários zombam de Arner e quebram sua perna. Arner não expressa dor nem medo, convencendo Tarlin com sua postura de aço.",
+          "notas": "Tarlin possui poder anômalo fatal de desacelerar o fluxo do tempo em batalha."
+        },
+        {
+          "id": "rrh1-b05",
+          "capitulo": 1,
+          "titulo": "A 1ª Reunião & As Corridas de Thyragons",
+          "eraId": "ascensao",
+          "local": "Torre RRH / Arena de Severum",
+          "pov": "Arner",
+          "personagens": ["Arner", "Firn", "Tarlin", "Delimitador", "Masin Yaa", "Tsuuya Yaa"],
+          "status": "CANONE_TRAVADO",
+          "resumo": "Inauguração oficial de Severum. Arner apresenta o propósito da RRH: roubar as riquezas de diamante dos Lamprois. As corridas de Thyragons movimentam fortunas enquanto o golpe é articulado.",
+          "notas": "Delimitador luta com Tay; Chin é sequestrado por Lister, mas Tarlin reage."
+        },
+        {
+          "id": "rrh1-b06",
+          "capitulo": 2,
+          "titulo": "A Diplomacia Falsa & Guerra Ethosthiana",
+          "eraId": "ascensao",
+          "local": "Espaço Cósmico / Planeta Lamproico",
+          "pov": "Deroo Da",
+          "personagens": ["Arner", "Deroo Da", "Lamproy", "Delimitador", "Tarlin"],
+          "status": "EM_REVISAO",
+          "resumo": "Arner finge diplomacia e promete salvar os Lamprois dos ataques dos Ethosthianos. Em troca, Severum entra na Liga das Riquezas do Leste (LRPL). A RRH massacra os Ethosthianos.",
+          "notas": "Ciecon é avistado nas proximidades de Severum e Arner pede uma reunião privada."
+        },
+        {
+          "id": "rrh1-b07",
+          "capitulo": 3,
+          "titulo": "A Revelação: O Homem de Diamante e a Ruptura de Deroo Da",
+          "eraId": "ascensao",
+          "local": "Calabouço dos Lamprois",
+          "pov": "Deroo Da",
+          "personagens": ["Deroo Da", "Masin Yaa", "Tsuuya Yaa", "Lamproy"],
+          "status": "EM_REVISAO",
+          "resumo": "Os irmãos Yaa chegam ao cofre e encontram apenas uma cela com um homem. Deroo analisa seu sangue e descobre moléculas de diamante puro. Deroo confronta Lamproy, sequestra o espécime e anuncia sua saída da RRH.",
+          "notas": "Ponto de virada dramático: Severum perde seu pilar científico e o mercado de diamantes quebra."
+        },
+        {
+          "id": "rrh1-b08",
+          "capitulo": 4,
+          "titulo": "Férias Interrompidas e a Invasão a Iutania",
+          "eraId": "ascensao",
+          "local": "Torre RRH / Planeta Iutania",
+          "pov": "Arner",
+          "personagens": ["Arner", "Delimitador", "Tarlin"],
+          "status": "RASCUNHO",
+          "resumo": "Arner convoca a 5ª Reunião de emergência após a sabotagem no preço dos diamantes. Divide a RRH em duas forças: uma ataca naves comerciais e a outra, sob o comando brutal de Delimitador, invade Iutania para escravizar os Aedificantes.",
+          "notas": "Aqui a trama se conecta com a origem de Punho Mortal (Naok)."
+        }
+      ]
+    },
+    {
+      "id": "punho-mortal-1",
+      "serieId": "punho-mortal",
+      "titulo": "Naok: Punho Mortal (Origens em Iutania)",
+      "autor": "Caio Henrique Oliveira Brasil",
+      "status": "EM_ESCRITA",
+      "sinopse": "No pacífico e verdejante planeta Iutania, a espécie dos Aedificantes superou seu passado selvagem graças à protocooperação telepática com os Mures. Juntos construíram dutovias agrícolas, cidades harmoniosas e ciência renovável — até o dia em que o Delimitador e a Red Right Hand desceram dos céus para transformar seu paraíso em uma linha de produção escravocrata.",
+      "beats": [
+        {
+          "id": "pm-b01",
+          "capitulo": 1,
+          "titulo": "A Aliança dos Aedificantes e Mures",
+          "eraId": "ascensao",
+          "local": "Planeta Iutania",
+          "pov": "Naok",
+          "personagens": ["Naok"],
+          "status": "CANONE_TRAVADO",
+          "resumo": "A história da evolução mútua: o vigor físico inesgotável dos Aedificantes unido ao intelecto e telepatia dos pequenos Mures. Criação da megaplantação subterrânea e sociedade.",
+          "notas": "Simbiose perfeita: energia física em troca de racionalidade e ciência."
+        },
+        {
+          "id": "pm-b02",
+          "capitulo": 2,
+          "titulo": "A Queda de Iutania sob o Delimitador",
+          "eraId": "ascensao",
+          "local": "Cidades Agrícolas de Iutania",
+          "pov": "Naok",
+          "personagens": ["Naok", "Delimitador"],
+          "status": "EM_REVISAO",
+          "resumo": "As naves de guerra de Severum chegam. Delimitador massacra as defesas, captura os sobreviventes e força os Aedificantes a trabalho escravo, desmantelando o pacto dos Mures.",
+          "notas": "Nascimento da vingança de Naok e o despertar do Punho Mortal."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "id": "rrh-1",
+  "titulo": "Red Right Hand",
+  "subtitulo": "Ato I: Primeiros Passos",
+  "autor": "Caio Henrique Oliveira Brasil",
+  "genero": "Ficção Científica Espacial / Space Opera",
+  "idioma": "pt-BR",
+  "status": "EM_REVISAO",
+  "isbn": "",
+  "asin": "",
+  "editora": "UVC Publicações",
+  "sinopse": "Muitos anos antes de se tornar um grande planeta, Severum era nada: apenas poeira, solidez e frio mortal. Então aparece Arner, um estrategista que dedicou sua vida e uma fortuna reunida por meios obscuros para mudar a ordem do cosmos. Ao convencer o arrogante gênio científico Deroo Da a instalar fornalhas térmicas subterrâneas e dutovias no planeta, Arner proclama as 35 Teses de Severum. Para defender essa província em um cosmos repleto de superpoderosos, ele funda a Red Right Hand — uma corporação armada formada por assassinos com lâminas dérmicas, atiradores que desaceleram o tempo e brutamontes guiados por ódio e ganância.",
+  "frontMatter": {
+    "dedicatoria": "Dedicado a todos que constroem impérios a partir da poeira.",
+    "epigrafe": "“Somos mais que uma equipe, muito mais que um governo. Somos uma potência, somos a autoridade, a ordem.” — Arner, 35 Teses de Severum.",
+    "fichaCatalografica": "Brasil, Caio Henrique Oliveira.\nRed Right Hand: Ato I: Primeiros Passos / Caio Henrique Oliveira Brasil. — 1. ed. — Severum: UVC, 2026.\n1. Ficção científica brasileira 2. Ficção espacial 3. Super-heróis I. Título."
+  },
+  "capitulos": [
+    {
+      "numero": 0,
+      "titulo": "A Reunião",
+      "arquivo": "capitulos/00-a-reuniao.md",
+      "status": "CANONE_TRAVADO",
+      "palavrasAprox": 1800
+    },
+    {
+      "numero": 1,
+      "titulo": "Fundação e Recrutamento",
+      "arquivo": "capitulos/01-recrutamento-e-fundacao.md",
+      "status": "CANONE_TRAVADO",
+      "palavrasAprox": 2400
+    },
+    {
+      "numero": 2,
+      "titulo": "As Corridas de Thyragons",
+      "arquivo": "capitulos/02-corridas-de-thyragons.md",
+      "status": "EM_REVISAO",
+      "palavrasAprox": 2100
+    },
+    {
+      "numero": 3,
+      "titulo": "A Diplomacia Falsa",
+      "arquivo": "capitulos/03-diplomacia-falsa.md",
+      "status": "EM_REVISAO",
+      "palavrasAprox": 2600
+    },
+    {
+      "numero": 4,
+      "titulo": "O Homem de Sangue de Diamante",
+      "arquivo": "capitulos/04-o-homem-de-diamante.md",
+      "status": "EM_REVISAO",
+      "palavrasAprox": 2300
+    },
+    {
+      "numero": 5,
+      "titulo": "Férias Interrompidas & Invasão a Iutania",
+      "arquivo": "capitulos/05-ferias-interrompidas-iutania.md",
+      "status": "RASCUNHO",
+      "palavrasAprox": 2900
+    }
+  ]
+}

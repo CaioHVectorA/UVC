@@ -152,13 +152,17 @@
     "equipe": "Red Right Hand",
     "alinhamento": "Líder Estrategista / Autoritário",
     "escala": "UNIVERSAL",
-    "desc": "Fundador de Severum e Comandante-Geral da Red Right Hand (RRH). Homem de passado enigmático, frio, calculista e dotado de uma visão imperial expansionista para erguer Severum como o maior polo comercial e militar do universo.",
+    "statusVisibilidade": "PUBLICO",
+    "livroIds": ["rrh-1"],
+    "desc": "Fundador de Severum e Comandante-Geral da Red Right Hand (RRH). Autor das 35 Teses de Severum. Homem de inteligência pragmática que transformou um asteroide cinza e morto em um polo comercial hegemônico através de fornalhas térmicas subterrâneas e alianças de alto risco.",
     "poderes": [
-      "Mestre supremo em estratégia bélica e geopolítica intergaláctica",
-      "Intuição tática praticamente profética",
-      "Acesso a tecnologias e armamentos de ponta"
+      "Mestre supremo em estratégia bélica, manipulação e geopolítica intergaláctica",
+      "Resiliência e autocontrole psicológico desumano (suportou espancamento e fratura sem ceder)",
+      "Redação e aplicação das 35 Teses de Severum",
+      "Monopólio econômico e militar da Red Right Hand"
     ],
     "aparicoes": [
+      "Red Right Hand (Volume I)",
       "Red Right Hand (Série)"
     ],
     "img": "RRH.png"
@@ -166,16 +170,19 @@
   {
     "id": "deroo-da",
     "nome": "Deroo Da",
-    "equipe": "Red Right Hand",
+    "equipe": "Red Right Hand / Independente",
     "alinhamento": "Cientista Neutro",
     "escala": "UNIVERSAL",
-    "desc": "Gênio científico da Red Right Hand. Mestre em cibernética, mecatrônica espacial e sistemas autônomos. Guarda segredos e planos tecnológicos que nem mesmo Arner é capaz de antecipar.",
+    "statusVisibilidade": "PUBLICO",
+    "livroIds": ["rrh-1"],
+    "desc": "O cientista mais brilhante e arrogante do cosmos. Aceitou o convite de Arner por curiosidade experimental, criando as fornalhas subterrâneas e dutovias térmicas de Severum. Descobre o segredo do sangue de diamante no calabouço dos Lamprois e rompe com a RRH, desestabilizando o império.",
     "poderes": [
-      "Intelecto de nível superior em engenharia cibernética e veículos de dobra",
-      "Criação de armaduras, drones e implantes bio-mecânicos",
-      "Vasto domínio em ciências humanas e computação"
+      "Intelecto de nível superior em termodinâmica planetária, engenharia e dobras estelares",
+      "Análise molecular e biotecnologia avançada",
+      "Criação de armaduras, drones e implantes bio-mecânicos"
     ],
     "aparicoes": [
+      "Red Right Hand (Volume I)",
       "Red Right Hand (Série)",
       "Deroo Da no Espaço (Série)",
       "Congregadores"
@@ -290,13 +297,17 @@
     "equipe": "Red Right Hand",
     "alinhamento": "Guerreiros de Choque",
     "escala": "UNIVERSAL",
-    "desc": "Dupla de jovens combatentes com passado trágico. Portam a misteriosa Maldição Enokití, que lhes permite materializar lâminas afiadíssimas diretamente de sua bioenergia.",
+    "statusVisibilidade": "PUBLICO",
+    "livroIds": ["rrh-1"],
+    "desc": "Gêmeos bivitelinos resgatados por Arner de um planeta arruinado após perderem o pai. Submetidos a uma maldição rogada por uma feiticeira que os uniu por um elo inquebrável: materializam lâminas letais diretamente de sua pele. Masin considera Severum um paraíso; Tsuuya desconfia de Arner desde o ritual, alimentando uma crescente dicotomia entre os dois.",
     "poderes": [
-      "Maldição Enokití (conjuração instantânea de lâminas de energia)",
-      "Velocidade e acrobacia sobre-humanas",
-      "Sincronia perfeita de combate em dupla"
+      "Elo Inquebrável das Lâminas Dérmicas",
+      "Masin: Lâmina preparatória que vulnerabiliza, atordoa e retarda a vítima",
+      "Tsuuya: Lâmina de corte definitivo que retalha o alvo vulnerabilizado gerando desmembramento ou morte imediata",
+      "Sincronia tática de combate em dupla"
     ],
     "aparicoes": [
+      "Red Right Hand (Volume I)",
       "Red Right Hand (Série)"
     ],
     "img": "RRH.png"
