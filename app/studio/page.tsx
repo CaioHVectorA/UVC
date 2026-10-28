@@ -1,12 +1,15 @@
-import { getChapters } from "@/lib/chapters";
 import { renderChapters } from "@/lib/render-chapters";
 import { Reader } from "@/components/reader";
 import { PageIntro } from "@/components/ui";
+import { getStudioContent } from "@/lib/studio-content";
+import { StudioSessionControl } from "@/components/studio-session-controls";
+import { StudioNavigation } from "@/components/studio-navigation";
 export const metadata = { title: "Studio do autor" };
 export default async function StudioPage() {
-  const chapters = await getChapters();
+  const { chapters, characters } = await getStudioContent();
   return (
     <>
+      <StudioNavigation />
       <PageIntro
         label="Do lado de cá das histórias"
         title="Um espaço para olhar de novo."
@@ -14,12 +17,21 @@ export default async function StudioPage() {
         Leia os capítulos de Red Right Hand e consulte o cânone ao lado do
         texto. Um lugar para revisão, com espaço para a história respirar.
       </PageIntro>
+      <div className="studio-session-bar">
+        <p>Sessão do autor · Consulta e revisão</p>
+        <StudioSessionControl action="signout" />
+      </div>
       <p className="notice">
-        Este espaço de revisão é público. O conteúdo é versionado no Git; esta
-        página não salva alterações nem armazena manuscritos privados.
+        As alterações são feitas nos arquivos do projeto. Esta tela é de
+        consulta e não salva edições. Os capítulos compartilhados no portal
+        seguem a seleção de publicação.
       </p>
       {chapters.length ? (
-        <Reader chapters={renderChapters(chapters)} studio />
+        <Reader
+          chapters={renderChapters(chapters)}
+          referenceCharacters={characters}
+          studio
+        />
       ) : (
         <div className="empty-state">
           <h2>Nenhum capítulo compartilhado para revisão.</h2>

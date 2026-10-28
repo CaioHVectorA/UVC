@@ -1,5 +1,4 @@
-import { series } from "@/lib/content";
-import media from "@/data/media.json";
+import { series, publication } from "@/lib/content";
 
 const editions: Record<string, { slug: string; art: string; color: string }> = {
   guardioes: { slug: "guardioes", art: "guardioes", color: "#f3bd62" },
@@ -55,8 +54,13 @@ export const characterArt: Record<string, string> = {
   inera: "guardioes-logo",
   alero: "guardioes-logo",
 };
-export const mediaUrl = (name: string) => {
-  if (!media.some((item) => item.id === name))
-    throw new Error(`Imagem não registrada: ${name}`);
-  return `/media/${name}.webp`;
-};
+export { mediaUrl } from "./media";
+
+export const publishedEditions = publication.catalog.map((edition) => {
+  const story = stories.find((entry) => entry.id === edition.seriesId);
+  if (!story) throw new Error(`Edição sem história canônica: ${edition.id}`);
+  return { ...edition, story };
+});
+export const publishedStories = stories.filter((story) =>
+  publishedEditions.some((edition) => edition.seriesId === story.id),
+);

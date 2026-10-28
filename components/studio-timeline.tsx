@@ -1,9 +1,7 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowUpRight, Copy } from "lucide-react";
-import { timeline } from "@/lib/content";
-import { stories } from "@/lib/catalog";
+import { Copy } from "lucide-react";
+import type { Timeline } from "@/lib/schemas";
 import { PageIntro } from "@/components/ui";
 import { SegmentedControl } from "@/components/segmented-control";
 import { StatusBadge } from "@/components/status-badge";
@@ -13,7 +11,7 @@ const options = [
   { value: "series", label: "Séries paralelas" },
 ] as const;
 type View = (typeof options)[number]["value"];
-export default function TimelinePage() {
+export function StudioTimeline({ timeline }: { timeline: Timeline }) {
   const [view, setView] = useState<View>("eras");
   const [status, setStatus] = useState("TODOS");
   const [pov, setPov] = useState("TODOS");
@@ -38,12 +36,8 @@ export default function TimelinePage() {
   }
   return (
     <div className="chronology-page">
-      <PageIntro
-        label="Tudo se conecta"
-        title="Entre o primeiro passo e o infinito."
-      >
-        Explore as eras que atravessam o universo e as histórias que acontecem
-        pelo caminho. A cronologia completa contém spoilers.
+      <PageIntro label="Oficina" title="Cronologia">
+        Eras, cenas e séries do universo.
       </PageIntro>
       <SegmentedControl
         label="Visão da cronologia"
@@ -170,7 +164,6 @@ export default function TimelinePage() {
       {view === "series" && (
         <div className="faction-grid chronology-series">
           {timeline.seriesParalelas.map((series) => {
-            const story = stories.find((s) => s.id === series.id);
             return (
               <article className="faction-card" key={series.id}>
                 <p className="eyebrow">
@@ -179,12 +172,6 @@ export default function TimelinePage() {
                 <h2>{series.titulo}</h2>
                 <p>{series.descricao}</p>
                 <p>Protagonista: {series.protagonista}</p>
-                {story && (
-                  <Link href={`/historias/${story.slug}`} className="text-link">
-                    Conhecer a história
-                    <ArrowUpRight size={16} aria-hidden />
-                  </Link>
-                )}
               </article>
             );
           })}

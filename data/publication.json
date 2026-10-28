@@ -1,7 +1,19 @@
 {
   "mode": "git-static",
-  "publicReview": true,
+  "studioAccess": "author-only",
   "books": {
-    "rrh-1": { "chapters": [0, 1, 2, 3, 4, 5] }
-  }
+    "rrh-1": {
+      "chapters": []
+    }
+  },
+  "catalog": [
+    {
+      "id": "rrh-ascensao",
+      "seriesId": "red-right-hand",
+      "titulo": "Red Right Hand",
+      "subtitulo": "Ascensão",
+      "formato": "Kindle",
+      "amazonUrl": "https://www.amazon.com/Red-Right-Hand-Ascens%C3%A3o-Portuguese-ebook/dp/B0CLKRNS29"
+    }
+  ]
 }

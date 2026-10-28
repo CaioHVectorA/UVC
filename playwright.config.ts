@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { studioTestEnv } from "./tests/studio-fixture";
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: false,
@@ -18,10 +19,25 @@ export default defineConfig({
         }
       : {}),
   },
-  webServer: {
-    command: "npm run start -- --hostname 127.0.0.1 --port 3100",
-    url: "http://127.0.0.1:3100",
-    reuseExistingServer: !process.env.CI,
-    timeout: 60000,
-  },
+  webServer: [
+    {
+      command: "npm run start -- --hostname 127.0.0.1 --port 3100",
+      url: "http://127.0.0.1:3100",
+      env: {
+        NEXTAUTH_SECRET: "",
+        UVC_STUDIO_GITHUB_CLIENT_ID: "",
+        UVC_STUDIO_GITHUB_CLIENT_SECRET: "",
+        UVC_STUDIO_GITHUB_ID: "",
+      },
+      reuseExistingServer: false,
+      timeout: 60000,
+    },
+    {
+      command: "npm run start -- --hostname 127.0.0.1 --port 3101",
+      url: "http://127.0.0.1:3101/studio/entrar",
+      env: studioTestEnv,
+      reuseExistingServer: false,
+      timeout: 60000,
+    },
+  ],
 });

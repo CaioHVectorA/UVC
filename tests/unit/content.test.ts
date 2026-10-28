@@ -100,7 +100,18 @@ test("sitemap só usa origem configurada e destinos de leitura explícitos", asy
     assert.deepEqual(sitemap(), []);
     process.env.UVC_SITE_URL = "https://uvc.example";
     const urls = sitemap().map((item) => item.url);
-    assert.ok(urls.includes("https://uvc.example/ler/0"));
+    assert.equal(
+      urls.some((url) => url.includes("/ler/")),
+      false,
+    );
+    assert.equal(
+      urls.some((url) => url.includes("/timeline")),
+      false,
+    );
+    assert.equal(
+      urls.some((url) => url.includes("/historias/congregadores")),
+      false,
+    );
     assert.ok(urls.includes("https://uvc.example/historias/red-right-hand"));
     assert.equal(
       urls.some((url) => url.includes("studio")),
@@ -123,6 +134,36 @@ test("snapshot público bloqueia material explicitamente reservado", async () =>
     publishedCharactersSchema.safeParse([
       { ...characters[0], statusVisibilidade: "RESERVADO" },
     ]).success,
+    false,
+  );
+});
+
+test("a vitrine exige edição publicada explícita e rejeita lojas/IDs inválidos", async () => {
+  const { publishedStories, publishedEditions } =
+    await import("../../lib/catalog");
+  assert.deepEqual(
+    publishedStories.map((story) => story.id),
+    ["red-right-hand"],
+  );
+  assert.equal(publishedEditions[0].amazonUrl.endsWith("/dp/B0CLKRNS29"), true);
+  assert.deepEqual(publication.books["rrh-1"].chapters, []);
+  assert.equal(
+    publicationSchema.safeParse({
+      ...publication,
+      catalog: [...publication.catalog, publication.catalog[0]],
+    }).success,
+    false,
+  );
+  assert.equal(
+    publicationSchema.safeParse({
+      ...publication,
+      catalog: [
+        {
+          ...publication.catalog[0],
+          amazonUrl: "https://www.amazon.com.evil.example/dp/B0CLKRNS29",
+        },
+      ],
+    }).success,
     false,
   );
 });

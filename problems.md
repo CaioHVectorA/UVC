@@ -1,10 +1,10 @@
 # Correções técnicas e pendências do UVC
 
-Atualizado em 26/10/2026. Diagnóstico original: `03a85bb`; redesenho: `a1e7c78`. Esta revisão implementa as correções de sistema descritas abaixo. O documento distingue problemas corrigidos de decisões editoriais e serviços ainda inexistentes. Resultados locais não comprovam o estado do deploy remoto.
+Atualizado em 28/10/2026. Diagnóstico original: `03a85bb`; redesenho: `a1e7c78`. Esta revisão implementa as correções de sistema descritas abaixo. O documento distingue problemas corrigidos de decisões editoriais e serviços ainda inexistentes. Resultados locais não comprovam o estado do deploy remoto.
 
 ## Decisão de arquitetura
 
-O produto publicado usa **Git → validação → build → deploy**. O Studio é um espaço **público de leitura/revisão**, não um editor persistente. Nenhum endpoint aceita alterações de manuscritos ou cronologia. A desativação removeu uma capacidade insegura que não era usada pelo Studio; não há login, banco ou cache de manuscritos fingidos.
+O produto publicado usa **Git → validação → build → deploy**. O Studio é um espaço **privado de leitura/revisão**, protegido por autenticação GitHub e autorização do ID do autor; não é um editor persistente. Nenhum endpoint aceita alterações de manuscritos ou cronologia. A desativação removeu uma capacidade insegura que não era usada pelo Studio; há login do autor, sem banco ou cache de manuscritos fingidos.
 
 Conteúdo e histórico persistem no Git. Uma alteração só chega ao site depois de novo build/deploy. Um futuro editor remoto exigirá outro fluxo de autenticação, armazenamento e concorrência, descrito no [fluxo editorial](docs/architecture/editorial-workflow.md).
 
@@ -18,7 +18,7 @@ Conteúdo e histórico persistem no Git. Uma alteração só chega ao site depoi
 | UVC-004 | Corrigido | Schemas, referências e consulta exata de capítulos validados |
 | UVC-005 | Corrigido na aplicação; operação contínua | Sem CORS universal, sem parsing/escrita de payload; limites de tráfego dependem da hospedagem |
 | UVC-006 | Corrigido na revisão | Next 15.5.28, transitivas corrigidas e auditoria sem avisos conhecidos |
-| UVC-007 | Corrigido no contrato público | Política explícita de leitura, spoilers e Studio público; não oferece sigilo |
+| UVC-007 | Corrigido no contrato público | Leitor público separado de Studio autenticado; Git público continua sem sigilo |
 | UVC-008 | Corrigido | Páginas e APIs usam o snapshot do mesmo commit/build |
 | UVC-009 | Contrato corrigido; revisão editorial pendente | IDs estáveis, schemas e normalização; 18 personagens continuam sem classificação editorial explícita |
 | UVC-010 | Manifesto implementado; créditos pendentes | Fonte/dimensões/finalidade registradas; aprovação de direitos permanece humana |
@@ -62,9 +62,9 @@ As APIs GET são públicas deliberadamente. CORS/robots não são autenticação
 
 **Implementado:** `data/publication.json` declara `git-static`, revisão pública e os seis capítulos já compartilhados. A mesma lista governa as páginas geradas, leitor, Studio, links de capítulos, sitemap e API. Se todos forem removidos da lista, o Studio apresenta estado vazio; o catálogo não oferece leitura inexistente.
 
-O Studio informa que é público e não salva alterações. O acervo completo do Codex avisa sobre spoilers. Ausência de `statusVisibilidade` é normalizada como `NAO_CLASSIFICADO`, sem alegar publicação/privacidade. A classificação pública existente não foi expandida por suposição. O build bloqueia registros explicitamente marcados como `RESERVADO`, em vez de enviá-los silenciosamente no snapshot público; essa barreira não remove informação já colocada no Git público.
+O Studio agora exige login GitHub do autor antes de carregar conteúdo e informa que não salva alterações. O acervo completo do Codex avisa sobre spoilers. Ausência de `statusVisibilidade` é normalizada como `NAO_CLASSIFICADO`, sem alegar publicação/privacidade. A classificação pública existente não foi expandida por suposição. O build bloqueia registros explicitamente marcados como `RESERVADO`, em vez de enviá-los silenciosamente no snapshot público; essa barreira não remove informação já colocada no Git público.
 
-**Limite editorial:** este repositório e seu histórico são públicos. Tirar um capítulo da UI não o apaga do Git. Não há área privada e não devem ser enviados manuscritos confidenciais a ela. Migrar material realmente reservado para fonte privada e arquitetura autenticada exige decisão do autor; não é possível obter sigilo retroativo com um filtro cliente.
+**Limite editorial:** este repositório e seu histórico são públicos. Tirar um capítulo da UI não o apaga do Git. A autenticação do Studio não transforma o Git público em armazenamento privado. Não devem ser enviados manuscritos confidenciais ao repositório. Migrar material realmente reservado para fonte privada e arquitetura autenticada exige decisão do autor; não é possível obter sigilo retroativo com um filtro cliente.
 
 ## UVC-008 e UVC-009 — Fonte de verdade e contratos
 
@@ -89,7 +89,7 @@ Foram adicionados **apenas IDs estáveis** às oito histórias, sem mudar títul
 
 ## UVC-011 — Qualidade reprodutível
 
-**Implementado:** ESLint flat config (Next/TypeScript), sem assistente interativo, e Prettier como verificação explícita. Foram adicionados **9 testes unitários** e **17 testes de integração/navegador** cobrindo contratos, integridade de arquivos, APIs, filtros, navegação, clipboard com falha, leitor, rotas, cabeçalhos, SEO e acessibilidade.
+**Implementado:** ESLint flat config (Next/TypeScript), sem assistente interativo, e Prettier como verificação explícita. Foram adicionados **14 testes unitários** e **28 testes de integração/navegador** cobrindo contratos, integridade de arquivos, APIs, filtros, navegação, clipboard com falha, leitor, rotas, cabeçalhos, SEO e acessibilidade.
 
 Workflow `.github/workflows/ci.yml`: instalação pelo lockfile, validação, formatação, lint, tipos, unitários, auditoria, build e navegador. Usa Node 22, permissão de repositório somente leitura, timeout e artefatos de falha. Não exige segredos nem manda conteúdo para ferramentas externas.
 
@@ -117,7 +117,7 @@ A cronologia é uma lista explorável, não um canvas ou grafo arrastável. Essa
 
 A falha de comunicação foi corrigida: documentação diferencia o que existe de planejamento. Não há botão de salvar, exportação/ISBN/ASIN inventado, serviço de Lore Guard “ativo” ou compra sem destino.
 
-**Evoluções futuras:** editor remoto privado, EPUB/PDF validado, auditoria de IA e integração KDP exigem implementação e decisões editoriais próprias. O [fluxo editorial](docs/architecture/editorial-workflow.md) explica pré-condições. Não foram construídos um banco, login ou serviço de publicação fictícios apenas para marcar essa linha como concluída.
+**Evoluções futuras:** edição remota persistente, EPUB/PDF validado, auditoria de IA e integração KDP exigem implementação e decisões editoriais próprias. O [fluxo editorial](docs/architecture/editorial-workflow.md) explica pré-condições. Não foram construídos um banco, login ou serviço de publicação fictícios apenas para marcar essa linha como concluída.
 
 ## UVC-015 — Documentação e descoberta
 
@@ -125,7 +125,7 @@ A falha de comunicação foi corrigida: documentação diferencia o que existe d
 
 **Configuração restante:** definir **`UVC_SITE_URL` com o domínio HTTPS real antes do build**. Sem isso o site funciona, mas não inventa domínio e não publica URLs no sitemap; a decisão não usa automaticamente o endereço antigo de referência. A origem é validada, rejeitando caminho, credenciais, parâmetros e protocolos inadequados. Testes cobrem sitemap com e sem origem.
 
-`robots.txt` pede para não indexar Studio/API, mas não bloqueia acesso público. Não declara datas de atualização ou publicações que não foram verificadas.
+`robots.txt` e `noindex` evitam descoberta do Studio; a autorização do servidor é a barreira de acesso. As APIs de capítulos/cronologia continuam públicas e somente leitura. Não declara datas de atualização ou publicações que não foram verificadas.
 
 ## Verificação desta revisão
 
@@ -149,5 +149,26 @@ Conteúdo: 21 personagens, 5 facções, 8 histórias, 6 capítulos e 20 imagens.
 1. Configurar domínio real no deploy e confirmar build/CI remoto.
 2. Revisar classificações de personagens e créditos/licenças das imagens com o autor.
 3. Medir tráfego/acessibilidade real e configurar limites/alertas de hospedagem.
-4. Se for desejado um editor privado, escolher identidade e armazenamento, implementar autorização/conflitos/backup e só então introduzir escrita HTTP.
+4. Se for desejado um editor privado, configurar identidade do autor e armazenamento privado, implementar autorização de escrita/conflitos/backup e só então introduzir escrita HTTP.
 5. Quando a obra estiver pronta editorialmente, implementar/validar o pipeline EPUB/KDP com metadados reais.
+
+
+## Separação Studio / portal — 28/10/2026
+
+Layouts independentes via grupo `(public)` e `/studio`. O workspace permanece fechado sem OAuth completo. A autorização usa ID numérico imutável do GitHub, sessão criptografada de até 8 horas e nova checagem da conta permitida a cada acesso aos dados. Cookies/CSRF/state/PKCE são gerenciados pelo NextAuth. O leitor público não recebe o dataset do inspetor por meio do componente Reader.
+
+Veja [configuração, limites e validação de acesso](docs/architecture/studio-access.md). A autenticação real com GitHub exige configurar a OAuth App e validar o retorno no domínio de produção; tokens assinados de teste verificam o controle de acesso local sem simular um login real no provedor.
+
+
+## Oficina de personagens
+
+Painel privado em `/studio/personagens`, com biblioteca, ficha em três seções, prévia e referência canônica somente leitura. Criação nesta entrega usa rascunhos na sessão e arquivos JSON de trabalho, sem gravação no servidor ou publicação automática. Importação estrita e controle de saída protegem o trabalho no fluxo suportado. Persistência privada durável e exportação de livros continuam pendentes. Ver [oficina e direção de exportação Kindle](docs/architecture/studio-character-workshop.md).
+
+
+## Vitrine mínima e acesso privado — revisão de 28/10/2026
+
+Esta revisão substitui os estados públicos descritos nas entradas históricas acima. A vitrine apresenta somente a edição publicada Red Right Hand: Ascensão e seu link Amazon. As artes e estudos permanecem na galeria, separados dos livros; não foram adotados como capa oficial. Obras futuras deixam de ter página pública de catálogo.
+
+A lista de capítulos públicos está vazia. A cronologia exige sessão do autor na página e API. O Codex público recebe apenas campos resumidos dos personagens classificados como públicos, sem opção de abrir o acervo inteiro. O Studio continua com consulta de todos os capítulos de trabalho e oficina privada. Isso não remove arquivos ou histórico de um repositório público.
+
+A ativação real do login depende de cadastrar a OAuth App e as variáveis na Vercel, publicar novamente e conferir o callback. Sem configuração válida, o Studio permanece fechado. Consulte o [passo a passo](docs/architecture/studio-access.md).

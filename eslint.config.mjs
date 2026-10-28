@@ -8,6 +8,7 @@ const config = [
   {
     ignores: [
       ".next/**",
+      ".vercel/**",
       "node_modules/**",
       "legacy/**",
       "public/**",

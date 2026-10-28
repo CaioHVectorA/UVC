@@ -1,7 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { mediaUrl, stories } from "@/lib/catalog";
 
 export function SectionHeading({
   eyebrow,
@@ -27,33 +25,6 @@ export function SectionHeading({
         </Link>
       )}
     </div>
-  );
-}
-export function StoryCard({ story }: { story: (typeof stories)[number] }) {
-  return (
-    <Link
-      href={`/historias/${story.slug}`}
-      className="story-card"
-      style={{ "--story-accent": story.color } as React.CSSProperties}
-    >
-      <div className="story-art">
-        <Image
-          src={mediaUrl(story.art)}
-          alt={`Capa ou símbolo de ${story.titulo}`}
-          width={500}
-          height={680}
-          sizes="(max-width: 760px) 45vw, (max-width: 1280px) 23vw, 300px"
-        />
-        <span className="story-arrow">
-          <ArrowUpRight size={20} aria-hidden />
-        </span>
-      </div>
-      <div className="story-meta">
-        <span>{story.tipo === "SÉRIE" ? "Série" : "Solo"}</span>
-        <span>{story.local === "TERRA" ? "Glen / Terra" : "Universo"}</span>
-      </div>
-      <h3>{story.titulo}</h3>
-    </Link>
   );
 }
 export function PageIntro({

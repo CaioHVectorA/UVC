@@ -16,7 +16,8 @@ export const timeline = timelineJson as Timeline;
 export const book = bookJson as CanonicalBook;
 export { publication };
 export function isPublicChapter(numero: number) {
-  return publication.books["rrh-1"].chapters.includes(numero);
+  const allowed: readonly number[] = publication.books["rrh-1"].chapters;
+  return allowed.includes(numero);
 }
 
 export const publicChapters = book.capitulos.filter((c) =>

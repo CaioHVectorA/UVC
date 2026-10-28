@@ -3,21 +3,45 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Copy, Check } from "lucide-react";
 import type { RenderedChapter } from "@/lib/render-chapters";
-import { characters } from "@/lib/content";
+import type { Character } from "@/lib/schemas";
 
 export function Reader({
   chapters,
   initialChapter = 0,
   studio = false,
+  referenceCharacters = [],
 }: {
   chapters: RenderedChapter[];
   initialChapter?: number;
   studio?: boolean;
+  referenceCharacters?: Character[];
 }) {
   const contentsRef = useRef<HTMLDetailsElement>(null);
+  const preferencesRef = useRef<HTMLDetailsElement>(null);
+  const paperRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (contentsRef.current && window.matchMedia("(max-width: 760px)").matches)
       contentsRef.current.open = false;
+    if (
+      preferencesRef.current &&
+      window.matchMedia("(max-width: 760px)").matches
+    )
+      preferencesRef.current.open = false;
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem("uvc-reading-preferences") ?? "null",
+      );
+      if (
+        saved &&
+        Number.isInteger(saved.size) &&
+        saved.size >= 16 &&
+        saved.size <= 24
+      )
+        setSize(saved.size);
+      if (typeof saved?.night === "boolean") setNight(saved.night);
+    } catch {
+      /* Storage may be unavailable; reading remains functional. */
+    }
   }, []);
   const [selected, setSelected] = useState(initialChapter);
   const [size, setSize] = useState(18);
@@ -29,8 +53,30 @@ export function Reader({
     (c) => c.numero === (studio ? selected : initialChapter),
   );
   const chapter = chapters[index] || chapters[0];
-  const character = characters.find((c) => c.id === characterId);
+  const character = referenceCharacters.find((c) => c.id === characterId);
   const totalWords = chapters.reduce((sum, c) => sum + c.words, 0);
+  function savePreferences(nextSize: number, nextNight: boolean) {
+    setSize(nextSize);
+    setNight(nextNight);
+    try {
+      localStorage.setItem(
+        "uvc-reading-preferences",
+        JSON.stringify({ size: nextSize, night: nextNight }),
+      );
+    } catch {
+      /* Preferences are optional. */
+    }
+  }
+  function selectChapter(numero: number) {
+    setSelected(numero);
+    setFeedback("");
+    if (window.matchMedia("(max-width: 760px)").matches && contentsRef.current)
+      contentsRef.current.open = false;
+    requestAnimationFrame(() => {
+      paperRef.current?.focus({ preventScroll: true });
+      paperRef.current?.scrollIntoView({ block: "start", behavior: "instant" });
+    });
+  }
   async function copyPrompt() {
     if (copying) return;
     setCopying(true);
@@ -53,18 +99,15 @@ export function Reader({
         <details ref={contentsRef} open>
           <summary>Sumário de capítulos</summary>
           <nav aria-label="Capítulos de Red Right Hand" className="chapter-nav">
-            {chapters.map((c, i) =>
+            {chapters.map((c) =>
               studio ? (
                 <button
                   key={c.numero}
                   className="chapter-choice"
                   aria-pressed={chapter.numero === c.numero}
-                  onClick={() => {
-                    setSelected(c.numero);
-                    setFeedback("");
-                  }}
+                  onClick={() => selectChapter(c.numero)}
                 >
-                  {String(i + 1).padStart(2, "0")} · {c.titulo}
+                  Cap. {String(c.numero).padStart(2, "0")} · {c.titulo}
                 </button>
               ) : (
                 <Link
@@ -74,29 +117,32 @@ export function Reader({
                     chapter.numero === c.numero ? "page" : undefined
                   }
                 >
-                  {String(i + 1).padStart(2, "0")} · {c.titulo}
+                  Cap. {String(c.numero).padStart(2, "0")} · {c.titulo}
                 </Link>
               ),
             )}
           </nav>
         </details>
-        <label className="reader-control">
-          Tamanho do texto: {size}px
-          <input
-            type="range"
-            min="16"
-            max="24"
-            value={size}
-            onChange={(e) => setSize(Number(e.target.value))}
-          />
-        </label>
-        <button
-          className="button button-secondary mt-5 w-full"
-          aria-pressed={night}
-          onClick={() => setNight(!night)}
-        >
-          {night ? "Usar papel claro" : "Usar leitura noturna"}
-        </button>
+        <details ref={preferencesRef} open className="reader-preferences">
+          <summary>Ajustes de leitura</summary>
+          <label className="reader-control">
+            Tamanho do texto: {size}px
+            <input
+              type="range"
+              min="16"
+              max="24"
+              value={size}
+              onChange={(e) => savePreferences(Number(e.target.value), night)}
+            />
+          </label>
+          <button
+            className="button button-secondary mt-5 w-full"
+            aria-pressed={night}
+            onClick={() => savePreferences(size, !night)}
+          >
+            {night ? "Usar papel claro" : "Usar leitura noturna"}
+          </button>
+        </details>
         {studio && (
           <p className="text-xs text-[var(--muted)] mt-5 leading-relaxed">
             {totalWords.toLocaleString("pt-BR")} palavras nos arquivos atuais.
@@ -120,6 +166,9 @@ export function Reader({
           </span>
         </div>
         <article
+          ref={paperRef}
+          tabIndex={-1}
+          aria-label={`Capítulo ${chapter.numero}: ${chapter.titulo}`}
           className={`reading-paper ${night ? "reader-night" : ""}`}
           style={{ fontSize: `${size}px` }}
         >
@@ -130,10 +179,7 @@ export function Reader({
             studio ? (
               <button
                 className="text-link"
-                onClick={() => {
-                  setSelected(chapters[index - 1].numero);
-                  setFeedback("");
-                }}
+                onClick={() => selectChapter(chapters[index - 1].numero)}
               >
                 ← Capítulo anterior
               </button>
@@ -153,10 +199,7 @@ export function Reader({
             studio ? (
               <button
                 className="text-link"
-                onClick={() => {
-                  setSelected(chapters[index + 1].numero);
-                  setFeedback("");
-                }}
+                onClick={() => selectChapter(chapters[index + 1].numero)}
               >
                 Próximo capítulo →
               </button>
@@ -183,7 +226,7 @@ export function Reader({
               value={characterId}
               onChange={(e) => setCharacterId(e.target.value)}
             >
-              {characters.map((c) => (
+              {referenceCharacters.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.nome}
                 </option>

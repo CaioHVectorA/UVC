@@ -207,7 +207,30 @@ export const timelineSchema = z
 export const publicationSchema = z
   .object({
     mode: z.literal("git-static"),
-    publicReview: z.literal(true),
+    studioAccess: z.literal("author-only"),
+    catalog: z
+      .array(
+        z
+          .object({
+            id,
+            seriesId: id,
+            titulo: text,
+            subtitulo: text.optional(),
+            formato: z.literal("Kindle"),
+            amazonUrl: z.url().refine((value) => {
+              const url = new URL(value);
+              return (
+                url.protocol === "https:" &&
+                url.hostname === "www.amazon.com" &&
+                !url.username &&
+                !url.password &&
+                /\/dp\/[A-Z0-9]{10}$/.test(url.pathname)
+              );
+            }, "Link Amazon inválido"),
+          })
+          .strict(),
+      )
+      .refine(unique, "IDs de edições duplicados"),
     books: z.record(
       id,
       z

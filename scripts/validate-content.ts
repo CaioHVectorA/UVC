@@ -47,6 +47,9 @@ async function main() {
     for (const id of character.livroIds ?? [])
       if (!timeline.livros.some((b) => b.id === id))
         throw new Error(`Livro de personagem desconhecido: ${id}`);
+  for (const edition of publication.catalog)
+    if (!series.some((story) => story.id === edition.seriesId))
+      throw new Error(`Edição sem história: ${edition.id}`);
   const rrh = timeline.livros.find((b) => b.id === book.id);
   if (!rrh) throw new Error("Livro sem referência na cronologia.");
   for (const beat of rrh.beats)
