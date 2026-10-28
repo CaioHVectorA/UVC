@@ -59,3 +59,9 @@ Verificação automatizada cobre reflow público em 320/390/768/1440 px, Axe, na
 ## Oficina de personagens
 
 `/studio/personagens` usa biblioteca à esquerda, formulário central e prévia à direita a partir de 1100 px. Em larguras intermediárias, a prévia fica abaixo do editor; no celular as áreas se empilham e a biblioteca inicia recolhida. Campos de texto têm fonte de 16 px, rótulo explícito e altura mínima de 48 px. As três seções preservam valores ao alternar e a consulta do cânone não permite edição. As ações principais são criar ficha, abrir arquivo e baixar rascunhos; não há botão de salvar que sugira persistência remota inexistente. Veja a [documentação da oficina](studio-character-workshop.md).
+
+## Revisão editorial e galeria de criação
+
+A vitrine combina Cormorant Garamond nos títulos e Space Grotesk na interface, hospedadas localmente com suas licenças OFL em `app/fonts`. A capa publicada de RRH vem do servidor de imagens da Amazon associado ao ASIN `B0CLKRNS29`, preservada em `public/covers/rrh-ascensao.jpg`; a URL de origem está no registro da edição. A imagem mostra o subtítulo **A Ascensão**, refletido na apresentação. Não foi substituída por uma arte histórica.
+
+Os projetos listados em `publication.workInProgress` aparecem separadamente em “Em desenvolvimento”, sem datas estimadas nem páginas de leitura liberadas. O detalhe de livro continua limitado a edições publicadas. Páginas `/codex/[id]` apresentam dados canônicos dos personagens classificados como públicos. A galeria privada usa biblioteca com busca, prévia e formulário de notas e conexões; veja [o contrato de salvamento](studio-gallery.md).

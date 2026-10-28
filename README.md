@@ -4,11 +4,12 @@ Portal de ficção independente criado por Caio Henrique: histórias da Terra/Gl
 
 ## O que funciona hoje
 
-- Vitrine pública mínima com a edição publicada **Red Right Hand: Ascensão**, link de compra na Amazon e página do livro. Obras em desenvolvimento não aparecem no catálogo público.
+- Vitrine editorial com a edição publicada **Red Right Hand: A Ascensão**, capa obtida no servidor de imagens da Amazon pelo ASIN, link de compra e página do livro. Projetos em desenvolvimento aparecem em seção separada, sem promessa de lançamento ou acesso aos manuscritos.
 - Galeria separada em `/assets`, preservando as artes e estudos históricos. Essas imagens não são usadas como capas oficiais na vitrine.
-- Codex público com busca e apenas os personagens classificados como públicos, sem expor as fichas completas do Studio.
+- Codex público com busca e páginas individuais dos personagens classificados como públicos, consumindo suas fichas canônicas. Personagens não classificados não ganham página automaticamente.
 - Studio privado: leitor dos seis capítulos de trabalho, cronologia e consulta canônica, com login GitHub exclusivo do autor e autorização no servidor. Fechado enquanto faltar configuração.
 - Oficina em `/studio/personagens`: fichas por seções, referência canônica, prévia e arquivos JSON para baixar/reabrir. Rascunhos ficam na memória da página; ainda não há salvamento automático no servidor.
+- Galeria privada em `/studio/galeria`: 87 assets da codebase com notas, ideias, textos, tags e vínculos a personagens, histórias e capítulos; cópia neste navegador e arquivo de backup, sem sincronização remota.
 - APIs somente leitura: capítulos seguem a liberação explícita; cronologia exige sessão do autor. Nenhuma grava manuscritos.
 
 A publicação segue o modelo **Git → validação → build → deploy**. Alterações em arquivos não aparecem num deploy antigo: é necessário reconstruir a aplicação. A política explícita de capítulos compartilhados está em [`data/publication.json`](data/publication.json). Todos os arquivos deste repositório público devem ser tratados como públicos; filtro de spoilers não é sigilo.
@@ -66,10 +67,13 @@ O CI em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) repete as verific
 | `tests/` | Contratos, APIs, interface, reflow e acessibilidade automatizada |
 | `docs/` | Cânone, arquitetura, decisões e fluxo editorial |
 
+Para atualizar o inventário privado após adicionar/mover assets: `npm run assets:index`.
+
 Para regenerar os derivados das imagens: `npm run media:prepare`. O manifesto registra fonte, dimensões, finalidade e revisão de créditos/licenças; arquivos desconhecidos não recebem autoria inventada.
 
 ## Documentação
 
+- [Galeria de ideias e limites de salvamento](docs/architecture/studio-gallery.md)
 - [Oficina de personagens e limites de salvamento](docs/architecture/studio-character-workshop.md)
 - [Fluxo editorial e publicação](docs/architecture/editorial-workflow.md)
 - [Contratos das APIs e schemas](docs/architecture/api-schemas.md)

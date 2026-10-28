@@ -76,7 +76,7 @@ test("rascunhos não são leitura pública; consulta de capítulos rejeita entra
   expect(await timeline.text()).not.toContain("erasCosmicas");
 });
 
-test("vitrine só apresenta edição publicada e compra real, sem artes da galeria", async ({
+test("vitrine apresenta capa publicada, compra e projetos em andamento separados", async ({
   page,
 }, testInfo) => {
   await page.goto("/");
@@ -85,12 +85,16 @@ test("vitrine só apresenta edição publicada e compra real, sem artes da galer
   await expect(
     page.getByRole("link", { name: "Ver na Amazon" }),
   ).toHaveAttribute("href", /\/dp\/B0CLKRNS29$/);
-  await expect(page.locator("main img")).toHaveCount(0);
-  await expect(page.locator("main")).not.toContainText("Congregadores");
+  await expect(page.locator("main img")).toHaveCount(1);
+  await expect(page.locator("main img")).toHaveAttribute("src", /rrh-ascensao/);
+  await expect(page.locator(".in-progress-card")).toHaveCount(7);
+  await expect(page.locator(".in-progress-section")).toContainText(
+    "Congregadores",
+  );
   await expect(page.locator('a[href^="/ler/"]')).toHaveCount(0);
   await page.getByRole("link", { name: "Sobre o livro" }).click();
   await expect(page).toHaveURL(/\/historias\/red-right-hand$/);
-  await expect(page.locator("main img")).toHaveCount(0);
+  await expect(page.locator("main img")).toHaveCount(1);
   await expect(page.locator("main")).not.toContainText("Em revisão");
   await page.goto("/");
   await page.screenshot({
@@ -175,6 +179,7 @@ const publicRoutes = [
   "/assets",
   "/historias/red-right-hand",
   "/studio/entrar",
+  "/codex/arner",
 ];
 for (const width of [320, 390, 768, 1440])
   test(`reflow a ${width}px`, async ({ page }) => {
@@ -215,9 +220,27 @@ test("SEO e cabeçalhos de segurança respeitam os destinos publicados", async (
   );
   expect((await request.get("/sitemap.xml")).status()).toBe(200);
   await page.goto("/historias/red-right-hand");
-  await expect(page).toHaveTitle(/Red Right Hand: Ascensão/);
+  await expect(page).toHaveTitle(/Red Right Hand: A Ascensão/);
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
     "content",
-    "Red Right Hand: Ascensão",
+    "Red Right Hand: A Ascensão",
   );
+});
+
+test("páginas de personagens públicos têm conteúdo canônico e recusam IDs não liberados", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/codex");
+  await page.getByRole("link", { name: "Arner", exact: false }).click();
+  await expect(page).toHaveURL(/\/codex\/arner$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Arner" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Habilidades" }),
+  ).toBeVisible();
+  await expect(page.locator("main img")).toHaveCount(0);
+  expect((await request.get("/codex/ciecon")).status()).toBe(404);
+  expect((await request.get("/codex/inexistente")).status()).toBe(404);
 });

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, UsersRound, Waypoints } from "lucide-react";
+import { BookOpen, UsersRound, Waypoints, Images } from "lucide-react";
 
 export function StudioNavigation() {
   const pathname = usePathname();
@@ -39,6 +39,17 @@ export function StudioNavigation() {
         aria-current={pathname === "/studio/cronologia" ? "page" : undefined}
       >
         <Waypoints size={17} aria-hidden /> Cronologia
+      </Link>
+      <Link
+        href="/studio/galeria"
+        prefetch={false}
+        onNavigate={(event) => {
+          event.preventDefault();
+          window.location.assign("/studio/galeria");
+        }}
+        aria-current={pathname === "/studio/galeria" ? "page" : undefined}
+      >
+        <Images size={17} aria-hidden /> Galeria
       </Link>
     </nav>
   );

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 const links = [
   { href: "/#livros", label: "Livros" },
+  { href: "/codex", label: "Personagens" },
   { href: "/assets", label: "Galeria" },
 ];
 export function SiteHeader() {

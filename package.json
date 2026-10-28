@@ -14,7 +14,8 @@
     "validate:content": "tsx scripts/validate-content.ts",
     "test": "tsx --test tests/unit/*.test.ts",
     "test:e2e": "playwright test",
-    "format:check": "prettier --check app components lib scripts tests *.ts *.mjs"
+    "format:check": "prettier --check app components lib scripts tests *.ts *.mjs",
+    "assets:index": "node scripts/index-studio-assets.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

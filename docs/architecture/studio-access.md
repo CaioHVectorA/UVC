@@ -26,7 +26,7 @@ Studio e endpoints de autenticação têm `Cache-Control: private, no-store` e `
 
 ## Publicação e limites
 
-`data/publication.json` declara `studioAccess: author-only` e os capítulos liberados no leitor/API/sitemap. Entrar no Studio não amplia a publicação nem altera o manifesto. A lista de capítulos públicos está vazia. O Studio recebe os seis capítulos de trabalho após autorização, sem salvar edições. O Codex público recebe somente campos resumidos dos personagens classificados como `PUBLICO`. `/api/timeline` responde 401 sem sessão válida do autor. O catálogo de edições publicadas é separado da liberação de trechos: cadastrar um livro não libera automaticamente seu manuscrito.
+`data/publication.json` declara `studioAccess: author-only` e os capítulos liberados no leitor/API/sitemap. Entrar no Studio não amplia a publicação nem altera o manifesto. A lista de capítulos públicos está vazia. O Studio recebe os seis capítulos de trabalho após autorização, sem salvar edições. O Codex público recebe somente personagens classificados como `PUBLICO`, com páginas individuais de dados canônicos. `/api/timeline` responde 401 sem sessão válida do autor. O catálogo de edições publicadas é separado da liberação de trechos: cadastrar um livro não libera automaticamente seu manuscrito.
 
 Proteger `/studio` **não** torna privados os arquivos de `books`, `data`, `docs` nem o histórico deste repositório público. Conteúdo confidencial futuro precisa de fonte privada separada e controles de autorização antes de qualquer serialização. Classificação editorial e aviso de spoilers não são permissões de acesso.
 
@@ -52,3 +52,5 @@ Em GitHub → Settings → Developer settings → OAuth Apps, criar uma aplicaç
 - `UVC_SITE_URL=https://uvc-olive.vercel.app`: origem dos metadados públicos.
 
 Fazer novo deploy após configurar as variáveis. Entrar em `/studio`, autorizar no GitHub e confirmar o retorno à área do autor. Conferir também saída da sessão e recusa de outra conta. Não enviar segredos pelo chat nem adicioná-los ao repositório. A presença da implementação no Git não confirma a configuração das variáveis ou um teste real do OAuth.
+
+A galeria `/studio/galeria` segue a mesma autorização no acesso aos dados; `/api/studio/assets/[id]` verifica sessão do autor em cada imagem. Notas ficam no navegador do autor ou no arquivo baixado, sem sincronização remota. [Detalhes](studio-gallery.md).

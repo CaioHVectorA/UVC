@@ -1,4 +1,6 @@
 "use client";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { PageIntro } from "@/components/ui";
@@ -47,7 +49,12 @@ export function PublishedCharacters({
             id={character.id}
             className="character-card"
           >
-            <h2>{character.nome}</h2>
+            <p className="eyebrow">{character.equipe}</p>
+            <h2>
+              <Link href={`/codex/${character.id}`}>
+                {character.nome} <ArrowUpRight size={18} aria-hidden />
+              </Link>
+            </h2>
             <p>{character.desc}</p>
           </article>
         ))}

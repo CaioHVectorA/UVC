@@ -208,6 +208,12 @@ export const publicationSchema = z
   .object({
     mode: z.literal("git-static"),
     studioAccess: z.literal("author-only"),
+    workInProgress: z
+      .array(id)
+      .refine(
+        (ids) => new Set(ids).size === ids.length,
+        "Séries em andamento duplicadas",
+      ),
     catalog: z
       .array(
         z
@@ -217,6 +223,13 @@ export const publicationSchema = z
             titulo: text,
             subtitulo: text.optional(),
             formato: z.literal("Kindle"),
+            cover: z.string().regex(/^\/covers\/[a-z0-9-]+\.jpg$/),
+            coverSource: z
+              .url()
+              .refine(
+                (value) =>
+                  new URL(value).origin === "https://m.media-amazon.com",
+              ),
             amazonUrl: z.url().refine((value) => {
               const url = new URL(value);
               return (

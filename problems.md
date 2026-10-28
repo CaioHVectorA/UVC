@@ -172,3 +172,12 @@ Esta revisão substitui os estados públicos descritos nas entradas históricas 
 A lista de capítulos públicos está vazia. A cronologia exige sessão do autor na página e API. O Codex público recebe apenas campos resumidos dos personagens classificados como públicos, sem opção de abrir o acervo inteiro. O Studio continua com consulta de todos os capítulos de trabalho e oficina privada. Isso não remove arquivos ou histórico de um repositório público.
 
 A ativação real do login depende de cadastrar a OAuth App e as variáveis na Vercel, publicar novamente e conferir o callback. Sem configuração válida, o Studio permanece fechado. Consulte o [passo a passo](docs/architecture/studio-access.md).
+
+
+## Vitrine editorial, personagens e galeria de ideias — 28/10/2026
+
+Revisão pedida pelo autor: tipografia editorial local, capa de RRH recuperada pelo ASIN no servidor de imagens da Amazon e seção separada de projetos em desenvolvimento. Páginas individuais de personagens públicos restauradas, com dados canônicos e sem transformar artes do acervo em retratos oficiais.
+
+Galeria privada implementada em `/studio/galeria`: inventário das 87 imagens da codebase, busca, prévia autenticada, notas, ideias, texto, tags e conexões a personagens/histórias/capítulos. Cópia local no navegador e importação/exportação JSON; sincronização remota e publicação por essa tela continuam pendentes. Cadastro da OAuth App e credenciais na Vercel dependem de acesso autenticado às respectivas contas.
+
+Validação desta revisão: lint, tipos, formatação, validação de conteúdo e build passaram; 17 testes unitários e 33 de integração/navegador passaram. As 87 imagens originais foram verificadas como legíveis e incluídas no tracing do endpoint privado. OAuth real continua dependendo da configuração externa e teste de retorno do GitHub.

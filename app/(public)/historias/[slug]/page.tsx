@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { publishedStories, publishedEditions } from "@/lib/catalog";
@@ -42,14 +43,31 @@ export default async function StoryPage({
         <ArrowLeft size={16} aria-hidden /> Livros
       </Link>
       <p className="storefront-kicker">Caio Henrique · {edition.formato}</p>
-      <h1>{edition.titulo}</h1>
-      {edition.subtitulo && (
-        <p className="published-book-subtitle">{edition.subtitulo}</p>
-      )}
-      <p className="published-book-synopsis">{edition.story.sinopse}</p>
-      <a href={edition.amazonUrl} className="button button-primary">
-        Ver na Amazon <ArrowUpRight size={17} aria-hidden />
-      </a>
+      <div className="book-detail-grid">
+        <div>
+          <Image
+            src={edition.cover}
+            alt={`Capa de ${edition.titulo}: ${edition.subtitulo}`}
+            width={350}
+            height={500}
+            priority
+            className="published-cover"
+          />
+        </div>
+        <div>
+          <h1>{edition.titulo}</h1>
+          {edition.subtitulo && (
+            <p className="published-book-subtitle">{edition.subtitulo}</p>
+          )}
+          <p className="published-book-synopsis">{edition.story.sinopse}</p>
+          <a href={edition.amazonUrl} className="button button-primary">
+            Ver na Amazon <ArrowUpRight size={17} aria-hidden />
+          </a>
+          <Link href="/codex" className="text-link book-character-link">
+            Conhecer os personagens →
+          </Link>
+        </div>
+      </div>
     </article>
   );
 }

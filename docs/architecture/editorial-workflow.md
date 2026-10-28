@@ -18,8 +18,8 @@ As rotas HTTP de escrita antigas foram desabilitadas. Isso resolve os riscos de 
 
 ## Público, spoilers e manuscritos privados
 
-- A vitrine contém apenas Red Right Hand: Ascensão, com o link Amazon fornecido pelo autor. Os seis capítulos de trabalho não são liberados no leitor público.
-- `statusVisibilidade: PUBLICO` seleciona os únicos personagens enviados à interface pública do Codex, em campos resumidos. Ausência de classificação é normalizada como `NAO_CLASSIFICADO`; ela não é convertida automaticamente em publicado nem privado.
+- A seção de publicados contém Red Right Hand: A Ascensão, com capa e link Amazon. Projetos em desenvolvimento são selecionados explicitamente em `publication.workInProgress`, em seção separada. Os seis capítulos de trabalho não são liberados no leitor público.
+- `statusVisibilidade: PUBLICO` seleciona os únicos personagens enviados à interface pública do Codex, com páginas individuais de dados canônicos. Ausência de classificação é normalizada como `NAO_CLASSIFICADO`; ela não é convertida automaticamente em publicado nem privado.
 - O build rejeita personagens explicitamente marcados como `RESERVADO`; isso evita publicação silenciosa no snapshot, mas não protege o histórico público do Git.
 - O acervo completo de personagens e a cronologia são consultados no Studio após autorização. A galeria é uma seção pública separada e não funciona como catálogo de livros publicados. O Studio é privado, com autorização no servidor; isso não torna privados os arquivos já presentes no Git público. Não armazenar segredos ou manuscritos privados em JSON enviados ao cliente, nesta área ou neste repositório público.
 - Um futuro workspace privado precisa de armazenamento separado, autenticação no servidor, autorização por recurso, proteção de origem para sessões, controle de concorrência, histórico e política de backup antes de aceitar gravação.

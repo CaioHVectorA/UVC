@@ -1,5 +1,18 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import localFont from "next/font/local";
+const editorialFont = localFont({
+  src: "./fonts/CormorantGaramond.ttf",
+  variable: "--font-editorial",
+  display: "swap",
+  weight: "300 700",
+});
+const interfaceFont = localFont({
+  src: "./fonts/SpaceGrotesk.ttf",
+  variable: "--font-interface",
+  display: "swap",
+  weight: "300 700",
+});
 import { getSiteUrl } from "@/lib/site-url";
 const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
@@ -24,7 +37,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body>
+      <body className={`${editorialFont.variable} ${interfaceFont.variable}`}>
         <a href="#conteudo" className="skip-link">
           Pular para o conteúdo
         </a>

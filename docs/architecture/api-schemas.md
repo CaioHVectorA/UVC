@@ -37,7 +37,11 @@ Capítulos só são públicos quando liberados no manifesto. Cronologia exige au
 - Histórias: ID estável, título, tipo, local, sinopse e arcos opcionais. Catálogo usa ID, sem depender da posição nem do título.
 - Livro: manifesto estrito, números/arquivos únicos e caminhos de Markdown limitados ao diretório de capítulos.
 - Cronologia: IDs únicos, estados conhecidos, referências a eras e séries existentes; cenas de RRH devem apontar para capítulos do manifesto.
-- Publicação: modo explícito `git-static`, acesso `author-only`, lista única de capítulos existentes e catálogo explícito de edições publicadas com ID único, referência à série e URL HTTPS da Amazon com ASIN.
+- Publicação: modo explícito `git-static`, acesso `author-only`, lista única de capítulos existentes e catálogo explícito de edições publicadas com ID único, referência à série, capa local com origem Amazon, URL HTTPS de compra com ASIN e seleção de séries em desenvolvimento.
 - Mídia: IDs únicos, caminhos contidos em `assets`, dimensões verificadas com Sharp e derivados existentes. Estado de direitos `verified` exige crédito/licença; a validação não determina direitos autorais.
 
 Schemas validam estrutura e referências, não fatos narrativos. Não adicionam personagens/estados ao cânone automaticamente.
+
+## Prévia privada de assets
+
+`GET /api/studio/assets/[id]` exige sessão do autor, retorna imagem WebP sem cache compartilhado e recusa IDs desconhecidos. Não aceita caminhos de arquivo na query. Veja [galeria do Studio](studio-gallery.md).

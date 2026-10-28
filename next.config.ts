@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  outputFileTracingIncludes: { "/api/studio/assets/*": ["./assets/**/*"] },
   async headers() {
     return [
       {

@@ -64,3 +64,7 @@ export const publishedEditions = publication.catalog.map((edition) => {
 export const publishedStories = stories.filter((story) =>
   publishedEditions.some((edition) => edition.seriesId === story.id),
 );
+
+export const inProgressStories = stories.filter((story) =>
+  (publication.workInProgress as readonly string[]).includes(story.id),
+);

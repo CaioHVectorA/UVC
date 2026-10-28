@@ -1,4 +1,5 @@
-import { readFile, access } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { readFile, access, readdir } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import {
@@ -47,9 +48,54 @@ async function main() {
     for (const id of character.livroIds ?? [])
       if (!timeline.livros.some((b) => b.id === id))
         throw new Error(`Livro de personagem desconhecido: ${id}`);
-  for (const edition of publication.catalog)
-    if (!series.some((story) => story.id === edition.seriesId))
+  const knownSeries = new Set(series.map((story) => story.id));
+  for (const id of publication.workInProgress) {
+    if (!knownSeries.has(id))
+      throw new Error(`Série em andamento desconhecida: ${id}`);
+    if (publication.catalog.some((edition) => edition.seriesId === id))
+      throw new Error(`Série publicada também marcada em andamento: ${id}`);
+  }
+  for (const edition of publication.catalog) {
+    if (!knownSeries.has(edition.seriesId))
       throw new Error(`Edição sem história: ${edition.id}`);
+    await access(`public${edition.cover}`);
+    const cover = await sharp(`public${edition.cover}`).metadata();
+    if (!cover.width || !cover.height)
+      throw new Error(`Capa inválida: ${edition.id}`);
+  }
+  const inventory = (await json("data/studio-assets.json")) as {
+    id: string;
+    source: string;
+    name: string;
+    folder: string;
+  }[];
+  async function assetFiles(directory: string): Promise<string[]> {
+    const groups = await Promise.all(
+      (await readdir(directory, { withFileTypes: true })).map(async (entry) => {
+        const source = path.posix.join(directory, entry.name);
+        return entry.isDirectory()
+          ? assetFiles(source)
+          : entry.isFile() && /\.(png|jpe?g|webp)$/i.test(entry.name)
+            ? [source]
+            : [];
+      }),
+    );
+    return groups.flat();
+  }
+  const files = (await assetFiles("assets")).sort();
+  if (
+    JSON.stringify(files) !==
+    JSON.stringify(inventory.map((entry) => entry.source).sort())
+  )
+    throw new Error("Acervo mudou: execute npm run assets:index.");
+  if (new Set(inventory.map((entry) => entry.id)).size !== inventory.length)
+    throw new Error("IDs de assets duplicados.");
+  for (const entry of inventory)
+    if (
+      entry.id !==
+      createHash("sha256").update(entry.source).digest("hex").slice(0, 20)
+    )
+      throw new Error("ID de asset inválido.");
   const rrh = timeline.livros.find((b) => b.id === book.id);
   if (!rrh) throw new Error("Livro sem referência na cronologia.");
   for (const beat of rrh.beats)

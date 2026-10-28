@@ -30,3 +30,15 @@ export async function getStudioTimeline() {
     stories: series.map((story) => ({ id: story.id, titulo: story.titulo })),
   };
 }
+
+export async function getStudioGalleryData() {
+  const session = await requireStudioAuthor();
+  const { studioAssets } = await import("./studio-assets");
+  return {
+    ownerId: session.studioAuthorId!,
+    assets: studioAssets,
+    characters: characters.map(({ id, nome }) => ({ id, nome })),
+    stories: series.map(({ id, titulo }) => ({ id, titulo })),
+    chapters: book.capitulos.map(({ numero, titulo }) => ({ numero, titulo })),
+  };
+}

@@ -5,8 +5,18 @@ import { getStudioContent } from "@/lib/studio-content";
 import { StudioSessionControl } from "@/components/studio-session-controls";
 import { StudioNavigation } from "@/components/studio-navigation";
 export const metadata = { title: "Studio do autor" };
-export default async function StudioPage() {
+export default async function StudioPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ capitulo?: string }>;
+}) {
   const { chapters, characters } = await getStudioContent();
+  const requested = Number((await searchParams).capitulo ?? 0);
+  const initialChapter = chapters.some(
+    (chapter) => chapter.numero === requested,
+  )
+    ? requested
+    : 0;
   return (
     <>
       <StudioNavigation />
@@ -31,6 +41,7 @@ export default async function StudioPage() {
           chapters={renderChapters(chapters)}
           referenceCharacters={characters}
           studio
+          initialChapter={initialChapter}
         />
       ) : (
         <div className="empty-state">

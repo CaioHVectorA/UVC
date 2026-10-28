@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { encode } from "next-auth/jwt";
 import { studioTestEnv } from "../studio-fixture";
+import inventory from "../../data/studio-assets.json";
 
 const base = "http://127.0.0.1:3101";
 async function authorCookie(id = "123", maxAge = 3600) {
@@ -440,4 +441,180 @@ test("cronologia de trabalho e sua API exigem acesso do autor", async ({
   await expect(page.locator(".clipboard-feedback")).toContainText(
     "Não foi possível copiar",
   );
+});
+
+test("galeria privada e imagens exigem sessão do autor", async ({
+  request,
+}) => {
+  for (const headers of [
+    {},
+    { Cookie: "__Secure-next-auth.session-token=forjado" },
+    { Cookie: await authorCookie("124") },
+  ] as Record<string, string>[]) {
+    const page = await request.get(`${base}/studio/galeria`, {
+      headers,
+      maxRedirects: 0,
+    });
+    expect(page.status()).toBe(307);
+    expect(await page.text()).not.toContain(inventory[0].source);
+    const image = await request.get(
+      `${base}/api/studio/assets/${inventory[0].id}`,
+      { headers },
+    );
+    expect(image.status()).toBe(401);
+    expect(image.headers()["cache-control"]).toContain("no-store");
+  }
+  const headers = { Cookie: await authorCookie() };
+  const image = await request.get(
+    `${base}/api/studio/assets/${inventory[0].id}`,
+    { headers },
+  );
+  expect(image.status()).toBe(200);
+  expect(image.headers()["content-type"]).toBe("image/webp");
+  expect((await image.body()).length).toBeGreaterThan(100);
+  expect(
+    (
+      await request.get(`${base}/api/studio/assets/00000000000000000000`, {
+        headers,
+      })
+    ).status(),
+  ).toBe(404);
+});
+
+test("galeria conecta assets ao texto, preserva cópia local e exporta sem publicar", async ({
+  page,
+  request,
+}, testInfo) => {
+  const { readFile } = await import("node:fs/promises");
+  await page.context().addCookies([
+    {
+      name: "__Secure-next-auth.session-token",
+      value: (await authorCookie()).split("=")[1],
+      domain: "127.0.0.1",
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      sameSite: "Lax",
+    },
+  ]);
+  await page.goto(`${base}/studio/galeria`);
+  await expect(page.getByText("87 assets no projeto")).toBeVisible();
+  await page
+    .getByLabel("Título de trabalho", { exact: true })
+    .fill("Estudo privado de Severum");
+  await page
+    .getByRole("textbox", { name: "Ideia", exact: true })
+    .fill("Uma atmosfera para a cena.");
+  await page
+    .getByLabel("Texto e notas", { exact: true })
+    .fill("Trecho de teste privado do autor.");
+  await page.getByRole("checkbox", { name: "Arner", exact: true }).check();
+  await page
+    .getByRole("checkbox", { name: "Red Right Hand", exact: true })
+    .check();
+  await page.getByRole("checkbox", { name: /00 · A Reunião/ }).check();
+  await expect(page.locator(".gallery-linked-summary")).toContainText("Arner");
+  await page
+    .getByRole("button", { name: "Salvar neste navegador", exact: true })
+    .click();
+  await page.reload();
+  await expect(
+    page.getByLabel("Título de trabalho", { exact: true }),
+  ).toHaveValue("Estudo privado de Severum");
+  await expect(
+    page.getByRole("checkbox", { name: "Arner", exact: true }),
+  ).toBeChecked();
+  await page
+    .getByRole("combobox", { name: "Mostrar", exact: true })
+    .selectOption("linked");
+  await expect(page.locator(".gallery-asset")).toHaveCount(1);
+  const event = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Baixar cópia", exact: true }).click();
+  const file = testInfo.outputPath("gallery-workspace.json");
+  await (await event).saveAs(file);
+  const saved = JSON.parse(await readFile(file, "utf8"));
+  expect(saved.notes[0].characterIds).toEqual(["arner"]);
+  expect(saved.notes[0].chapterNumbers).toEqual([0]);
+  await page.getByLabel("Arquivo de notas da galeria").setInputFiles({
+    name: "invalido.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"format":"outro"}'),
+  });
+  await expect(page.locator("main").getByRole("alert")).toContainText(
+    "Arquivo inválido",
+  );
+  await expect(
+    page.getByLabel("Título de trabalho", { exact: true }),
+  ).toHaveValue("Estudo privado de Severum");
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByLabel("Arquivo de notas da galeria").setInputFiles(file);
+  await expect(page.getByRole("status").first()).toContainText(
+    "Arquivo aberto",
+  );
+  await page
+    .getByRole("button", { name: "Salvar neste navegador", exact: true })
+    .click();
+  const canon = await readFile("data/characters.json", "utf8");
+  expect(canon).not.toContain("Trecho de teste privado do autor");
+  expect(await (await request.get("/assets")).text()).not.toContain(
+    "Estudo privado de Severum",
+  );
+  await page.screenshot({
+    path: testInfo.outputPath("studio-gallery-desktop.png"),
+    fullPage: true,
+  });
+  await page.getByRole("link", { name: "RRH · Capítulo 00" }).click();
+  await expect(page.locator(".reading-paper")).toContainText("A Reunião");
+});
+
+test("galeria oferece reflow, acesso por teclado e aviso de saída sem salvar", async ({
+  page,
+}) => {
+  const AxeBuilder = (await import("@axe-core/playwright")).default;
+  await page.context().addCookies([
+    {
+      name: "__Secure-next-auth.session-token",
+      value: (await authorCookie()).split("=")[1],
+      domain: "127.0.0.1",
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      sameSite: "Lax",
+    },
+  ]);
+  await page.goto(`${base}/studio/galeria`);
+  await page
+    .getByRole("button", { name: "Salvar neste navegador", exact: true })
+    .click();
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - innerWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+  }
+  const result = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+    .analyze();
+  expect(
+    result.violations.map((v) => ({
+      id: v.id,
+      targets: v.nodes.map((n) => n.target),
+    })),
+  ).toEqual([]);
+  await page
+    .getByRole("textbox", { name: "Ideia", exact: true })
+    .fill("Ainda não salvo.");
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.getByRole("link", { name: "Manuscrito", exact: true }).click();
+  await expect(page).toHaveURL(/\/studio\/galeria$/);
+  await expect(
+    page.getByRole("textbox", { name: "Ideia", exact: true }),
+  ).toHaveValue("Ainda não salvo.");
+  await page
+    .getByRole("button", { name: "Salvar neste navegador", exact: true })
+    .click();
+  await page.getByRole("link", { name: "Manuscrito", exact: true }).click();
+  await expect(page).toHaveURL(/\/studio$/);
 });
