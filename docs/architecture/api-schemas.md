@@ -1,47 +1,28 @@
-# APIs de leitura e contratos de conteúdo
+# Contratos do Studio e publicação
 
-Fonte executável dos schemas: [`../../lib/schemas.ts`](../../lib/schemas.ts). O comando `npm run validate:content` roda antes de desenvolvimento/build e no CI. Tipos da aplicação derivam dos schemas; módulos cliente não carregam o runtime Zod para validar dados já verificados no build.
+## Sessão
 
-## Capítulos
+- `POST /api/studio/session`: usuário/senha; cria cookie HttpOnly e sessão no banco. Credenciais inválidas: 401; origem inválida: 403; conexão ausente/indisponível: 503.
+- `GET /api/studio/session`: informa se há sessão válida.
+- `DELETE /api/studio/session`: verifica origem e revoga a sessão no DB.
 
-`GET /api/chapters?num=0` (padrão: capítulo 0). Aceita representação canônica de 0 a 99 e representação de dois dígitos para compatibilidade (`00` a `09`). A busca é **exata** no manifesto `book.json`, com a disponibilidade de `data/publication.json`; não usa `startsWith` nem monta caminho de arquivo a partir da query.
+## Workspace autenticado
 
-A lista atual de capítulos públicos está vazia: os manuscritos existentes respondem 404. Quando houver liberação explícita, a resposta 200 segue este contrato:
+- `GET /api/studio/workspace`: fichas, relações e layout.
+- `PUT /api/studio/entities`: grava ficha validada, exigindo versão atual. Versão obsoleta: 409. A versão anterior e a alteração são transacionais.
+- `GET /api/studio/entities?id=...`: até 30 versões anteriores da ficha.
+- `POST /api/studio/relations`: cria ligação direcionada entre fichas existentes, sem duplicação ou autorrelação.
+- `DELETE /api/studio/relations`: remove o vínculo; preserva as fichas.
+- `POST /api/studio/layout`: salva posições do mapa separadamente do conteúdo editorial.
+- `POST /api/studio/import`: multipart de PDF/TXT/Markdown, até 4 MB, PDF até 500 páginas e texto até 500 mil caracteres. O documento inicia privado e o original é preservado no banco. PDF sem texto não recebe OCR fictício.
+- `GET /api/studio/files/[id]`: download autenticado do original.
+- `GET /api/studio/assets/[id]`: prévia autenticada de um asset registrado, sem aceitar um caminho arbitrário do cliente.
+- `GET /api/timeline`: eventos do PostgreSQL e seus vínculos, com sessão do autor. A edição ocorre pela API de fichas.
 
-```json
-{"chapter":"00-a-reuniao.md","content":"…Markdown…","status":"CANONE_TRAVADO","source":"git-static"}
-```
+Gravações exigem sessão e origem correspondente à aplicação. Respostas privadas têm no-store; erros não incluem conexão ou stack. Os schemas executáveis estão em `lib/workspace.ts`; o SQL inicial está em `db/migrations/001_initial.sql`.
 
-| Condição | Resposta |
-| --- | --- |
-| Número/consulta inválido, parâmetro desconhecido ou `num` duplicado | 400, `INVALID_QUERY` ou `INVALID_CHAPTER` |
-| Capítulo inexistente ou fora da lista pública | 404, `NOT_FOUND` |
-| Falha ao carregar arquivo do deploy | 500, `CONTENT_UNAVAILABLE`, sem caminhos/stack na resposta |
+## Site público
 
-`HEAD` usa o mesmo resultado sem corpo. Os caminhos do manifesto são validados e o leitor ainda confere contenção no diretório do livro. Não há wildcard CORS.
+A wiki consulta apenas fichas publicadas e filtra atributos privados antes de renderizar componentes cliente. `/api/public/visuals/[id]` serve somente imagens vinculadas a fichas visuais publicadas. Não é uma rota para abrir manuscritos ou originais importados.
 
-## Cronologia
-
-`GET /api/timeline` exige sessão autorizada do autor e responde 401 (`UNAUTHORIZED`) quando ausente ou inválida. Com autorização, retorna o snapshot usado em `/studio/cronologia`. Não relê um cache mutável, não aplica merge de JSON recebido e não grava no filesystem.
-
-## Métodos de escrita
-
-As duas rotas rejeitam POST, PUT, PATCH e DELETE com HTTP **405** e código `READ_ONLY`. Nenhuma dessas funções lê/grava corpo ou chama armazenamento. `Allow: GET, HEAD, OPTIONS`. OPTIONS retorna 204 e o mesmo Allow, sem autorizar preflight de escrita. Não há resposta `success: true` nem estado `cached` fictício.
-
-Capítulos só são públicos quando liberados no manifesto. Cronologia exige autorização no servidor. CORS não substitui autenticação. Escrita só existe pelo fluxo Git, com as permissões e histórico do repositório. Conteúdo privado exigirá arquitetura própria, não um filtro cliente.
-
-## Contratos e referências
-
-- Personagens: IDs únicos, nome/equipe/alinhamento descritivos, poderes/aparições não vazios, escala inclusive a forma híbrida existente de Hades. `livroIds` e classificação são opcionais no arquivo histórico; classificação ausente normaliza para `NAO_CLASSIFICADO`, sem inventar estado editorial.
-- Facções: IDs únicos, base, liderança, membros e descrição.
-- Histórias: ID estável, título, tipo, local, sinopse e arcos opcionais. Catálogo usa ID, sem depender da posição nem do título.
-- Livro: manifesto estrito, números/arquivos únicos e caminhos de Markdown limitados ao diretório de capítulos.
-- Cronologia: IDs únicos, estados conhecidos, referências a eras e séries existentes; cenas de RRH devem apontar para capítulos do manifesto.
-- Publicação: modo explícito `git-static`, acesso `author-only`, lista única de capítulos existentes e catálogo explícito de edições publicadas com ID único, referência à série, capa local com origem Amazon, URL HTTPS de compra com ASIN e seleção de séries em desenvolvimento.
-- Mídia: IDs únicos, caminhos contidos em `assets`, dimensões verificadas com Sharp e derivados existentes. Estado de direitos `verified` exige crédito/licença; a validação não determina direitos autorais.
-
-Schemas validam estrutura e referências, não fatos narrativos. Não adicionam personagens/estados ao cânone automaticamente.
-
-## Prévia privada de assets
-
-`GET /api/studio/assets/[id]` exige sessão do autor, retorna imagem WebP sem cache compartilhado e recusa IDs desconhecidos. Não aceita caminhos de arquivo na query. Veja [galeria do Studio](studio-gallery.md).
+A API legada de capítulos continua somente leitura e respeita a lista explícita de `data/publication.json`, atualmente vazia. Consultas inválidas retornam 400; trechos não liberados retornam 404. As antigas escritas em capítulos e timeline continuam 405, sem falso sucesso. Endpoints OAuth antigos respondem 410; o login atual usa `/api/studio/session`.

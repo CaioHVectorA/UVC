@@ -35,3 +35,6 @@ next-env.d.ts
 # browser regression artifacts
 /playwright-report/
 /test-results/
+
+# private working imports and DB backups
+/.local/

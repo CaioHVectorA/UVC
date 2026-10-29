@@ -1,20 +1,30 @@
 import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/lib/site-url";
 import { publishedStories } from "@/lib/catalog";
-import { characters, book, isPublicChapter } from "@/lib/content";
-export default function sitemap(): MetadataRoute.Sitemap {
+import { book, isPublicChapter } from "@/lib/content";
+import { databaseConfigured, loadWorkspace } from "@/lib/database";
+import { seedEntities } from "@/lib/workspace-seed";
+export const dynamic = "force-dynamic";
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getSiteUrl();
   if (!origin) return [];
+  const entities = databaseConfigured()
+    ? (await loadWorkspace(true)).entities
+    : seedEntities.filter((e) => e.published);
   return [
     "/",
     "/codex",
+    "/conceitos",
     "/assets",
-    ...characters
-      .filter((character) => character.statusVisibilidade === "PUBLICO")
-      .map((character) => `/codex/${character.id}`),
-    ...publishedStories.map((story) => `/historias/${story.slug}`),
+    ...publishedStories.map((s) => `/historias/${s.slug}`),
+    ...entities
+      .filter((e) => e.kind === "character")
+      .map((e) => `/codex/${e.id}`),
+    ...entities
+      .filter((e) => ["concept", "place", "artifact"].includes(e.kind))
+      .map((e) => `/conceitos/${e.id}`),
     ...book.capitulos
-      .filter((chapter) => isPublicChapter(chapter.numero))
-      .map((chapter) => `/ler/${chapter.numero}`),
+      .filter((c) => isPublicChapter(c.numero))
+      .map((c) => `/ler/${c.numero}`),
   ].map((route) => ({ url: new URL(route, origin).href }));
 }

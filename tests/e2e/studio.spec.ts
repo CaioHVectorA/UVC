@@ -1,620 +1,496 @@
-import { test, expect } from "@playwright/test";
-import { encode } from "next-auth/jwt";
+import {
+  test,
+  expect,
+  type APIRequestContext,
+  type Page,
+} from "@playwright/test";
+import { Pool } from "pg";
+import AxeBuilder from "@axe-core/playwright";
+import { readFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 import { studioTestEnv } from "../studio-fixture";
-import inventory from "../../data/studio-assets.json";
-
+import {
+  blankEntity,
+  type StudioWorkspace,
+  type StudioEntity,
+} from "../../lib/workspace";
+import assets from "../../data/studio-assets.json";
 const base = "http://127.0.0.1:3101";
-async function authorCookie(id = "123", maxAge = 3600) {
-  const value = await encode({
-    secret: studioTestEnv.NEXTAUTH_SECRET,
-    token: { studioAuthorId: id, sub: id },
-    maxAge,
+const origin = { Origin: base };
+async function login(request: APIRequestContext) {
+  const result = await request.post(`${base}/api/studio/session`, {
+    headers: origin,
+    data: { username: "admin", password: "admin" },
   });
-  return `__Secure-next-auth.session-token=${value}`;
+  expect(result.status(), await result.text()).toBe(200);
+}
+async function loginPage(page: Page) {
+  await login(page.request);
+}
+async function workspace(request: APIRequestContext) {
+  return (await (
+    await request.get(`${base}/api/studio/workspace`)
+  ).json()) as StudioWorkspace;
+}
+async function put(request: APIRequestContext, entity: StudioEntity) {
+  const payload = Object.fromEntries(
+    Object.entries(entity).filter(([key]) => key !== "updatedAt"),
+  );
+  return request.put(`${base}/api/studio/entities`, {
+    headers: origin,
+    data: payload,
+  });
 }
 
-test("Studio fechado não envia manuscritos nem aceita ativação por cookie", async ({
+test("login admin/admin cria sessão no banco; recusa credenciais erradas, CSRF e sessão forjada", async ({
   request,
 }) => {
-  for (const headers of [
-    {},
-    { Cookie: await authorCookie() },
-    {
-      "x-middleware-subrequest":
-        "middleware:middleware:middleware:middleware:middleware",
-    },
-  ] as Record<string, string>[]) {
-    const response = await request.get("/studio", { headers, maxRedirects: 0 });
-    expect(response.status()).toBe(307);
-    expect(response.headers().location).toBe("/studio/entrar");
-    expect(response.headers()["cache-control"]).toContain("no-store");
-    expect(await response.text()).not.toContain("A Reunião");
-  }
-  const response = await request.get("/api/auth/providers");
-  expect(response.status()).toBe(503);
-});
-
-test("sem sessão, cookie forjado, sessão expirada e outra conta não recebem o Studio", async ({
-  request,
-}) => {
-  for (const cookie of [
-    "",
-    "__Secure-next-auth.session-token=forjado",
-    await authorCookie("124"),
-    await authorCookie("123", -120),
-  ]) {
-    const response = await request.get(`${base}/studio`, {
-      headers: { Cookie: cookie },
-      maxRedirects: 0,
-    });
-    expect(response.status()).toBe(307);
-    expect(response.headers().location).toBe("/studio/entrar");
-    expect(await response.text()).not.toContain("A Reunião");
-  }
-  // RSC requests must pass the same page-level authorization.
-  const response = await request.get(`${base}/studio?_rsc=test`, {
-    headers: { RSC: "1" },
-  });
-  expect(await response.text()).not.toContain("A Reunião");
-});
-
-test("sessão válida do autor libera consulta; continua sem escrita HTTP", async ({
-  request,
-}) => {
-  const headers = { Cookie: await authorCookie() };
-  const response = await request.get(`${base}/studio`, { headers });
-  expect(response.status()).toBe(200);
-  expect(await response.text()).toContain("A Reunião");
-  expect(response.headers()["cache-control"]).toContain("no-store");
-  expect(response.headers()["x-robots-tag"]).toContain("noindex");
-  for (const route of ["/api/chapters", "/api/timeline"]) {
-    expect(
-      (
-        await request.post(`${base}${route}`, {
-          headers,
-          data: { content: "não salvar" },
-        })
-      ).status(),
-    ).toBe(405);
-  }
-});
-
-test("entrada do Studio tem navegação própria e o portal continua público", async ({
-  page,
-}) => {
-  await page.goto(`${base}/studio/entrar?error=AccessDenied`);
-  await expect(
-    page.getByRole("button", { name: "Entrar com GitHub" }),
-  ).toBeVisible();
-  await expect(page.locator('.notice[role="alert"]')).toContainText(
-    "Não foi possível autorizar",
-  );
-  await expect(
-    page.getByRole("navigation", { name: "Navegação principal" }),
-  ).toHaveCount(0);
-  await expect(page.locator(".reader-layout")).toHaveCount(0);
-  await page.getByRole("link", { name: "Voltar ao portal público" }).click();
-  await expect(
-    page.getByRole("navigation", { name: "Navegação principal" }),
-  ).toBeVisible();
-  await page.goto(`${base}/historias/red-right-hand`);
-  await expect(page.getByRole("link", { name: "Ver na Amazon" })).toBeVisible();
-  await expect(page.locator(".inspector")).toHaveCount(0);
-});
-
-test("signout exige CSRF e encerra a sessão no cookie", async ({
-  playwright,
-}) => {
-  const token = (await authorCookie()).split("=")[1];
-  // Add a fixture session to the cookie jar; subsequent responses can clear it.
-  const signedIn = await playwright.request.newContext({
-    baseURL: base,
-    storageState: {
-      cookies: [
-        {
-          name: "__Secure-next-auth.session-token",
-          value: token,
-          domain: "127.0.0.1",
-          path: "/",
-          expires: -1,
-          httpOnly: true,
-          secure: true,
-          sameSite: "Lax",
-        },
-      ],
-      origins: [],
-    },
-  });
-  const csrfResponse = await signedIn.get("/api/auth/csrf");
-  expect((await signedIn.get("/studio", { maxRedirects: 0 })).status()).toBe(
-    200,
-  );
-  const { csrfToken } = await csrfResponse.json();
-  const invalid = await signedIn.post("/api/auth/signout", {
-    form: { csrfToken: "inválido", json: "true" },
-    maxRedirects: 0,
-  });
-  expect(invalid.headers()["set-cookie"] ?? "").not.toContain(
-    "__Secure-next-auth.session-token=;",
-  );
-  const result = await signedIn.post("/api/auth/signout", {
-    form: { csrfToken, json: "true" },
-  });
-  expect(result.headers()["set-cookie"]).toContain(
-    "__Secure-next-auth.session-token=;",
-  );
-  expect((await signedIn.get("/studio", { maxRedirects: 0 })).status()).toBe(
-    307,
-  );
-  await signedIn.dispose();
-});
-
-test("autor troca capítulo com foco no texto e encerra sessão pela interface", async ({
-  page,
-}) => {
-  const token = (await authorCookie()).split("=")[1];
-  await page.context().addCookies([
-    {
-      name: "__Secure-next-auth.session-token",
-      value: token,
-      domain: "127.0.0.1",
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-    },
-  ]);
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(`${base}/studio`);
-  await expect(
-    page.getByText("Sessão do autor · Consulta e revisão"),
-  ).toBeVisible();
-  await page.getByText("Sumário de capítulos", { exact: true }).click();
-  await page
-    .getByRole("button", {
-      name: "Cap. 01 · Fundação e Recrutamento",
-      exact: true,
-    })
-    .click();
-  await expect(page.locator("article h1")).toContainText("01");
-  await expect(page.locator(".reading-paper")).toBeFocused();
-  await expect(
-    page.locator(".reader-sidebar>details:first-child"),
-  ).not.toHaveAttribute("open", "");
-  await page.getByText("Ajustes de leitura", { exact: true }).click();
-  await page.getByRole("button", { name: "Usar leitura noturna" }).click();
-  await page.getByRole("slider").fill("24");
-  await page
-    .getByRole("button", { name: "Próximo capítulo →", exact: true })
-    .click();
-  await expect(page.locator(".reading-paper")).toHaveClass(/reader-night/);
-  await expect(page.locator("article h1")).toContainText("02");
-  await expect(page.getByRole("slider")).toHaveValue("24");
-  await page.getByRole("button", { name: "Encerrar sessão" }).click();
-  await expect(page).toHaveURL(/\/studio\/entrar$/);
-  await page.goto(`${base}/studio`);
-  await expect(page).toHaveURL(/\/studio\/entrar$/);
-  await expect(page.locator(".reader-layout")).toHaveCount(0);
-});
-
-test("painel de personagens é privado e não entrega fichas por RSC sem autorização", async ({
-  request,
-}) => {
-  for (const headers of [{}, { Cookie: await authorCookie("124") }] as Record<
-    string,
-    string
-  >[]) {
-    const response = await request.get(`${base}/studio/personagens`, {
-      headers,
-      maxRedirects: 0,
-    });
-    expect(response.status()).toBe(307);
-    expect(response.headers().location).toBe("/studio/entrar");
-  }
-  const rsc = await request.get(`${base}/studio/personagens?_rsc=test`, {
-    headers: { RSC: "1" },
-  });
-  expect(await rsc.text()).not.toContain("Fundador de Severum");
-});
-
-test("oficina cria ficha, consulta cânone e permite baixar/reabrir rascunhos sem publicá-los", async ({
-  page,
-  request,
-}, testInfo) => {
-  const { readFile } = await import("node:fs/promises");
-  const canonBefore = await readFile("data/characters.json", "utf8");
-  await page.context().addCookies([
-    {
-      name: "__Secure-next-auth.session-token",
-      value: (await authorCookie()).split("=")[1],
-      domain: "127.0.0.1",
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-    },
-  ]);
-  await page.goto(`${base}/studio/personagens`);
-  await page
-    .getByLabel("Nome do personagem", { exact: true })
-    .fill("Ficha de teste privada");
-  await page.getByLabel("Escala", { exact: true }).selectOption("TERRA");
-  await page
-    .getByLabel("Quem é esse personagem?", { exact: true })
-    .fill("Descrição de teste escrita pelo autor.");
-  await expect(page.locator(".workshop-preview h2")).toHaveText(
-    "Ficha de teste privada",
-  );
-  await page.getByRole("button", { name: "Motivações", exact: true }).click();
-  await page
-    .getByLabel("O que ele quer?", { exact: true })
-    .fill("Desejo de teste");
-  await page
-    .getByLabel("O que o impede?", { exact: true })
-    .fill("Conflito de teste");
-  await page
-    .getByRole("button", { name: "Poderes e arco", exact: true })
-    .click();
-  await page
-    .getByLabel("Poderes e habilidades", { exact: true })
-    .fill("Habilidade de teste\nOutra habilidade de teste");
-  await page
-    .getByLabel("Limites, custos e vulnerabilidades", { exact: true })
-    .fill("Limite de teste");
-  await expect(page.locator(".workshop-checklist h3")).toContainText("4/4");
-  await page.getByRole("button", { name: /Cânone 21/ }).click();
-  await page.getByRole("button", { name: /^Arner Red Right Hand$/ }).click();
-  await expect(page.locator(".workshop-canonical")).toContainText(
-    "Comandante-Geral",
-  );
-  await expect(
-    page.getByRole("form", { name: "Rascunho de personagem" }),
-  ).toHaveCount(0);
-  await page.getByRole("button", { name: /Rascunhos 1/ }).click();
-  await page.getByRole("button", { name: "Identidade", exact: true }).click();
-  await expect(
-    page.getByLabel("Nome do personagem", { exact: true }),
-  ).toHaveValue("Ficha de teste privada");
-  const downloaded = page.waitForEvent("download");
-  await page
-    .getByRole("button", { name: "Baixar rascunhos", exact: true })
-    .click();
-  const download = await downloaded;
-  const file = testInfo.outputPath("character-drafts.json");
-  await download.saveAs(file);
-  const workspace = JSON.parse(await readFile(file, "utf8"));
-  expect(workspace.status).toBe("RASCUNHO");
-  expect(workspace.drafts[0].nome).toBe("Ficha de teste privada");
-  expect(workspace.drafts[0].poderes).toContain("Outra habilidade");
-  await page.getByRole("link", { name: "Manuscrito", exact: true }).click();
-  await expect(page).toHaveURL(/\/studio$/);
-  await page.getByRole("link", { name: "Personagens", exact: true }).click();
-  await page
-    .getByLabel("Importar arquivo de rascunhos", { exact: true })
-    .setInputFiles(file);
-  await expect(
-    page.getByLabel("Nome do personagem", { exact: true }),
-  ).toHaveValue("Ficha de teste privada");
-  expect(await readFile("data/characters.json", "utf8")).toBe(canonBefore);
-  expect(await (await request.get("/codex")).text()).not.toContain(
-    "Ficha de teste privada",
-  );
-});
-
-test("oficina preserva alterações ao cancelar saída e rejeita importação inválida", async ({
-  page,
-}) => {
-  await page.context().addCookies([
-    {
-      name: "__Secure-next-auth.session-token",
-      value: (await authorCookie()).split("=")[1],
-      domain: "127.0.0.1",
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-    },
-  ]);
-  await page.goto(`${base}/studio/personagens`);
-  await page
-    .getByLabel("Nome do personagem", { exact: true })
-    .fill("Não perder este rascunho");
-  page.once("dialog", (dialog) => dialog.dismiss());
-  await page.getByRole("link", { name: "Manuscrito", exact: true }).click();
-  await expect(page).toHaveURL(/\/studio\/personagens$/);
-  await page
-    .getByLabel("Importar arquivo de rascunhos", { exact: true })
-    .setInputFiles({
-      name: "invalido.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"status":"PUBLICO"}'),
-    });
-  await expect(page.locator('.workshop-error[role="alert"]')).toBeVisible();
-  await expect(
-    page.getByLabel("Nome do personagem", { exact: true }),
-  ).toHaveValue("Não perder este rascunho");
-  let dialogs = 0;
-  page.on("dialog", async (dialog) => {
-    dialogs += 1;
-    await dialog.accept();
-  });
-  await page.getByRole("link", { name: "Manuscrito", exact: true }).click();
-  await expect(page).toHaveURL(/\/studio$/);
-  expect(dialogs).toBe(1);
-});
-
-test("oficina tem reflow móvel e acessibilidade automatizada", async ({
-  page,
-}, testInfo) => {
-  const { default: AxeBuilder } = await import("@axe-core/playwright");
-  await page.context().addCookies([
-    {
-      name: "__Secure-next-auth.session-token",
-      value: (await authorCookie()).split("=")[1],
-      domain: "127.0.0.1",
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-    },
-  ]);
-  await page.goto(`${base}/studio/personagens`);
-  for (const width of [320, 390, 768, 1440]) {
-    await page.setViewportSize({ width, height: 1000 });
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth - innerWidth,
-      ),
-      String(width),
-    ).toBeLessThanOrEqual(1);
-  }
-  await expect(
-    page.getByRole("heading", {
-      name: "Um personagem começa aqui.",
-      exact: true,
-    }),
-  ).toBeVisible();
-  const analysis = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-    .analyze();
   expect(
-    analysis.violations.map((violation) => ({
-      id: violation.id,
-      targets: violation.nodes.map((node) => node.target),
-    })),
-  ).toEqual([]);
-  await page.screenshot({
-    path: testInfo.outputPath("character-workshop-desktop.png"),
-    fullPage: true,
-  });
-});
-
-test("cronologia de trabalho e sua API exigem acesso do autor", async ({
-  page,
-  request,
-}) => {
-  const anonymous = await request.get(`${base}/api/timeline`);
-  expect(anonymous.status()).toBe(401);
-  expect(await anonymous.text()).not.toContain("erasCosmicas");
+    (await request.get(`${base}/studio`, { maxRedirects: 0 })).status(),
+  ).toBe(307);
+  expect((await request.get(`${base}/api/studio/workspace`)).status()).toBe(
+    401,
+  );
   expect(
     (
-      await request.get(`${base}/studio/cronologia`, { maxRedirects: 0 })
+      await request.get(`${base}/api/studio/workspace`, {
+        headers: { Cookie: "uvc-studio-session=" + "x".repeat(43) },
+      })
     ).status(),
-  ).toBe(307);
-  const cookie = await authorCookie();
-  const authorized = await request.get(`${base}/api/timeline`, {
-    headers: { Cookie: cookie },
+  ).toBe(401);
+  expect(
+    (
+      await request.post(`${base}/api/studio/session`, {
+        headers: { Origin: "https://outro.example" },
+        data: { username: "admin", password: "admin" },
+      })
+    ).status(),
+  ).toBe(403);
+  expect(
+    (
+      await request.post(`${base}/api/studio/session`, {
+        headers: origin,
+        data: { username: "admin", password: "errada" },
+      })
+    ).status(),
+  ).toBe(401);
+  const response = await request.post(`${base}/api/studio/session`, {
+    headers: origin,
+    data: { username: "admin", password: "admin" },
   });
-  expect(authorized.status()).toBe(200);
-  expect((await authorized.json()).erasCosmicas).toHaveLength(5);
-  await page.context().addCookies([
-    {
-      name: "__Secure-next-auth.session-token",
-      value: cookie.split("=")[1],
-      domain: "127.0.0.1",
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-    },
-  ]);
-  await page.goto(`${base}/studio/cronologia`);
-  await expect(page.locator(".era-card")).toHaveCount(5);
-  await page.getByRole("button", { name: "Cenas de Red Right Hand" }).click();
-  await page.getByLabel("Estado da cena").selectOption("RASCUNHO");
-  await page.getByLabel("Ponto de vista").selectOption("Deroo Da");
-  await expect(
-    page.getByRole("heading", { name: "Nenhuma cena encontrada." }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Limpar filtros" }).click();
-  await expect(page.locator(".scene-card")).toHaveCount(8);
-  await page.evaluate(() =>
-    Object.defineProperty(navigator, "clipboard", {
-      value: { writeText: () => Promise.reject(new Error("Denied")) },
-      configurable: true,
-    }),
-  );
+  expect(response.status()).toBe(200);
+  expect(response.headers()["set-cookie"]).toContain("HttpOnly");
+  expect(response.headers()["set-cookie"]).toContain("SameSite=lax");
+  const cookie = response.headers()["set-cookie"].split(";")[0];
+  expect((await request.get(`${base}/studio`)).status()).toBe(200);
+  expect(
+    (
+      await request.delete(`${base}/api/studio/session`, {
+        headers: { Origin: "https://outro.example" },
+      })
+    ).status(),
+  ).toBe(403);
+  expect(
+    (
+      await request.delete(`${base}/api/studio/session`, { headers: origin })
+    ).status(),
+  ).toBe(200);
+  expect(
+    (
+      await request.get(`${base}/api/studio/workspace`, {
+        headers: { Cookie: cookie },
+      })
+    ).status(),
+  ).toBe(401);
+});
+
+test("formulário de login entra com admin/admin sem depender do GitHub", async ({
+  page,
+}) => {
+  await page.goto(`${base}/studio/entrar`);
+  await page.getByLabel("Usuário", { exact: true }).fill("admin");
+  await page.getByLabel("Senha", { exact: true }).fill("errada");
   await page
-    .getByRole("button", { name: "Copiar prompt de revisão" })
-    .first()
+    .getByRole("button", { name: "Entrar no Studio", exact: true })
     .click();
-  await expect(page.locator(".clipboard-feedback")).toContainText(
-    "Não foi possível copiar",
+  await expect(page.locator("main").getByRole("alert")).toContainText(
+    "Usuário ou senha inválidos",
+  );
+  await page.getByLabel("Senha", { exact: true }).fill("admin");
+  await page
+    .getByRole("button", { name: "Entrar no Studio", exact: true })
+    .click();
+  await expect(page).toHaveURL(`${base}/studio`);
+  await expect(page.locator(".db-editor")).toBeVisible();
+});
+
+test("sem DB, Studio informa conexão ausente e não finge autenticar ou salvar", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/studio");
+  await expect(page).toHaveURL(/\/studio\/entrar$/);
+  await expect(page.locator("main")).toContainText("PostgreSQL");
+  const response = await request.post("/api/studio/session", {
+    headers: { Origin: "http://127.0.0.1:3100" },
+    data: { username: "admin", password: "admin" },
+  });
+  expect(response.status()).toBe(503);
+  expect((await request.get("/api/studio/workspace")).status()).toBe(401);
+});
+
+test("gravação PostgreSQL tem histórico e recusa versão antiga sem perder texto", async ({
+  request,
+}) => {
+  await login(request);
+  const entity = {
+    ...blankEntity("concept"),
+    title: "Conceito privado " + randomUUID(),
+    body: "Primeira versão",
+  };
+  const created = await put(request, entity);
+  expect(created.status()).toBe(200);
+  const first = (await created.json()) as StudioEntity;
+  expect(first.version).toBe(1);
+  const updated = await put(request, {
+    ...first,
+    body: "Segunda versão persistida",
+  });
+  expect(updated.status()).toBe(200);
+  expect((await updated.json()).version).toBe(2);
+  expect(
+    (await put(request, { ...first, body: "Não deve sobrescrever" })).status(),
+  ).toBe(409);
+  const pool = new Pool({ connectionString: studioTestEnv.DATABASE_URL });
+  try {
+    const result = await pool.query(
+      "SELECT body,version FROM uvc_entities WHERE id=$1",
+      [entity.id],
+    );
+    expect(result.rows[0]).toEqual({
+      body: "Segunda versão persistida",
+      version: 2,
+    });
+  } finally {
+    await pool.end();
+  }
+  const history = await (
+    await request.get(`${base}/api/studio/entities?id=${entity.id}`)
+  ).json();
+  expect(history[0].snapshot.body).toBe("Primeira versão");
+  expect((await request.get(`${base}/conceitos/${entity.id}`)).status()).toBe(
+    404,
+  );
+  expect(
+    (
+      await request.put(`${base}/api/studio/entities`, {
+        headers: { Origin: "https://outro.example" },
+        data: entity,
+      })
+    ).status(),
+  ).toBe(403);
+  expect(
+    (
+      await request.put(`${base}/api/studio/entities`, {
+        headers: origin,
+        data: { ...entity, publishNow: true },
+      })
+    ).status(),
+  ).toBe(400);
+});
+
+test("edição de personagens persiste no banco e notas privadas não vazam no perfil público", async ({
+  page,
+  request,
+}) => {
+  const before = await readFile("data/characters.json", "utf8");
+  await loginPage(page);
+  await page.goto(`${base}/studio/personagens?id=cole-froz`);
+  await page
+    .getByLabel("Descrição e conteúdo", { exact: true })
+    .fill("Descrição canônica de teste salva pelo autor.");
+  await page
+    .getByLabel("Notas privadas de trabalho", { exact: true })
+    .fill("NOTA_INTERNA_NAO_PUBLICAR");
+  await page.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(page.locator(".workshop-feedback")).toContainText(
+    "Salvo no PostgreSQL",
+  );
+  await page.reload();
+  await expect(
+    page.getByLabel("Descrição e conteúdo", { exact: true }),
+  ).toHaveValue("Descrição canônica de teste salva pelo autor.");
+  const profile = await request.get(`${base}/codex/cole-froz`);
+  expect(profile.status()).toBe(200);
+  const html = await profile.text();
+  expect(html).toContain("Descrição canônica de teste salva pelo autor.");
+  expect(html).not.toContain("NOTA_INTERNA_NAO_PUBLICAR");
+  expect(await readFile("data/characters.json", "utf8")).toBe(before);
+});
+
+test("conceitos conectam-se a personagens no mapa e guardam o layout", async ({
+  page,
+}) => {
+  await loginPage(page);
+  await page.goto(`${base}/studio/conceitos?id=concept-planetas-cegos`);
+  await page
+    .getByLabel("Definição, regras e exemplos", { exact: true })
+    .fill("Definição de trabalho preenchida pelo autor para o teste.");
+  await page.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(page.locator(".workshop-feedback")).toContainText(
+    "Salvo no PostgreSQL",
+  );
+  await page.getByLabel("Conectar com", { exact: true }).selectOption("arner");
+  await page.getByLabel("Relação", { exact: true }).fill("é estudado por");
+  await page
+    .getByRole("button", { name: "Criar vínculo", exact: true })
+    .click();
+  await expect(page.locator(".db-relation-list")).toContainText(
+    "é estudado por",
+  );
+  await expect(
+    page.locator('.react-flow__node[data-id="arner"]'),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Salvar layout", exact: true })
+    .click();
+  await expect(page.locator(".workshop-feedback")).toContainText(
+    "Layout do mapa salvo",
+  );
+  await page.reload();
+  await expect(page.locator(".db-relation-list")).toContainText(
+    "é estudado por",
+  );
+  await page.locator('.react-flow__node[data-id="arner"]').click();
+  await expect(page.getByLabel("Nome ou título", { exact: true })).toHaveValue(
+    "Arner",
   );
 });
 
-test("galeria privada e imagens exigem sessão do autor", async ({
+test("galeria é visual: descrição e vínculos no DB, imagem privada protegida", async ({
+  page,
   request,
 }) => {
-  for (const headers of [
-    {},
-    { Cookie: "__Secure-next-auth.session-token=forjado" },
-    { Cookie: await authorCookie("124") },
-  ] as Record<string, string>[]) {
-    const page = await request.get(`${base}/studio/galeria`, {
-      headers,
-      maxRedirects: 0,
-    });
-    expect(page.status()).toBe(307);
-    expect(await page.text()).not.toContain(inventory[0].source);
-    const image = await request.get(
-      `${base}/api/studio/assets/${inventory[0].id}`,
-      { headers },
-    );
-    expect(image.status()).toBe(401);
-    expect(image.headers()["cache-control"]).toContain("no-store");
-  }
-  const headers = { Cookie: await authorCookie() };
-  const image = await request.get(
-    `${base}/api/studio/assets/${inventory[0].id}`,
-    { headers },
+  const id = `visual-${assets[0].id}`;
+  expect(
+    (await request.get(`${base}/api/studio/assets/${assets[0].id}`)).status(),
+  ).toBe(401);
+  await loginPage(page);
+  await page.goto(`${base}/studio/galeria?id=${id}`);
+  await expect(page.locator(".db-visual-preview img")).toBeVisible();
+  await page
+    .getByLabel("Descrição visual", { exact: true })
+    .fill("Referência visual: contraste de luzes e perspectiva urbana.");
+  await page
+    .getByLabel("Mostrar esta ficha no site público após salvar")
+    .uncheck();
+  await page.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(page.locator(".workshop-feedback")).toContainText(
+    "Salvo no PostgreSQL",
+  );
+  await page.reload();
+  await expect(
+    page.getByLabel("Descrição visual", { exact: true }),
+  ).toHaveValue("Referência visual: contraste de luzes e perspectiva urbana.");
+  expect((await request.get(`${base}/api/public/visuals/${id}`)).status()).toBe(
+    404,
+  );
+  const image = await page.request.get(
+    `${base}/api/studio/assets/${assets[0].id}`,
   );
   expect(image.status()).toBe(200);
   expect(image.headers()["content-type"]).toBe("image/webp");
-  expect((await image.body()).length).toBeGreaterThan(100);
-  expect(
-    (
-      await request.get(`${base}/api/studio/assets/00000000000000000000`, {
-        headers,
-      })
-    ).status(),
-  ).toBe(404);
 });
 
-test("galeria conecta assets ao texto, preserva cópia local e exporta sem publicar", async ({
+test("evento e tarefa são editáveis e ligados à história", async ({ page }) => {
+  await loginPage(page);
+  await page.goto(`${base}/studio/cronologia`);
+  await page.getByRole("button", { name: "Nova ficha", exact: true }).click();
+  await page
+    .getByLabel("Nome ou título", { exact: true })
+    .fill("Evento de teste " + randomUUID());
+  await page
+    .getByLabel("Data, era ou referência temporal", { exact: true })
+    .fill("Durante Marginal");
+  await page.getByLabel("Ordem na cronologia", { exact: true }).fill("42");
+  await page.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(page.locator(".workshop-feedback")).toContainText(
+    "Salvo no PostgreSQL",
+  );
+  await page
+    .getByLabel("Conectar com", { exact: true })
+    .selectOption("story-marginal");
+  await page
+    .getByRole("button", { name: "Criar vínculo", exact: true })
+    .click();
+  await expect(page.locator(".db-relation-list")).toContainText("Marginal");
+  await page.getByRole("link", { name: "Tarefas", exact: true }).click();
+  await page.getByRole("button", { name: "Nova ficha", exact: true }).click();
+  await page
+    .getByLabel("Nome ou título", { exact: true })
+    .fill("Revisar cena de teste");
+  await page.getByLabel("Estado", { exact: true }).selectOption("done");
+  await page.getByLabel("Prioridade", { exact: true }).selectOption("high");
+  await page.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(page.locator(".workshop-feedback")).toContainText(
+    "Salvo no PostgreSQL",
+  );
+});
+
+test("importação de manuscrito preserva o original no DB e não o publica", async ({
   page,
   request,
-}, testInfo) => {
-  const { readFile } = await import("node:fs/promises");
-  await page.context().addCookies([
-    {
-      name: "__Secure-next-auth.session-token",
-      value: (await authorCookie()).split("=")[1],
-      domain: "127.0.0.1",
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-    },
-  ]);
-  await page.goto(`${base}/studio/galeria`);
-  await expect(page.getByText("87 assets no projeto")).toBeVisible();
-  await page
-    .getByLabel("Título de trabalho", { exact: true })
-    .fill("Estudo privado de Severum");
-  await page
-    .getByRole("textbox", { name: "Ideia", exact: true })
-    .fill("Uma atmosfera para a cena.");
-  await page
-    .getByLabel("Texto e notas", { exact: true })
-    .fill("Trecho de teste privado do autor.");
-  await page.getByRole("checkbox", { name: "Arner", exact: true }).check();
-  await page
-    .getByRole("checkbox", { name: "Red Right Hand", exact: true })
-    .check();
-  await page.getByRole("checkbox", { name: /00 · A Reunião/ }).check();
-  await expect(page.locator(".gallery-linked-summary")).toContainText("Arner");
-  await page
-    .getByRole("button", { name: "Salvar neste navegador", exact: true })
-    .click();
-  await page.reload();
-  await expect(
-    page.getByLabel("Título de trabalho", { exact: true }),
-  ).toHaveValue("Estudo privado de Severum");
-  await expect(
-    page.getByRole("checkbox", { name: "Arner", exact: true }),
-  ).toBeChecked();
-  await page
-    .getByRole("combobox", { name: "Mostrar", exact: true })
-    .selectOption("linked");
-  await expect(page.locator(".gallery-asset")).toHaveCount(1);
-  const event = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Baixar cópia", exact: true }).click();
-  const file = testInfo.outputPath("gallery-workspace.json");
-  await (await event).saveAs(file);
-  const saved = JSON.parse(await readFile(file, "utf8"));
-  expect(saved.notes[0].characterIds).toEqual(["arner"]);
-  expect(saved.notes[0].chapterNumbers).toEqual([0]);
-  await page.getByLabel("Arquivo de notas da galeria").setInputFiles({
-    name: "invalido.json",
-    mimeType: "application/json",
-    buffer: Buffer.from('{"format":"outro"}'),
+}) => {
+  await loginPage(page);
+  await page.goto(`${base}/studio/manuscritos`);
+  const content = "Manuscrito privado de teste.\nEste texto não é público.";
+  await page.getByLabel("Importar manuscrito PDF ou texto").setInputFiles({
+    name: "Texto privado de teste.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from(content),
   });
-  await expect(page.locator("main").getByRole("alert")).toContainText(
-    "Arquivo inválido",
+  await expect(page.locator(".workshop-feedback")).toContainText(
+    "Manuscrito importado no PostgreSQL",
   );
   await expect(
-    page.getByLabel("Título de trabalho", { exact: true }),
-  ).toHaveValue("Estudo privado de Severum");
-  page.once("dialog", (dialog) => dialog.accept());
-  await page.getByLabel("Arquivo de notas da galeria").setInputFiles(file);
-  await expect(page.getByRole("status").first()).toContainText(
-    "Arquivo aberto",
+    page.getByLabel("Texto do manuscrito", { exact: true }),
+  ).toHaveValue(content);
+  const link = page.getByRole("link", { name: "Baixar documento original" });
+  const url = await link.getAttribute("href");
+  expect(url).toBeTruthy();
+  expect((await request.get(base + url!)).status()).toBe(401);
+  const original = await page.request.get(base + url!);
+  expect(original.status()).toBe(200);
+  expect(await original.text()).toBe(content);
+  const all = await workspace(page.request);
+  const document = all.entities.find(
+    (e) => e.title === "Texto privado de teste",
+  )!;
+  expect(document.published).toBe(false);
+  expect((await request.get(`${base}/conceitos/${document.id}`)).status()).toBe(
+    404,
   );
-  await page
-    .getByRole("button", { name: "Salvar neste navegador", exact: true })
-    .click();
-  const canon = await readFile("data/characters.json", "utf8");
-  expect(canon).not.toContain("Trecho de teste privado do autor");
-  expect(await (await request.get("/assets")).text()).not.toContain(
-    "Estudo privado de Severum",
-  );
-  await page.screenshot({
-    path: testInfo.outputPath("studio-gallery-desktop.png"),
-    fullPage: true,
-  });
-  await page.getByRole("link", { name: "RRH · Capítulo 00" }).click();
-  await expect(page.locator(".reading-paper")).toContainText("A Reunião");
 });
 
-test("galeria oferece reflow, acesso por teclado e aviso de saída sem salvar", async ({
+test("rejeita vínculo inválido e duplicado sem corromper as fichas", async ({
+  request,
+}) => {
+  await login(request);
+  const data = {
+    id: randomUUID(),
+    sourceId: "arner",
+    targetId: "concept-planetas-cegos",
+    label: "teste de vínculo",
+  };
+  expect(
+    (
+      await request.post(`${base}/api/studio/relations`, {
+        headers: origin,
+        data,
+      })
+    ).status(),
+  ).toBe(200);
+  expect(
+    (
+      await request.post(`${base}/api/studio/relations`, {
+        headers: origin,
+        data: { ...data, id: randomUUID() },
+      })
+    ).ok(),
+  ).toBe(false);
+  expect(
+    (
+      await request.post(`${base}/api/studio/relations`, {
+        headers: origin,
+        data: { ...data, id: randomUUID(), targetId: "arner" },
+      })
+    ).status(),
+  ).toBe(400);
+  const all = await workspace(request);
+  expect(all.entities.some((e) => e.id === "arner")).toBe(true);
+  expect(
+    all.relations.filter(
+      (r) =>
+        r.sourceId === data.sourceId &&
+        r.targetId === data.targetId &&
+        r.label === data.label,
+    ),
+  ).toHaveLength(1);
+});
+
+for (const route of [
+  "/studio",
+  "/studio/personagens",
+  "/studio/galeria",
+  "/studio/manuscritos",
+])
+  test(`reflow e acessibilidade do editor PostgreSQL ${route}`, async ({
+    page,
+  }, testInfo) => {
+    await loginPage(page);
+    await page.goto(base + route);
+    await expect(page.locator(".db-editor")).toBeVisible();
+    for (const width of [320, 390, 768, 1440]) {
+      await page.setViewportSize({ width, height: 1000 });
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth - innerWidth,
+        ),
+        String(width),
+      ).toBeLessThanOrEqual(1);
+    }
+    if (route === "/studio") {
+      await expect
+        .poll(async () =>
+          Math.round(
+            (await page.locator(".react-flow__node").first().boundingBox())
+              ?.width ?? 0,
+          ),
+        )
+        .toBeGreaterThan(100);
+      await page
+        .getByRole("button", { name: "Expandir mapa", exact: true })
+        .click();
+      await expect(page.locator(".db-workbench")).toHaveClass(/map-wide/);
+      await page
+        .getByRole("button", { name: "Voltar ao editor", exact: true })
+        .click();
+    }
+    const analysis = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(
+      analysis.violations.map((v) => ({
+        id: v.id,
+        targets: v.nodes.map((n) => n.target),
+      })),
+    ).toEqual([]);
+    await page.screenshot({
+      path: testInfo.outputPath("studio-db.png"),
+      fullPage: true,
+    });
+  });
+
+test("cancelar saída preserva edição e logout revoga a sessão", async ({
   page,
 }) => {
-  const AxeBuilder = (await import("@axe-core/playwright")).default;
-  await page.context().addCookies([
-    {
-      name: "__Secure-next-auth.session-token",
-      value: (await authorCookie()).split("=")[1],
-      domain: "127.0.0.1",
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-    },
-  ]);
-  await page.goto(`${base}/studio/galeria`);
+  await loginPage(page);
+  await page.goto(`${base}/studio/conceitos`);
   await page
-    .getByRole("button", { name: "Salvar neste navegador", exact: true })
-    .click();
-  for (const width of [320, 390, 768, 1440]) {
-    await page.setViewportSize({ width, height: 1000 });
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth - innerWidth,
-      ),
-    ).toBeLessThanOrEqual(1);
-  }
-  const result = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-    .analyze();
-  expect(
-    result.violations.map((v) => ({
-      id: v.id,
-      targets: v.nodes.map((n) => n.target),
-    })),
-  ).toEqual([]);
-  await page
-    .getByRole("textbox", { name: "Ideia", exact: true })
-    .fill("Ainda não salvo.");
+    .getByLabel("Nome ou título", { exact: true })
+    .fill("Texto ainda não salvo");
   page.once("dialog", (dialog) => dialog.dismiss());
-  await page.getByRole("link", { name: "Manuscrito", exact: true }).click();
-  await expect(page).toHaveURL(/\/studio\/galeria$/);
-  await expect(
-    page.getByRole("textbox", { name: "Ideia", exact: true }),
-  ).toHaveValue("Ainda não salvo.");
+  await page.getByRole("link", { name: "Personagens", exact: true }).click();
+  await expect(page).toHaveURL(/\/studio\/conceitos$/);
+  await expect(page.getByLabel("Nome ou título", { exact: true })).toHaveValue(
+    "Texto ainda não salvo",
+  );
+  page.once("dialog", (dialog) => dialog.accept());
   await page
-    .getByRole("button", { name: "Salvar neste navegador", exact: true })
+    .getByRole("button", { name: "Encerrar sessão", exact: true })
     .click();
-  await page.getByRole("link", { name: "Manuscrito", exact: true }).click();
-  await expect(page).toHaveURL(/\/studio$/);
+  await expect(page).toHaveURL(/\/studio\/entrar$/);
+  expect(
+    (await page.request.get(`${base}/api/studio/workspace`)).status(),
+  ).toBe(401);
 });

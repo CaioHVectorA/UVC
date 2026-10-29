@@ -1,13 +1,8 @@
-import { getStudioTimeline } from "@/lib/studio-content";
-import { StudioTimeline } from "@/components/studio-timeline";
-import { StudioNavigation } from "@/components/studio-navigation";
-export const metadata = { title: "Cronologia — Studio" };
-export default async function StudioTimelinePage() {
-  const { timeline } = await getStudioTimeline();
-  return (
-    <>
-      <StudioNavigation />
-      <StudioTimeline timeline={timeline} />
-    </>
-  );
+import { StudioCollectionPage } from "@/components/studio-collection-page";
+export default function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ id?: string }>;
+}) {
+  return <StudioCollectionPage kind="event" searchParams={searchParams} />;
 }

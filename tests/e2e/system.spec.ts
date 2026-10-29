@@ -87,10 +87,8 @@ test("vitrine apresenta capa publicada, compra e projetos em andamento separados
   ).toHaveAttribute("href", /\/dp\/B0CLKRNS29$/);
   await expect(page.locator("main img")).toHaveCount(1);
   await expect(page.locator("main img")).toHaveAttribute("src", /rrh-ascensao/);
-  await expect(page.locator(".in-progress-card")).toHaveCount(7);
-  await expect(page.locator(".in-progress-section")).toContainText(
-    "Congregadores",
-  );
+  await expect(page.locator(".in-progress-card")).toHaveCount(1);
+  await expect(page.locator(".in-progress-section")).toContainText("Marginal");
   await expect(page.locator('a[href^="/ler/"]')).toHaveCount(0);
   await page.getByRole("link", { name: "Sobre o livro" }).click();
   await expect(page).toHaveURL(/\/historias\/red-right-hand$/);
@@ -121,7 +119,7 @@ test("menu móvel, galeria separada e seleção pública de personagens", async 
   await page.getByRole("combobox").selectOption("Cenários");
   await expect(page.locator(".gallery-item")).toHaveCount(2);
   await page.goto("/codex?equipe=Congregadores");
-  await expect(page.locator(".character-card")).toHaveCount(3);
+  await expect(page.locator(".character-card")).toHaveCount(31);
   await expect(page.locator("main img")).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: /Acervo completo/ }),
@@ -131,7 +129,7 @@ test("menu móvel, galeria separada e seleção pública de personagens", async 
     page.getByRole("heading", { name: "Nenhum personagem encontrado." }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Limpar busca" }).click();
-  await expect(page.locator(".character-card")).toHaveCount(3);
+  await expect(page.locator(".character-card")).toHaveCount(31);
 });
 
 test("acesso ao Studio sem configuração permanece fechado", async ({
@@ -141,7 +139,9 @@ test("acesso ao Studio sem configuração permanece fechado", async ({
   await page.goto("/studio");
   await expect(page).toHaveURL(/\/studio\/entrar$/);
   await expect(
-    page.getByText("O acesso ao Studio ainda não foi configurado."),
+    page.getByText(
+      "O Studio precisa de uma conexão PostgreSQL. Configure DATABASE_URL no servidor para entrar.",
+    ),
   ).toBeVisible();
   await expect(page.locator(".reading-paper")).toHaveCount(0);
   expect((await request.get("/timeline")).url()).toContain("/studio/entrar");
@@ -180,6 +180,8 @@ const publicRoutes = [
   "/historias/red-right-hand",
   "/studio/entrar",
   "/codex/arner",
+  "/conceitos",
+  "/conceitos/place-severum",
 ];
 for (const width of [320, 390, 768, 1440])
   test(`reflow a ${width}px`, async ({ page }) => {
@@ -241,6 +243,6 @@ test("páginas de personagens públicos têm conteúdo canônico e recusam IDs n
     page.getByRole("heading", { name: "Habilidades" }),
   ).toBeVisible();
   await expect(page.locator("main img")).toHaveCount(0);
-  expect((await request.get("/codex/ciecon")).status()).toBe(404);
+  expect((await request.get("/codex/ciecon")).status()).toBe(200);
   expect((await request.get("/codex/inexistente")).status()).toBe(404);
 });

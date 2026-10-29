@@ -1,87 +1,72 @@
 # UVC — Universo Virtual de Caio
 
-Portal de ficção independente criado por Caio Henrique: histórias da Terra/Glen e conflitos cósmicos de Severum, Ormuz, Hades e suas facções. O repositório preserva o cânone, textos e acervo histórico, e contém o site Next.js 15.
+Aplicação de ficção de Caio Henrique com vitrine pública e um Studio de autoria conectado ao PostgreSQL.
 
-## O que funciona hoje
+## Hoje
 
-- Vitrine editorial com a edição publicada **Red Right Hand: A Ascensão**, capa obtida no servidor de imagens da Amazon pelo ASIN, link de compra e página do livro. Projetos em desenvolvimento aparecem em seção separada, sem promessa de lançamento ou acesso aos manuscritos.
-- Galeria separada em `/assets`, preservando as artes e estudos históricos. Essas imagens não são usadas como capas oficiais na vitrine.
-- Codex público com busca e páginas individuais dos personagens classificados como públicos, consumindo suas fichas canônicas. Personagens não classificados não ganham página automaticamente.
-- Studio privado: leitor dos seis capítulos de trabalho, cronologia e consulta canônica, com login GitHub exclusivo do autor e autorização no servidor. Fechado enquanto faltar configuração.
-- Oficina em `/studio/personagens`: fichas por seções, referência canônica, prévia e arquivos JSON para baixar/reabrir. Rascunhos ficam na memória da página; ainda não há salvamento automático no servidor.
-- Galeria privada em `/studio/galeria`: 87 assets da codebase com notas, ideias, textos, tags e vínculos a personagens, histórias e capítulos; cópia neste navegador e arquivo de backup, sem sincronização remota.
-- APIs somente leitura: capítulos seguem a liberação explícita; cronologia exige sessão do autor. Nenhuma grava manuscritos.
+- **Vitrine:** Red Right Hand: A Ascensão publicado, com capa e link Amazon. **Marginal é o único projeto em desenvolvimento.** Os demais títulos permanecem no acervo do universo.
+- **Personagens:** 31 fichas públicas com origem no cânone e no legado. O Studio permite editar fichas, criar outras, manter notas privadas e controlar sua publicação.
+- **Conhecimento:** conceitos, lugares, objetos e facções são fichas próprias. “Planetas cegos” inicia como conceito privado a definir pelo autor, sem regras inventadas.
+- **Mapa:** conexões direcionadas com rótulos, seleção de fichas, navegação por vizinhança, pan/zoom e layout salvo no banco.
+- **Manuscritos:** edição de texto, contagem de palavras, leitura e histórico. Importação PDF/TXT/Markdown, com texto editável e original preservado para download privado. Não há exportação Kindle implementada.
+- **Cronologia e tarefas:** eventos com ordem/referência temporal; tarefas com prioridade, prazo e estado; ambos se ligam às outras fichas.
+- **Galeria:** referências visuais e suas descrições, conectadas às fichas. A seleção publicada é independente das ideias e manuscritos privados.
+- **Persistência:** fichas, ligações, layout, versões, documentos originais e sessões ficam no PostgreSQL. O editor não depende de localStorage para salvar.
 
-A publicação segue o modelo **Git → validação → build → deploy**. Alterações em arquivos não aparecem num deploy antigo: é necessário reconstruir a aplicação. A política explícita de capítulos compartilhados está em [`data/publication.json`](data/publication.json). Todos os arquivos deste repositório público devem ser tratados como públicos; filtro de spoilers não é sigilo.
+## Login e banco
 
-## Executar
+O usuário inicial é **admin**, senha **admin**, conforme solicitado para esta etapa. A senha fica como hash scrypt com salt; sessões usam cookies HttpOnly/SameSite e tokens aleatórios, com expiração e revogação no DB. Esse par conhecido é temporário e deve ser trocado antes de tratar o Studio como uma área exclusiva do autor em um deploy público.
 
-Node.js 22 ou superior e npm. Instalar do lockfile:
+**A única conexão obrigatória é `DATABASE_URL` (ou `POSTGRES_URL`).** Não é necessário cadastrar uma OAuth App. Sem banco configurado, o Studio informa a pendência e não finge salvar; a vitrine pode exibir o snapshot público do repositório. O PostgreSQL local não é automaticamente o banco da Vercel.
+
+Node.js 24 e npm:
 
 ```bash
 npm ci
+# Configure DATABASE_URL em .env.local, usando o modelo .env.example.
+npm run db:init
 npm run dev
 ```
 
-Desenvolvimento e build executam a validação de conteúdo automaticamente. Para servir a compilação de produção:
+O setup local desta revisão usa o contêiner `uvc-studio-postgres`, porta `127.0.0.1:55439`, com volume persistente e segredo apenas em `.env.local`, ignorado pelo Git. Para produção, configure a conexão hospedada nas variáveis da Vercel e faça novo deploy. Não copie o endereço local para a Vercel.
+
+As migrações ficam em `db/migrations`; a inicialização é transacional e serializada. O seed consome os datasets canônicos uma vez e não sobrescreve edições do banco a cada inicialização.
+
+## Marginal
+
+O PDF fornecido pelo autor foi importado no banco local, com texto e arquivo original privados. O manuscrito não foi adicionado ao Git público. Também foram criadas fichas privadas iniciais de seus personagens para revisão.
+
+Para importar no banco selecionado em `.env.local`:
 
 ```bash
-npm run build
-npm start
+npm run db:import:marginal -- "/caminho/Marginal PTP 2025-2.pdf"
 ```
 
-Copie `.env.example` para `.env.local` se quiser configurar `UVC_SITE_URL` com a origem HTTPS real do deploy, **antes de compilar**. Sem essa variável o site funciona, mas não inventa domínio canônico e o sitemap fica sem URLs. Não use o endereço do site antigo apenas por ter sido referência visual.
+O app oferece o botão **Importar manuscrito** para PDF, TXT e Markdown (até 4 MB; PDFs até 500 páginas). Extração de texto não preserva a diagramação: o original permanece disponível. PDF digitalizado sem texto precisa de OCR, que não é simulado pelo aplicativo.
 
-## Acesso ao Studio
-
-A vitrine segue `data/publication.json`. A lista de capítulos públicos está vazia: `/ler/*` e a API de capítulos não disponibilizam os manuscritos. `/studio` exige autenticação e autorização no servidor antes de carregar conteúdo; o link no portal não concede acesso. Sem configuração OAuth completa, a entrada informa indisponibilidade e não carrega manuscritos.
-
-Configure a OAuth App do GitHub e as variáveis de servidor conforme o [guia de acesso ao Studio](docs/architecture/studio-access.md). Nenhum segredo deve usar prefixo `NEXT_PUBLIC_` ou entrar no Git. O login protege o workspace; os arquivos deste repositório e o acervo compartilhado continuam públicos.
-
-## Verificações
+## Verificar
 
 ```bash
 npm run validate:content
 npm run lint
 npm run typecheck
 npm test
-npm audit --audit-level=moderate
 npm run build
-npx playwright install chromium
+npm run db:test
 npm run test:e2e
 ```
 
-O CI em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) repete as verificações e instala as dependências do navegador. Os testes de integração usam a aplicação compilada em `127.0.0.1:3100` e `:3101` (configuração fictícia de autenticação), sem modificar conteúdo. Artefatos de falha ficam em `test-results/` e não entram no Git.
+Os testes de navegador usam um PostgreSQL **isolado** (`uvc_test`, porta local 55440) e o login real do aplicativo. O preparo dos testes recusa bancos com outro nome/host. O CI provisiona um PostgreSQL próprio. Os testes não apagam o banco de trabalho.
 
-## Estrutura
+## Conteúdo e manutenção
 
-| Diretório/arquivo | Responsabilidade |
-| --- | --- |
-| `app/` | Páginas, leitura, APIs e metadados |
-| `components/` | Interface compartilhada, leitor e navegação |
-| `lib/content.ts`, `lib/schemas.ts` | Fonte de dados da aplicação e contratos verificados no build |
-| `data/` | Personagens, facções, histórias, cronologia e política de publicação |
-| `books/red-right-hand/` | Manifesto e textos canônicos em Markdown |
-| `assets/`, `legacy/` | Arquivo histórico preservado |
-| `data/media.json`, `public/media/` | Manifesto das imagens selecionadas e derivados WebP |
-| `tests/` | Contratos, APIs, interface, reflow e acessibilidade automatizada |
-| `docs/` | Cânone, arquitetura, decisões e fluxo editorial |
+`data/characters.json`, `data/factions.json` e `data/series_and_solos.json` alimentam o acervo inicial. As fichas públicas do banco controlam as atualizações publicadas pelo Studio. Notas privadas não são serializadas para a wiki. Manuscritos e fichas novas iniciam privados.
 
-Para atualizar o inventário privado após adicionar/mover assets: `npm run assets:index`.
+Os arquivos e o histórico deste repositório continuam públicos. Não adicione manuscritos confidenciais, backups ou segredos ao Git. Os originais em `assets/` e os textos legados foram preservados. Atualize o índice das imagens com `npm run assets:index` quando necessário.
 
-Para regenerar os derivados das imagens: `npm run media:prepare`. O manifesto registra fonte, dimensões, finalidade e revisão de créditos/licenças; arquivos desconhecidos não recebem autoria inventada.
-
-## Documentação
-
-- [Galeria de ideias e limites de salvamento](docs/architecture/studio-gallery.md)
-- [Oficina de personagens e limites de salvamento](docs/architecture/studio-character-workshop.md)
-- [Fluxo editorial e publicação](docs/architecture/editorial-workflow.md)
-- [Contratos das APIs e schemas](docs/architecture/api-schemas.md)
-- [Design system](docs/architecture/design-system.md)
-- [Problemas resolvidos e pendências](problems.md)
+- [Studio com PostgreSQL](docs/architecture/studio-database.md)
+- [Login e fronteira pública/privada](docs/architecture/studio-access.md)
+- [Fluxo editorial](docs/architecture/editorial-workflow.md)
+- [Contratos de API](docs/architecture/api-schemas.md)
+- [Problemas e estado das entregas](problems.md)
 - [Diretrizes do cânone](AGENTS.md)
-- [Cosmologia](docs/lore/cosmology.md) e [personagens](docs/characters/)
-
-Exportação EPUB/PDF/KPF, edição com salvamento e auditoria automática são **evoluções futuras**, não capacidades existentes. A publicação KDP precisa de validação editorial e metadados reais. Diagramas antigos de produto devem ser lidos como planejamento.
-
-O universo, os textos e personagens são apresentados como criação de Caio Henrique. A proveniência de cada arquivo visual histórico é registrada separadamente, sem presumir licença apenas por estar no acervo.

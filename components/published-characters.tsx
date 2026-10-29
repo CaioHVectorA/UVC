@@ -24,8 +24,8 @@ export function PublishedCharacters({
   );
   return (
     <>
-      <PageIntro label="Red Right Hand" title="Personagens">
-        Alguns dos nomes que fazem parte da história.
+      <PageIntro label="Universo UVC" title="Personagens">
+        Explore as fichas do universo e do acervo legado.
       </PageIntro>
       <div className="toolbar">
         <label className="search-field">

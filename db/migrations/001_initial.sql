@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS uvc_users(id text PRIMARY KEY, username text UNIQUE NOT NULL, password_hash text NOT NULL, failed_attempts integer NOT NULL DEFAULT 0, locked_until timestamptz);
+  CREATE TABLE IF NOT EXISTS uvc_sessions(token_hash text PRIMARY KEY,user_id text NOT NULL REFERENCES uvc_users(id),expires_at timestamptz NOT NULL);
+  CREATE TABLE IF NOT EXISTS uvc_entities(id text PRIMARY KEY,kind text NOT NULL,title text NOT NULL,body text NOT NULL DEFAULT '',summary text NOT NULL DEFAULT '',status text NOT NULL DEFAULT 'draft',published boolean NOT NULL DEFAULT false,tags jsonb NOT NULL DEFAULT '[]',attributes jsonb NOT NULL DEFAULT '{}',version integer NOT NULL DEFAULT 1,archived boolean NOT NULL DEFAULT false,updated_at timestamptz NOT NULL DEFAULT now());
+  CREATE TABLE IF NOT EXISTS uvc_relations(id text PRIMARY KEY,source_id text NOT NULL REFERENCES uvc_entities(id),target_id text NOT NULL REFERENCES uvc_entities(id),label text NOT NULL,UNIQUE(source_id,target_id,label),CHECK(source_id <> target_id));
+  CREATE TABLE IF NOT EXISTS uvc_files(id text UNIQUE NOT NULL,entity_id text PRIMARY KEY REFERENCES uvc_entities(id),name text NOT NULL,mime text NOT NULL,content bytea NOT NULL,sha256 text NOT NULL);
+  CREATE TABLE IF NOT EXISTS uvc_layout(user_id text NOT NULL,entity_id text NOT NULL REFERENCES uvc_entities(id),x double precision NOT NULL,y double precision NOT NULL,PRIMARY KEY(user_id,entity_id));
+  CREATE TABLE IF NOT EXISTS uvc_revisions(id bigserial PRIMARY KEY,entity_id text NOT NULL REFERENCES uvc_entities(id),user_id text NOT NULL,version integer NOT NULL,snapshot jsonb NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
+  CREATE INDEX IF NOT EXISTS uvc_entities_kind ON uvc_entities(kind,archived);
+  CREATE INDEX IF NOT EXISTS uvc_sessions_expiration ON uvc_sessions(expires_at);
+CREATE TABLE IF NOT EXISTS uvc_seed_versions(version integer PRIMARY KEY,installed_at timestamptz NOT NULL DEFAULT now());

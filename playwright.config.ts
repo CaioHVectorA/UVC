@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 import { studioTestEnv } from "./tests/studio-fixture";
 export default defineConfig({
   testDir: "./tests/e2e",
+  globalSetup: "./tests/global-setup.ts",
   fullyParallel: false,
   workers: 1,
   forbidOnly: !!process.env.CI,
@@ -24,6 +25,8 @@ export default defineConfig({
       command: "npm run start -- --hostname 127.0.0.1 --port 3100",
       url: "http://127.0.0.1:3100",
       env: {
+        DATABASE_URL: "",
+        POSTGRES_URL: "",
         NEXTAUTH_SECRET: "",
         UVC_STUDIO_GITHUB_CLIENT_ID: "",
         UVC_STUDIO_GITHUB_CLIENT_SECRET: "",

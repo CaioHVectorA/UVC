@@ -71,5 +71,12 @@
     "tipo": "SOLO",
     "local": "UNIVERSAL",
     "sinopse": "O embate titânico de Naok contra o Delimitador em meio às ruínas flamejantes de seu povo."
+  },
+  {
+    "id": "marginal",
+    "titulo": "Marginal",
+    "tipo": "SOLO",
+    "local": "TERRA",
+    "sinopse": "Projeto em desenvolvimento."
   }
 ]

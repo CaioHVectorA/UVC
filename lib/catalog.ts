@@ -1,6 +1,7 @@
 import { series, publication } from "@/lib/content";
 
 const editions: Record<string, { slug: string; art: string; color: string }> = {
+  marginal: { slug: "marginal", art: "uvc", color: "#edc993" },
   guardioes: { slug: "guardioes", art: "guardioes", color: "#f3bd62" },
   "menino-resiliente": {
     slug: "menino-resiliente",

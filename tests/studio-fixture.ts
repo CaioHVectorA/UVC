@@ -1,8 +1,10 @@
-// Local test credentials only: never used by application code or a deployment.
+// Isolated PostgreSQL for tests only; never use this credential for a deployment.
+export const testDatabaseUrl =
+  process.env.TEST_DATABASE_URL ??
+  "postgresql://uvc:uvc-test-only@127.0.0.1:55440/uvc_test";
 export const studioTestEnv = {
+  DATABASE_URL: testDatabaseUrl,
+  POSTGRES_URL: "",
+  UVC_SITE_URL: "https://studio.example.test",
   NEXTAUTH_URL: "https://studio.example.test",
-  NEXTAUTH_SECRET: "e2e-only-signing-secret-for-local-studio-tests-2026",
-  UVC_STUDIO_GITHUB_CLIENT_ID: "e2e-client",
-  UVC_STUDIO_GITHUB_CLIENT_SECRET: "e2e-provider-secret",
-  UVC_STUDIO_GITHUB_ID: "123",
 };

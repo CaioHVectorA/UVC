@@ -12,11 +12,9 @@
       "Conjuração de raios de energia concentrada",
       "Voo supersônico"
     ],
-    "aparicoes": [
-      "Guardiões (Série)",
-      "Menino Resiliente"
-    ],
-    "img": "Guardioes.png"
+    "aparicoes": ["Guardiões (Série)", "Menino Resiliente"],
+    "img": "Guardioes.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "kerry",
@@ -30,12 +28,9 @@
       "Endurecimento epidérmico (Pele em aço maciço)",
       "Mestre em combate corpo-a-corpo"
     ],
-    "aparicoes": [
-      "Kerry (Solo)",
-      "Guardiões (Série)",
-      "Menino Resiliente"
-    ],
-    "img": "Kerry.png"
+    "aparicoes": ["Kerry (Solo)", "Guardiões (Série)", "Menino Resiliente"],
+    "img": "Kerry.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "larry-mr",
@@ -49,11 +44,9 @@
       "Resistência a impactos contundentes e balísticos",
       "Absorção de choque cinético"
     ],
-    "aparicoes": [
-      "Menino Resiliente (Série - 12 Episódios)",
-      "Guardiões"
-    ],
-    "img": "MeninoResiliente.png"
+    "aparicoes": ["Menino Resiliente (Série - 12 Episódios)", "Guardiões"],
+    "img": "MeninoResiliente.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "ciecon",
@@ -67,11 +60,9 @@
       "Subconsciente racional e falante (Guia tático cósmico)",
       "Disparos de energia pelo Bracelete"
     ],
-    "aparicoes": [
-      "Ciecon (Solo)",
-      "Congregadores (Série)"
-    ],
-    "img": "Ciecon.jpg"
+    "aparicoes": ["Ciecon (Solo)", "Congregadores (Série)"],
+    "img": "Ciecon.jpg",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "rex",
@@ -85,10 +76,9 @@
       "Fisiologia adaptada para velocidade extrema",
       "Mandíbula com dentes perfurantes"
     ],
-    "aparicoes": [
-      "Congregadores (Série)"
-    ],
-    "img": "Cong.png"
+    "aparicoes": ["Congregadores (Série)"],
+    "img": "Cong.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "naok-pm",
@@ -102,11 +92,9 @@
       "Reflexos de combate aprimorados",
       "Vontade inquebrável"
     ],
-    "aparicoes": [
-      "Punho Mortal (Solo)",
-      "Congregadores (Série)"
-    ],
-    "img": "Punho Mortal.png"
+    "aparicoes": ["Punho Mortal (Solo)", "Congregadores (Série)"],
+    "img": "Punho Mortal.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "ormuz",
@@ -121,10 +109,9 @@
       "Controle da realidade e espaço primordial",
       "Imortalidade absoluta"
     ],
-    "aparicoes": [
-      "Mencionado em todas as obras maiores do UVC"
-    ],
-    "img": ""
+    "aparicoes": ["Mencionado em todas as obras maiores do UVC"],
+    "img": "",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "hades",
@@ -139,12 +126,9 @@
       "Teletransporte dimensional",
       "Manipulação mental e telecinese global"
     ],
-    "aparicoes": [
-      "Hades (Solo)",
-      "Guardiões (Série)",
-      "Ciecon (Solo)"
-    ],
-    "img": "HADES.png"
+    "aparicoes": ["Hades (Solo)", "Guardiões (Série)", "Ciecon (Solo)"],
+    "img": "HADES.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "arner",
@@ -161,10 +145,7 @@
       "Redação e aplicação das 35 Teses de Severum",
       "Monopólio econômico e militar da Red Right Hand"
     ],
-    "aparicoes": [
-      "Red Right Hand (Volume I)",
-      "Red Right Hand (Série)"
-    ],
+    "aparicoes": ["Red Right Hand (Volume I)", "Red Right Hand (Série)"],
     "img": "RRH.png"
   },
   {
@@ -201,11 +182,9 @@
       "Resistência a bombardeios e calor extremo",
       "Massa muscular hiper-densa"
     ],
-    "aparicoes": [
-      "Red Right Hand (Série)",
-      "Punho Mortal"
-    ],
-    "img": "delimitador.jpg"
+    "aparicoes": ["Red Right Hand (Série)", "Punho Mortal"],
+    "img": "delimitador.jpg",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "tarlin",
@@ -219,10 +198,9 @@
       "Porte do rifle sniper lendário Katharízo",
       "Percepção sensorial ampliada"
     ],
-    "aparicoes": [
-      "Red Right Hand (Série)"
-    ],
-    "img": "tarlin.jpg"
+    "aparicoes": ["Red Right Hand (Série)"],
+    "img": "tarlin.jpg",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "curtin",
@@ -236,10 +214,9 @@
       "Disparo de precisão com pistolas duplas Kayn & Abel",
       "Manobras aerodinâmicas de alta agilidade"
     ],
-    "aparicoes": [
-      "Red Right Hand (Série)"
-    ],
-    "img": "RRH.png"
+    "aparicoes": ["Red Right Hand (Série)"],
+    "img": "RRH.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "mylon",
@@ -252,10 +229,9 @@
       "Emissão de pulso luminoso hipnótico para controle e confusão mental",
       "Especialista em armas automáticas de cadência rápida"
     ],
-    "aparicoes": [
-      "Red Right Hand (Série)"
-    ],
-    "img": "RRH.png"
+    "aparicoes": ["Red Right Hand (Série)"],
+    "img": "RRH.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "chin",
@@ -269,10 +245,9 @@
       "Imunidade à dor física",
       "Maestria em explosivos e armamento pesado"
     ],
-    "aparicoes": [
-      "Red Right Hand (Série)"
-    ],
-    "img": "RRH.png"
+    "aparicoes": ["Red Right Hand (Série)"],
+    "img": "RRH.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "ellis",
@@ -286,10 +261,9 @@
       "Operações stealth e emboscada",
       "Rifle de precisão Nova Owl"
     ],
-    "aparicoes": [
-      "Red Right Hand (Série)"
-    ],
-    "img": "RRH.png"
+    "aparicoes": ["Red Right Hand (Série)"],
+    "img": "RRH.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "irmaos-yaa",
@@ -306,10 +280,7 @@
       "Tsuuya: Lâmina de corte definitivo que retalha o alvo vulnerabilizado gerando desmembramento ou morte imediata",
       "Sincronia tática de combate em dupla"
     ],
-    "aparicoes": [
-      "Red Right Hand (Volume I)",
-      "Red Right Hand (Série)"
-    ],
+    "aparicoes": ["Red Right Hand (Volume I)", "Red Right Hand (Série)"],
     "img": "RRH.png"
   },
   {
@@ -324,10 +295,9 @@
       "Disparos de energia destrutiva",
       "Voo de alta velocidade"
     ],
-    "aparicoes": [
-      "Guardiões (Série)"
-    ],
-    "img": ""
+    "aparicoes": ["Guardiões (Série)"],
+    "img": "",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "paw-froz",
@@ -341,10 +311,9 @@
       "Criação de construtos de gelo",
       "Voo"
     ],
-    "aparicoes": [
-      "Guardiões (Série)"
-    ],
-    "img": ""
+    "aparicoes": ["Guardiões (Série)"],
+    "img": "",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "inera",
@@ -353,14 +322,10 @@
     "alinhamento": "Heróina",
     "escala": "TERRA",
     "desc": "Figura maternal e líder moral dos Guardiões. Após um sequestro traumático, despertou a habilidade de canalizar chamas vivas.",
-    "poderes": [
-      "Pirocinese (manipulação e emissão de fogo)",
-      "Voo rápido"
-    ],
-    "aparicoes": [
-      "Guardiões (Série)"
-    ],
-    "img": "Guardioes.png"
+    "poderes": ["Pirocinese (manipulação e emissão de fogo)", "Voo rápido"],
+    "aparicoes": ["Guardiões (Série)"],
+    "img": "Guardioes.png",
+    "statusVisibilidade": "PUBLICO"
   },
   {
     "id": "alero",
@@ -373,9 +338,118 @@
       "Eletrocinese (manipulação de relâmpagos e eletricidade)",
       "Voo rápido"
     ],
-    "aparicoes": [
-      "Guardiões (Série)"
-    ],
-    "img": "Guardioes.png"
+    "aparicoes": ["Guardiões (Série)"],
+    "img": "Guardioes.png",
+    "statusVisibilidade": "PUBLICO"
+  },
+  {
+    "id": "cole-froz",
+    "nome": "Cole Froz",
+    "equipe": "Independente",
+    "alinhamento": "A revisar pelo autor",
+    "escala": "TERRA",
+    "desc": "Jovem nômade espacial que encontra refúgio na Antártida. Seu controle sobre gelo e neve se fortalece no continente congelado.",
+    "poderes": ["Manipulação de gelo e neve", "Voo"],
+    "aparicoes": ["O Glacial Fim do Mundo"],
+    "statusVisibilidade": "PUBLICO"
+  },
+  {
+    "id": "yeti",
+    "nome": "Yeti",
+    "equipe": "Independente",
+    "alinhamento": "A revisar pelo autor",
+    "escala": "TERRA",
+    "desc": "No relato legado, conta a Cole Froz que era humano e foi abandonado na Antártida durante uma guerra. A adaptação ao frio alterou seu corpo.",
+    "poderes": ["Adaptação ao frio", "Força física descrita no relato"],
+    "aparicoes": ["O Glacial Fim do Mundo"],
+    "statusVisibilidade": "PUBLICO"
+  },
+  {
+    "id": "dizz",
+    "nome": "Dizz",
+    "equipe": "Ligado a Ciecon",
+    "alinhamento": "A revisar pelo autor",
+    "escala": "UNIVERSAL",
+    "desc": "Voz que orienta Ciecon e se apresenta como uma representação do poder ligado ao Bracelete Divino.",
+    "poderes": ["Orientação a Ciecon descrita no texto legado"],
+    "aparicoes": ["Ciecon (Solo)"],
+    "statusVisibilidade": "PUBLICO"
+  },
+  {
+    "id": "kin",
+    "nome": "Kin",
+    "equipe": "Família de Kerry",
+    "alinhamento": "A revisar pelo autor",
+    "escala": "TERRA",
+    "desc": "Pai de Kerry, presente no início de sua história no texto legado.",
+    "poderes": ["Nenhum poder descrito no trecho de origem"],
+    "aparicoes": ["Kerry (Solo)"],
+    "statusVisibilidade": "PUBLICO"
+  },
+  {
+    "id": "clara",
+    "nome": "Clara",
+    "equipe": "Família de Kerry",
+    "alinhamento": "A revisar pelo autor",
+    "escala": "TERRA",
+    "desc": "Mãe de Kerry, presente no início de sua história no texto legado.",
+    "poderes": ["Nenhum poder descrito no trecho de origem"],
+    "aparicoes": ["Kerry (Solo)"],
+    "statusVisibilidade": "PUBLICO"
+  },
+  {
+    "id": "luy",
+    "nome": "Luy",
+    "equipe": "A revisar",
+    "alinhamento": "A revisar pelo autor",
+    "escala": "TERRA",
+    "desc": "Nome mencionado no relato legado de Kerry como responsável pela morte de seus pais.",
+    "poderes": ["Habilidades a revisar pelo autor"],
+    "aparicoes": ["Kerry (Solo)"],
+    "statusVisibilidade": "PUBLICO"
+  },
+  {
+    "id": "general-dawmnes",
+    "nome": "General Dawmnes",
+    "equipe": "Forças militares",
+    "alinhamento": "A revisar pelo autor",
+    "escala": "TERRA",
+    "desc": "Militar que enfrenta Cole Froz na Antártida e busca a ajuda dos Guardiões diante da crise descrita no relato legado.",
+    "poderes": ["Uso de armas de fogo e granadas de gás"],
+    "aparicoes": ["O Glacial Fim do Mundo"],
+    "statusVisibilidade": "PUBLICO"
+  },
+  {
+    "id": "tay",
+    "nome": "Tay",
+    "equipe": "A revisar pelo autor",
+    "alinhamento": "A revisar pelo autor",
+    "escala": "UNIVERSAL",
+    "desc": "Personagem que confronta o Delimitador no passado narrado em Red Right Hand.",
+    "poderes": ["Combate corpo a corpo com soco inglês"],
+    "aparicoes": ["Red Right Hand (Série)"],
+    "statusVisibilidade": "PUBLICO"
+  },
+  {
+    "id": "masin",
+    "nome": "Masin",
+    "equipe": "Red Right Hand / Irmãos Yaa",
+    "alinhamento": "A revisar pelo autor",
+    "escala": "UNIVERSAL",
+    "desc": "Um dos Irmãos Yaa, dupla de combatentes formada por Masin e Tsuuya.",
+    "poderes": ["Maldição Enokití: conjuração de lâminas de energia"],
+    "aparicoes": ["Red Right Hand (Série)"],
+    "statusVisibilidade": "PUBLICO"
+  },
+  {
+    "id": "tsuuya",
+    "nome": "Tsuuya",
+    "equipe": "Red Right Hand / Irmãos Yaa",
+    "alinhamento": "A revisar pelo autor",
+    "escala": "UNIVERSAL",
+    "desc": "Integrante dos Irmãos Yaa, dupla de combatentes formada por Masin e Tsuuya.",
+    "poderes": ["Maldição Enokití: conjuração de lâminas de energia"],
+    "aparicoes": ["Red Right Hand (Série)"],
+    "statusVisibilidade": "PUBLICO"
   }
 ]

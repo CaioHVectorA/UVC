@@ -65,3 +65,9 @@ Verificação automatizada cobre reflow público em 320/390/768/1440 px, Axe, na
 A vitrine combina Cormorant Garamond nos títulos e Space Grotesk na interface, hospedadas localmente com suas licenças OFL em `app/fonts`. A capa publicada de RRH vem do servidor de imagens da Amazon associado ao ASIN `B0CLKRNS29`, preservada em `public/covers/rrh-ascensao.jpg`; a URL de origem está no registro da edição. A imagem mostra o subtítulo **A Ascensão**, refletido na apresentação. Não foi substituída por uma arte histórica.
 
 Os projetos listados em `publication.workInProgress` aparecem separadamente em “Em desenvolvimento”, sem datas estimadas nem páginas de leitura liberadas. O detalhe de livro continua limitado a edições publicadas. Páginas `/codex/[id]` apresentam dados canônicos dos personagens classificados como públicos. A galeria privada usa biblioteca com busca, prévia e formulário de notas e conexões; veja [o contrato de salvamento](studio-gallery.md).
+
+## Studio persistente
+
+A interface de autoria usa biblioteca, editor/mapa e conexões. As coleções compartilham busca, estado editorial, publicação, histórico e salvamento real no banco. O mapa tem enquadramento legível após redimensionar, controle de alcance, zoom e opção de visualização ampla. A galeria foi reduzida ao seu papel visual; conceitos e textos têm fichas próprias. Campos do editor usam pelo menos 16 px e controles têm alvos apropriados ao toque.
+
+A verificação cruza navegação, API e PostgreSQL: não basta um aviso visual de salvamento. Os testes conferem conteúdo persistido, histórico, conflito de versão, sessão revogada e ausência de notas privadas na wiki.

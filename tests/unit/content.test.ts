@@ -97,9 +97,9 @@ test("sitemap só usa origem configurada e destinos de leitura explícitos", asy
   try {
     const { default: sitemap } = await import("../../app/sitemap");
     delete process.env.UVC_SITE_URL;
-    assert.deepEqual(sitemap(), []);
+    assert.deepEqual(await sitemap(), []);
     process.env.UVC_SITE_URL = "https://uvc.example";
-    const urls = sitemap().map((item) => item.url);
+    const urls = (await sitemap()).map((item) => item.url);
     assert.equal(
       urls.some((url) => url.includes("/ler/")),
       false,

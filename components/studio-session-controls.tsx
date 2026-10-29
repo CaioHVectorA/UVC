@@ -1,8 +1,6 @@
 "use client";
-import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
-import { LogIn, LogOut } from "lucide-react";
-
+import { LogOut } from "lucide-react";
 export function StudioSessionControl({
   action,
 }: {
@@ -17,39 +15,30 @@ export function StudioSessionControl({
         data-leave-studio={action === "signout" ? "true" : undefined}
         disabled={pending}
         onClick={async () => {
+          if (action === "signin") {
+            window.location.assign("/studio/entrar");
+            return;
+          }
           setPending(true);
-          setError("");
           try {
-            if (action === "signin")
-              await signIn("github", { callbackUrl: "/studio" });
-            else {
-              // Full navigation clears the previous session's in-browser RSC state.
-              const result = await signOut({ redirect: false });
-              if (!result?.url) throw new Error("Signout failed");
-              const response = await fetch("/api/auth/session", {
-                cache: "no-store",
-              });
-              if (!response.ok || (await response.json()).studioAuthorId)
-                throw new Error("Session is still active");
-              window.location.assign("/studio/entrar");
-            }
+            const response = await fetch("/api/studio/session", {
+              method: "DELETE",
+            });
+            if (!response.ok) throw new Error();
+            window.location.assign("/studio/entrar");
           } catch {
-            window.dispatchEvent(new Event("uvc-studio-navigation-cancelled"));
-            setError("Não foi possível concluir. Tente novamente.");
+            setError("Não foi possível sair. Tente novamente.");
             setPending(false);
+            window.dispatchEvent(new Event("uvc-studio-navigation-cancelled"));
           }
         }}
       >
-        {action === "signin" ? (
-          <LogIn size={18} aria-hidden />
-        ) : (
-          <LogOut size={18} aria-hidden />
-        )}
+        <LogOut size={18} aria-hidden />
         {pending
           ? "Aguarde…"
-          : action === "signin"
-            ? "Entrar com GitHub"
-            : "Encerrar sessão"}
+          : action === "signout"
+            ? "Encerrar sessão"
+            : "Entrar"}
       </button>
       <p role="status" className="session-feedback">
         {error}

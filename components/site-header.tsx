@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 const links = [
   { href: "/#livros", label: "Livros" },
   { href: "/codex", label: "Personagens" },
+  { href: "/conceitos", label: "Conceitos" },
   { href: "/assets", label: "Galeria" },
 ];
 export function SiteHeader() {

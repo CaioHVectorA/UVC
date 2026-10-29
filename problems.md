@@ -181,3 +181,19 @@ Revisão pedida pelo autor: tipografia editorial local, capa de RRH recuperada p
 Galeria privada implementada em `/studio/galeria`: inventário das 87 imagens da codebase, busca, prévia autenticada, notas, ideias, texto, tags e conexões a personagens/histórias/capítulos. Cópia local no navegador e importação/exportação JSON; sincronização remota e publicação por essa tela continuam pendentes. Cadastro da OAuth App e credenciais na Vercel dependem de acesso autenticado às respectivas contas.
 
 Validação desta revisão: lint, tipos, formatação, validação de conteúdo e build passaram; 17 testes unitários e 33 de integração/navegador passaram. As 87 imagens originais foram verificadas como legíveis e incluídas no tracing do endpoint privado. OAuth real continua dependendo da configuração externa e teste de retorno do GitHub.
+
+## Studio com PostgreSQL e espaço de autoria conectado — 28/10/2026
+
+O login do Studio passou a ser por usuário e senha, inicialmente `admin` / `admin`, com hash scrypt e sessões revogáveis no PostgreSQL. Não depende de uma OAuth App do GitHub. A senha conhecida foi solicitada para esta etapa; não oferece exclusividade em um deploy público.
+
+Fichas de personagens, conceitos, lugares, objetos, facções, histórias, manuscritos, eventos, referências visuais e tarefas agora têm persistência real. O editor mantém histórico e controle de versão; conflitos não sobrescrevem silenciosamente o trabalho. O mapa permite navegar por relações direcionadas, ajustar o alcance, ampliar e salvar o layout. A cronologia tem percurso visual e edição da referência temporal/ordem. Tarefas têm prazo, prioridade e estado.
+
+A galeria passou a ser estritamente visual, com descrição e conexões. Conceitos e ideias têm fichas próprias. A wiki consulta fichas publicadas e exclui notas de trabalho. O acervo público tem 31 personagens; os registros adicionais vêm do legado e têm proveniência documentada. Nenhum texto narrativo dos personagens existentes foi reescrito.
+
+Marginal é o único projeto em desenvolvimento na vitrine. Seu PDF de 81 páginas foi importado no PostgreSQL local, com texto editável e original privado preservado. O texto integral, backups e credenciais não foram adicionados ao Git. A importação pelo app também aceita PDF, TXT e Markdown, com limites explícitos e sem OCR fictício.
+
+Infraestrutura: PostgreSQL local com volume persistente e banco separado para testes. Projeto hospedado `UVC Studio` criado no Neon (`sweet-leaf-60096410`); a conexão do deploy depende da autorização das contas e provisionamento das variáveis da Vercel. Instalar a skill não autentica a CLI automaticamente. Não tratar banco local ou projeto vazio hospedado como conexão de produção concluída.
+
+Veja [arquitetura e persistência](docs/architecture/studio-database.md), [acesso](docs/architecture/studio-access.md) e [contratos](docs/architecture/api-schemas.md). Exportação de livros para Kindle, formatação editorial avançada e troca da autenticação temporária permanecem evoluções separadas.
+
+Validação local desta entrega: 20 testes unitários e 36 de integração/navegador passaram, além de lint, tipos, formatação, build e auditoria de dependências sem vulnerabilidades reportadas. O original importado de Marginal tem SHA-256 idêntico ao PDF fornecido. A sessão admin/admin foi conferida também no navegador com o banco de trabalho, separado do banco descartável dos testes.

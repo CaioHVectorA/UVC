@@ -8,18 +8,14 @@ import {
   Sparkles,
   BookOpen,
 } from "lucide-react";
-import { characters } from "@/lib/content";
+import { getPublicCharacters } from "@/lib/public-knowledge";
 import { publishedStories } from "@/lib/catalog";
 import { getSiteUrl } from "@/lib/site-url";
-const publicCharacters = characters.filter(
-  (character) => character.statusVisibilidade === "PUBLICO",
-);
-export const dynamicParams = false;
-export function generateStaticParams() {
-  return publicCharacters.map(({ id }) => ({ id }));
-}
-function getCharacter(id: string) {
-  const character = publicCharacters.find((entry) => entry.id === id);
+export const dynamic = "force-dynamic";
+async function getCharacter(id: string) {
+  const character = (await getPublicCharacters()).find(
+    (entry) => entry.id === id,
+  );
   if (!character) notFound();
   return character;
 }
@@ -28,7 +24,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const character = getCharacter((await params).id);
+  const character = await getCharacter((await params).id);
   return {
     title: character.nome,
     description: character.desc,
@@ -42,7 +38,7 @@ export default async function CharacterPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const character = getCharacter((await params).id);
+  const character = await getCharacter((await params).id);
   return (
     <article className="character-profile">
       <Link href="/codex" className="breadcrumb">
@@ -53,7 +49,13 @@ export default async function CharacterPage({
         <h1>{character.nome}</h1>
         <div className="character-facts">
           <span>{character.alinhamento}</span>
-          <span>{character.escala === "TERRA" ? "Terra" : "Universo"}</span>
+          <span>
+            {character.escala === "TERRA"
+              ? "Terra"
+              : character.escala === "UNIVERSAL / TERRA"
+                ? "Universo / Terra"
+                : "Universo"}
+          </span>
         </div>
         <p className="character-profile-description">{character.desc}</p>
       </header>
@@ -86,11 +88,10 @@ export default async function CharacterPage({
           <BookOpen size={20} aria-hidden /> Leia a história
         </h2>
         {publishedStories
-          .filter(
-            (story) =>
-              character.aparicoes.some((appearance) =>
-                appearance.includes(story.titulo),
-              ) || character.livroIds?.includes("rrh-1"),
+          .filter((story) =>
+            character.aparicoes.some((appearance) =>
+              appearance.includes(story.titulo),
+            ),
           )
           .map((story) => (
             <Link

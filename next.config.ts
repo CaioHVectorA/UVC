@@ -3,7 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  outputFileTracingIncludes: { "/api/studio/assets/*": ["./assets/**/*"] },
+  outputFileTracingIncludes: {
+    "/api/studio/assets/*": ["./assets/**/*"],
+    "/api/public/visuals/*": ["./assets/**/*"],
+    "/*": ["./books/red-right-hand/**/*", "./db/migrations/*.sql"],
+  },
   async headers() {
     return [
       {
