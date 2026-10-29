@@ -197,3 +197,7 @@ Infraestrutura: PostgreSQL local com volume persistente e banco separado para te
 Veja [arquitetura e persistência](docs/architecture/studio-database.md), [acesso](docs/architecture/studio-access.md) e [contratos](docs/architecture/api-schemas.md). Exportação de livros para Kindle, formatação editorial avançada e troca da autenticação temporária permanecem evoluções separadas.
 
 Validação local desta entrega: 20 testes unitários e 36 de integração/navegador passaram, além de lint, tipos, formatação, build e auditoria de dependências sem vulnerabilidades reportadas. O original importado de Marginal tem SHA-256 idêntico ao PDF fornecido. A sessão admin/admin foi conferida também no navegador com o banco de trabalho, separado do banco descartável dos testes.
+
+### 2026-10-29 — Escrita como ambiente próprio
+
+A coleção de manuscritos deixou de usar o formulário genérico. A mesa de escrita reúne árvore de capítulos/cenas por projeto, editor formatado, notas, pesquisa de referências, histórico e foco. O salvamento automático serializa requisições e conserva digitação feita durante uma gravação; falhas e conflitos mantêm o rascunho no editor. A implementação e os limites estão em `docs/architecture/writing-workspace.md`. Fontes e manuscritos originais não foram reescritos.

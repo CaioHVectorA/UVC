@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 const tools = [
   { href: "/studio", label: "Visão geral", icon: Network },
-  { href: "/studio/manuscritos", label: "Manuscritos", icon: BookOpen },
+  { href: "/studio/manuscritos", label: "Escrita", icon: BookOpen },
   { href: "/studio/personagens", label: "Personagens", icon: UsersRound },
   { href: "/studio/conceitos", label: "Conceitos", icon: Lightbulb },
   { href: "/studio/lugares", label: "Lugares", icon: MapPin },

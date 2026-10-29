@@ -4,6 +4,7 @@ import { StudioWorkbench } from "@/components/studio-workbench";
 import { StudioNavigation } from "@/components/studio-navigation";
 import { StudioSessionControl } from "@/components/studio-session-controls";
 import { kindLabels, type EntityKind } from "@/lib/workspace";
+import Link from "next/link";
 export async function StudioCollectionPage({
   kind = "all",
   searchParams,
@@ -28,6 +29,13 @@ export async function StudioCollectionPage({
         </div>
         <StudioSessionControl action="signout" />
       </div>
+      {kind === "all" && (
+        <Link href="/studio/manuscritos" className="studio-writing-entry">
+          <span>Seu próximo capítulo</span>
+          <strong>Continuar escrevendo →</strong>
+          <small>Capítulos, cenas e referências na mesma mesa.</small>
+        </Link>
+      )}
       <div className="db-stats">
         <span>
           {initial.entities.filter((e) => e.kind === "character").length}{" "}

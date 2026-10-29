@@ -2,7 +2,7 @@
 
 O repositório preserva os textos, artes e dados canônicos de origem. O PostgreSQL sustenta o trabalho de autoria. O seed importa o acervo uma vez; reiniciar o app não sobrescreve fichas editadas nem restaura vínculos removidos.
 
-1. Entre no Studio e escolha a coleção: manuscritos, personagens, conceitos, lugares, cronologia, galeria ou tarefas.
+1. Entre no Studio e abra **Escrita** para redigir, ou escolha uma coleção para trabalhar nas fichas de pesquisa. A [mesa de escrita](writing-workspace.md) reúne capítulos/cenas, editor e referências na mesma tela, com salvamento automático no banco.
 2. Crie/edite uma ficha. Use o resumo para busca, texto para o conteúdo e notas privadas para o trabalho interno. Salve no banco pelo botão ou Ctrl/Cmd+S.
 3. Conecte duas fichas com um rótulo que descreva a relação. Use o mapa para navegar por conexões e salvar a organização visual.
 4. Consulte versões anteriores pelo histórico. Carregar uma versão não publica nem grava sozinho: revise e salve uma nova versão.

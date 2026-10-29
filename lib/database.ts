@@ -161,12 +161,67 @@ export class ConflictError extends Error {
 export async function saveEntity(e: StudioEntity, userId: string) {
   await ensureDatabase();
   return transaction(async (client) => {
+    if (e.kind === "document") {
+      if (e.published)
+        throw new InvalidReferenceError("Manuscritos são privados.");
+      const a = e.attributes;
+      if (
+        a.writingType !== undefined &&
+        !["chapter", "scene"].includes(String(a.writingType))
+      )
+        throw new InvalidReferenceError("Tipo de texto inválido.");
+      if (
+        a.writingOrder !== undefined &&
+        (typeof a.writingOrder !== "number" || !Number.isFinite(a.writingOrder))
+      )
+        throw new InvalidReferenceError("Ordem do texto inválida.");
+      if (a.storyId !== undefined) {
+        const story = await client.query(
+          "SELECT id FROM uvc_entities WHERE id=$1 AND kind='story' AND NOT archived",
+          [a.storyId],
+        );
+        if (!story.rowCount)
+          throw new InvalidReferenceError("Escolha um projeto existente.");
+      }
+      if (a.writingParentId) {
+        const parent = (
+          await client.query(
+            "SELECT * FROM uvc_entities WHERE id=$1 AND NOT archived",
+            [a.writingParentId],
+          )
+        ).rows[0];
+        if (
+          a.writingType !== "scene" ||
+          !parent ||
+          parent.id === e.id ||
+          parent.kind !== "document" ||
+          parent.attributes.sourceFileId ||
+          parent.attributes.writingType === "scene" ||
+          parent.attributes.writingParentId ||
+          parent.attributes.storyId !== a.storyId
+        )
+          throw new InvalidReferenceError(
+            "Uma cena deve pertencer a um capítulo do mesmo projeto.",
+          );
+      }
+    }
     const previous = await client.query(
       "SELECT * FROM uvc_entities WHERE id=$1 FOR UPDATE",
       [e.id],
     );
     if (previous.rows.length) {
       const row = previous.rows[0];
+      // A plain-text edit from the catalog must not reopen stale rich text.
+      if (
+        e.kind === "document" &&
+        row.body !== e.body &&
+        row.attributes.richText &&
+        JSON.stringify(row.attributes.richText) ===
+          JSON.stringify(e.attributes.richText)
+      ) {
+        e = { ...e, attributes: { ...e.attributes } };
+        delete e.attributes.richText;
+      }
       if (row.kind !== e.kind)
         throw new InvalidReferenceError(
           "O tipo de uma ficha existente não pode ser alterado.",

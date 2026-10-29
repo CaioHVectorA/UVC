@@ -349,12 +349,12 @@ test("importação de manuscrito preserva o original no DB e não o publica", as
     mimeType: "text/plain",
     buffer: Buffer.from(content),
   });
-  await expect(page.locator(".workshop-feedback")).toContainText(
+  await expect(page.locator(".writing-message")).toContainText(
     "Manuscrito importado no PostgreSQL",
   );
   await expect(
-    page.getByLabel("Texto do manuscrito", { exact: true }),
-  ).toHaveValue(content);
+    page.getByRole("textbox", { name: "Texto do manuscrito", exact: true }),
+  ).toContainText("Manuscrito privado de teste.");
   const link = page.getByRole("link", { name: "Baixar documento original" });
   const url = await link.getAttribute("href");
   expect(url).toBeTruthy();
@@ -429,7 +429,11 @@ for (const route of [
   }, testInfo) => {
     await loginPage(page);
     await page.goto(base + route);
-    await expect(page.locator(".db-editor")).toBeVisible();
+    await expect(
+      page.locator(
+        route === "/studio/manuscritos" ? ".writing-prose" : ".db-editor",
+      ),
+    ).toBeVisible();
     for (const width of [320, 390, 768, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
       expect(

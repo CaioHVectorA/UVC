@@ -48,7 +48,7 @@ export function apiError(error: unknown) {
 }
 export async function inputJson(request: Request) {
   const text = await request.text();
-  if (text.length > 1000000) throw new ZodError([]);
+  if (text.length > 3000000) throw new ZodError([]);
   try {
     return JSON.parse(text);
   } catch {
