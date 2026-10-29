@@ -344,11 +344,13 @@ test("importação de manuscrito preserva o original no DB e não o publica", as
   await loginPage(page);
   await page.goto(`${base}/studio/manuscritos`);
   const content = "Manuscrito privado de teste.\nEste texto não é público.";
-  await page.getByLabel("Importar manuscrito PDF ou texto").setInputFiles({
-    name: "Texto privado de teste.txt",
-    mimeType: "text/plain",
-    buffer: Buffer.from(content),
-  });
+  await page
+    .getByLabel("Importar manuscrito PDF, DOCX ou texto")
+    .setInputFiles({
+      name: "Texto privado de teste.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from(content),
+    });
   await expect(page.locator(".writing-message")).toContainText(
     "Manuscrito importado no PostgreSQL",
   );

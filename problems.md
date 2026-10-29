@@ -201,3 +201,7 @@ Validação local desta entrega: 20 testes unitários e 36 de integração/naveg
 ### 2026-10-29 — Escrita como ambiente próprio
 
 A coleção de manuscritos deixou de usar o formulário genérico. A mesa de escrita reúne árvore de capítulos/cenas por projeto, editor formatado, notas, pesquisa de referências, histórico e foco. O salvamento automático serializa requisições e conserva digitação feita durante uma gravação; falhas e conflitos mantêm o rascunho no editor. A implementação e os limites estão em `docs/architecture/writing-workspace.md`. Fontes e manuscritos originais não foram reescritos.
+
+### 2026-10-29 — Entrada de documentos do Docs e Word
+
+Importação DOCX integrada à mesa de escrita e ao catálogo, com prévia sem gravação, divisão opcional por estilos de títulos, formatação editável, original privado e confirmação idempotente em transação. Limites e diferenças de fidelidade aparecem na prévia e em `docs/architecture/docx-import.md`. Validação: 27 testes unitários e 45 testes de integração/interface passaram, incluindo concorrência, download do original e acessibilidade da prévia.

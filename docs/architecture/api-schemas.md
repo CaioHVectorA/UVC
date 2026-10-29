@@ -15,6 +15,7 @@
 - `DELETE /api/studio/relations`: remove o vínculo; preserva as fichas.
 - `POST /api/studio/layout`: salva posições do mapa separadamente do conteúdo editorial.
 - `POST /api/studio/import`: multipart de PDF/TXT/Markdown, até 4 MB, PDF até 500 páginas e texto até 500 mil caracteres. O documento inicia privado e o original é preservado no banco. PDF sem texto não recebe OCR fictício.
+- `POST /api/studio/import/docx`: multipart de DOCX até 4 MB. `action=preview` devolve opções de divisão e avisos sem gravar fichas. `action=import` exige `storyId`, `split` (`none`, `h1`, `h2`), `importId` UUID e `digest` SHA-256 da prévia. A importação é privada, transacional e idempotente por ID. Fonte, original e capítulos são conectados no banco.
 - `GET /api/studio/files/[id]`: download autenticado do original.
 - `GET /api/studio/assets/[id]`: prévia autenticada de um asset registrado, sem aceitar um caminho arbitrário do cliente.
 - `GET /api/timeline`: eventos do PostgreSQL e seus vínculos, com sessão do autor. A edição ocorre pela API de fichas.

@@ -24,6 +24,7 @@ import {
   type EntityKind,
 } from "@/lib/workspace";
 import { useUnsavedWork } from "@/components/use-unsaved-work";
+import { DocxImportDialog } from "@/components/docx-import-dialog";
 import assets from "@/data/studio-assets.json";
 const KnowledgeMap = dynamic(() => import("@/components/knowledge-map"), {
   ssr: false,
@@ -93,6 +94,7 @@ export function StudioWorkbench({
     >(null);
   const saveRef = useRef<() => void>(() => {});
   const importRef = useRef<HTMLInputElement>(null);
+  const [docxFile, setDocxFile] = useState<File>();
   const [tagText, setTagText] = useState(first?.tags.join(", ") ?? "");
   const selectedTags = draft?.tags.join(", ") ?? "";
   useEffect(() => {
@@ -314,6 +316,10 @@ export function StudioWorkbench({
       )
     )
       return;
+    if (/\.docx$/i.test(file.name)) {
+      setDocxFile(file);
+      return;
+    }
     setPending(true);
     setError("");
     try {
@@ -345,6 +351,28 @@ export function StudioWorkbench({
   const wordCount = draft?.body.trim().split(/\s+/).filter(Boolean).length ?? 0;
   return (
     <div className={`db-workbench ${mapWide ? "map-wide" : ""}`}>
+      {docxFile && (
+        <DocxImportDialog
+          file={docxFile}
+          storyId="story-marginal"
+          projectTitle="Marginal"
+          onCancel={() => setDocxFile(undefined)}
+          onComplete={(fresh, id) => {
+            setWorkspace(fresh);
+            setDraft(fresh.entities.find((e) => e.id === id));
+            setFilter("document");
+            setDirty(false);
+            setHistory(null);
+            setPreview(false);
+            setSearch("");
+            setError("");
+            setDocxFile(undefined);
+            setFeedback(
+              "DOCX importado no PostgreSQL. Abra Escrita para continuar.",
+            );
+          }}
+        />
+      )}
       <div className="db-commandbar">
         <div>
           <Database size={18} aria-hidden />
@@ -363,10 +391,10 @@ export function StudioWorkbench({
           </button>
           <input
             className="sr-only"
-            aria-label="Importar manuscrito PDF ou texto"
+            aria-label="Importar manuscrito PDF, DOCX ou texto"
             ref={importRef}
             type="file"
-            accept=".pdf,.txt,.md,application/pdf,text/plain"
+            accept=".pdf,.txt,.md,.docx,application/pdf,text/plain"
             onChange={(event) => {
               const file = event.target.files?.[0];
               if (file) void importFile(file);

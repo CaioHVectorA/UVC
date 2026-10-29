@@ -8,7 +8,7 @@ Aplicação de ficção de Caio Henrique com vitrine pública e um Studio de aut
 - **Personagens:** 31 fichas públicas com origem no cânone e no legado. O Studio permite editar fichas, criar outras, manter notas privadas e controlar sua publicação.
 - **Conhecimento:** conceitos, lugares, objetos e facções são fichas próprias. “Planetas cegos” inicia como conceito privado a definir pelo autor, sem regras inventadas.
 - **Mapa:** conexões direcionadas com rótulos, seleção de fichas, navegação por vizinhança, pan/zoom e layout salvo no banco.
-- **Manuscritos:** edição de texto, contagem de palavras, leitura e histórico. Importação PDF/TXT/Markdown, com texto editável e original preservado para download privado. Não há exportação Kindle implementada.
+- **Escrita:** capítulos e cenas por projeto, editor formatado, referências, foco, contagem de palavras e histórico. Importação DOCX com prévia e divisão por títulos, além de PDF/TXT/Markdown. O original fica preservado para download privado. Não há exportação Kindle implementada.
 - **Cronologia e tarefas:** eventos com ordem/referência temporal; tarefas com prioridade, prazo e estado; ambos se ligam às outras fichas.
 - **Galeria:** referências visuais e suas descrições, conectadas às fichas. A seleção publicada é independente das ideias e manuscritos privados.
 - **Persistência:** fichas, ligações, layout, versões, documentos originais e sessões ficam no PostgreSQL. O editor não depende de localStorage para salvar.
@@ -34,7 +34,7 @@ As migrações ficam em `db/migrations`; a inicialização é transacional e ser
 
 ## Marginal
 
-O PDF fornecido pelo autor foi importado no banco local, com texto e arquivo original privados. O manuscrito não foi adicionado ao Git público. Também foram criadas fichas privadas iniciais de seus personagens para revisão.
+O PDF fornecido pelo autor foi importado no banco de autoria, com texto e arquivo original privados. O manuscrito não foi adicionado ao Git público. Também foram criadas fichas privadas iniciais de seus personagens para revisão.
 
 Para importar no banco selecionado em `.env.local`:
 
@@ -42,7 +42,7 @@ Para importar no banco selecionado em `.env.local`:
 npm run db:import:marginal -- "/caminho/Marginal PTP 2025-2.pdf"
 ```
 
-O app oferece o botão **Importar manuscrito** para PDF, TXT e Markdown (até 4 MB; PDFs até 500 páginas). Extração de texto não preserva a diagramação: o original permanece disponível. PDF digitalizado sem texto precisa de OCR, que não é simulado pelo aplicativo.
+O app oferece **Importar texto** em Escrita para DOCX, PDF, TXT e Markdown (até 4 MB; PDFs até 500 páginas). O [importador DOCX](docs/architecture/docx-import.md) mostra uma prévia antes de criar os capítulos, conserva formatação básica e mantém o arquivo original. Fontes, paginação, imagens e layouts complexos precisam de conferência. PDF digitalizado sem texto precisa de OCR, que não é simulado pelo aplicativo.
 
 ## Verificar
 

@@ -40,6 +40,7 @@ import {
   writingContent,
 } from "@/lib/writing";
 import { useWritingDocument } from "./use-writing-document";
+import { DocxImportDialog } from "./docx-import-dialog";
 const WritingEditor = dynamic(
   () => import("./writing-editor").then((m) => m.WritingEditor),
   {
@@ -124,6 +125,7 @@ export function WritingDesk({
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [search, setSearch] = useState("");
+  const [docxFile, setDocxFile] = useState<File>();
   const flush = useRef<() => Promise<boolean>>(async () => true),
     fileInput = useRef<HTMLInputElement>(null);
   const active = workspace.entities.find((e) => e.id === activeId);
@@ -234,6 +236,10 @@ export function WritingDesk({
     setMessage("");
     try {
       if (!(await flush.current())) return;
+      if (/\.docx$/i.test(file.name)) {
+        setDocxFile(file);
+        return;
+      }
       const form = new FormData();
       form.set("file", file);
       form.set(
@@ -282,6 +288,7 @@ export function WritingDesk({
         <label className="writing-project">
           <span>Projeto</span>
           <select
+            aria-label="Projeto"
             value={storyId}
             disabled={busy}
             onChange={(e) => {
@@ -326,9 +333,12 @@ export function WritingDesk({
           <button
             type="button"
             aria-label="Notas e referências"
-            aria-expanded={inspector && !focus}
+            disabled={active?.kind !== "document"}
+            aria-expanded={inspector && !focus && active?.kind === "document"}
             aria-controls={
-              inspector && !focus ? "writing-inspector" : undefined
+              inspector && !focus && active?.kind === "document"
+                ? "writing-inspector"
+                : undefined
             }
             onClick={() => {
               setInspector(focus || !inspector);
@@ -478,8 +488,8 @@ export function WritingDesk({
               ref={fileInput}
               className="sr-only"
               type="file"
-              accept=".pdf,.txt,.md"
-              aria-label="Importar manuscrito PDF ou texto"
+              accept=".pdf,.txt,.md,.docx"
+              aria-label="Importar manuscrito PDF, DOCX ou texto"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) void importFile(file);
@@ -523,6 +533,24 @@ export function WritingDesk({
           </div>
         )}
       </div>
+      {docxFile && (
+        <DocxImportDialog
+          file={docxFile}
+          storyId={storyId}
+          projectTitle={story?.title ?? "Textos avulsos"}
+          onCancel={() => setDocxFile(undefined)}
+          onComplete={(fresh, id) => {
+            setWorkspace(fresh);
+            setActiveId(id);
+            rememberDocument(id);
+            setDocxFile(undefined);
+            setSearch("");
+            setMessage(
+              "DOCX importado. Os textos estão prontos para editar; o original está em Material de origem.",
+            );
+          }}
+        />
+      )}
     </section>
   );
 }
@@ -572,10 +600,15 @@ function WritingSession({
   }, [flush, save]);
   const words = wordCount(draft.body),
     goal = Number(draft.attributes.wordGoal ?? 0);
+  const inheritedSourceId = workspace.entities.find(
+    (e) => e.id === draft.attributes.importSourceId,
+  )?.attributes.sourceFileId;
   const sourceId =
     typeof draft.attributes.sourceFileId === "string"
       ? draft.attributes.sourceFileId
-      : null;
+      : typeof inheritedSourceId === "string"
+        ? inheritedSourceId
+        : null;
   const { refIds, references } = useMemo(() => {
     const refIds = new Set(
       workspace.relations

@@ -8,6 +8,8 @@ O centro usa Tiptap/ProseMirror, com corpo, título, subtítulo e seção, negri
 
 O inspetor contém estado, sinopse, notas privadas, meta de palavras e versões. Referências permitem pesquisar personagens, conceitos, lugares, objetos, eventos e imagens, ler a ficha e vinculá-la ao texto sem abandonar a redação. Abrir a ficha completa usa outra aba.
 
+Para trazer o trabalho do Docs ou Word, [importe um DOCX](docx-import.md). A prévia permite confirmar a divisão por títulos antes de criar capítulos formatados no projeto; o arquivo original fica preservado em Material de origem.
+
 ## Persistência e concorrência
 
 O salvamento automático acontece após uma pausa de 1,1 segundo; Ctrl/Cmd+S e o botão salvam imediatamente. Uma única fila serializa as gravações por documento. Se o autor continuar digitando durante uma requisição, a resposta atualiza a versão do banco sem substituir o texto mais recente; a fila grava as alterações seguintes com essa nova versão. Trocar de texto, projeto ou criar/importar outro aguarda o salvamento pendente.
