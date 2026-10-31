@@ -24,7 +24,10 @@ const tools = [
 export function StudioNavigation() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Ferramentas do Studio" className="studio-workspace-nav">
+    <nav
+      aria-label="Ferramentas do Studio"
+      className="studio-workspace-nav flex flex-wrap relative z-50"
+    >
       {tools.map(({ href, label, icon: Icon }) => (
         <Link
           key={href}

@@ -78,8 +78,74 @@ export const seedEntities: StudioEntity[] = [
     "concept-planetas-cegos",
     "concept",
     "Planetas cegos",
-    "Conceito indicado pelo autor. Definição, regras e exemplos a preencher.",
-    { source: "Indicação do autor", definitionPending: true },
+    "Mundos velados no vácuo espacial profundo, situados fora do alcance da luz de Ormuz e das rotas mapeadas de Severum. Envoltos em penumbra gravitacional e anomalias de dobra, esses corpos celestes abrigam relíquias cósmicas primordiais, civilizações esquecidas e refúgios inacessíveis às frotas intergalácticas.",
+    {
+      category: "cosmologia",
+      scale: "UNIVERSAL",
+      rules: [
+        "Invisibilidade Cartográfica: Planetas cegos não emitem radiação estelar comum e são imperceptíveis a radares convencionais, exigindo telemetria quântica.",
+        "Vácuo Profundo: Orbitam pontos neutros no abismo interestelar, fora da jurisdição ou do patrulhamento da Red Right Hand e dos Congregadores.",
+        "Preservação Primordial: Qualquer bioma ou civilização existente em um planeta cego evolui em isolamento extremo, imune a interferências cósmicas normais.",
+      ],
+      visualAssetId: "c8f2c9fc90e20837f585",
+      source: "Indicação do autor",
+      definitionPending: true,
+    },
+    false,
+  ),
+  entity(
+    "concept-dualidade-ormuz-hades",
+    "concept",
+    "A Origem do Universo e a Dualidade Ormuz/Hades",
+    "A gênese do cosmos fundamentada no choque eterno entre Ormuz — a Mente Criadora, guardião da ordem, causalidades e equilíbrio vital — e Hades — a antítese primordial, soberano da entropia cósmica e da aniquilação estelar. Enquanto Ormuz tece o destino e abençoa campeões através de relíquias como o Bracelete Divino, Hades materializa sua ruína através do Lampião, artefato capaz de drenar a essência de estrelas e civilizações inteiras para destronar a ordem universal.",
+    {
+      category: "cosmologia",
+      scale: "UNIVERSAL",
+      rules: [
+        "Causalidade Criadora: Ormuz não intervém fisicamente de forma direta, tecendo leis de harmonia e abençoando campeões portadores de relíquias divinas.",
+        "Entropia Predatória: Hades consome a energia vital de estrelas e planetas através d'O Lampião, acumulando essência para corromper a criação.",
+        "Inviolabilidade Primordial: Nenhuma força mortal pode destruir Hades ou Ormuz definitivamente; apenas conter, aprisionar ou selar suas manifestações.",
+      ],
+      visualAssetId: "8651398f2883f1cc0309",
+      source: "docs/lore/cosmology.md",
+    },
+    true,
+  ),
+  entity(
+    "concept-metodologia-severum",
+    "concept",
+    "Metodologia Corporativo-Militar de Severum",
+    "Doutrina hegemônica formulada pelo líder e estrategista supremo Arner, consolidando a cidade-estado espacial de Severum como o maior polo bélico, financeiro e industrial do cosmos. A metodologia unifica mercantilismo agressivo, neutralidade calculada diante de conflitos divinos, padronização militar draconiana através da Red Right Hand e do Esquadrão Fingers, e exploração científica pragmática de novos mercados planetários.",
+    {
+      category: "geopolitica",
+      scale: "SETOR",
+      rules: [
+        "Rentabilidade Bélica: Toda intervenção armada da Red Right Hand deve produzir retorno estratégico, expansão comercial ou vantagem territorial para Severum.",
+        "Comando Compartimentalizado: Células e divisões como o Esquadrão Fingers atuam com autonomia tática local sob diretrizes sigilosas de Arner.",
+        "Pragmatismo Cósmico: Alianças e tratados de neutralidade são temporários e subordinados à soberania econômica e industrial de Severum.",
+      ],
+      visualAssetId: "fb91a9ad8dfe38591285",
+      source: "docs/lore/world-building.md",
+    },
+    true,
+  ),
+  entity(
+    "concept-biotecnologia-deroo-da",
+    "concept",
+    "Biotecnologia Deroo Da",
+    "Vanguarda de bioengenharia, síntese de cibernética orgânica e enxertos biomecânicos avançados desenvolvidos nos laboratórios privados de Deroo Da em Severum. Essa tecnologia transcende as limitações biológicas convencionais, capacitando organismos vivos com exoesqueletos integrados, próteses neurais autônomas, regeneração celular acelerada e interfaces de combate que operam no limiar entre a máquina e a carne viva.",
+    {
+      category: "biologia",
+      scale: "SETOR",
+      rules: [
+        "Integração Neuro-Cibernética: Próteses e enxertos ligam-se diretamente às sinapses do hospedeiro, exigindo estabilização neural para prevenir choque biomecânico.",
+        "Modularidade de Combate: Sistemas de blindagem celular e armamentos integrados adaptam-se dinamicamente ao vácuo espacial e ambientes hostis.",
+        "Monopólio Tecnológico: Apenas Deroo Da detém os códigos genéticos e algoritmos de sincronia sináptica dos enxertos mais letais de Severum.",
+      ],
+      visualAssetId: "2a14a0ec2c6a9ed44ab2",
+      source: "docs/characters/deroo-da.md",
+    },
+    true,
   ),
   entity(
     "place-glen",
@@ -117,8 +183,19 @@ export const seedEntities: StudioEntity[] = [
     "concept-enokiti",
     "concept",
     "Maldição Enokití",
-    "Maldição dos Irmãos Yaa que permite conjurar lâminas de energia.",
-    { source: "docs/characters/irmaos-yaa.md" },
+    "Maldição ancestral e espiritual herdada pela linhagem dos Irmãos Yaa (Masin e Tsuuya). Concede aos portadores a capacidade de materializar e projetar lâminas afiadas de pura bioenergia sólida a partir de seus próprios corpos, multiplicando reflexos e potência física em combate sincronizado, mas cobrando um severo desgaste anímico e tributo de sangue dos usuários.",
+    {
+      category: "misticismo",
+      scale: "TERRA",
+      rules: [
+        "Materialização Bioenergética: Lâminas de energia pura são conjuradas instantaneamente a partir da bioenergia do portador, cortando matérias convencionais.",
+        "Custo Vital: O uso prolongado drena reservas vitais, provocando fadiga celular severa e desgaste anímico nos portadores.",
+        "Vínculo de Linhagem: Apenas descendentes com a assinatura de sangue da linhagem Yaa manifestam a maldição sem rejeição fatal.",
+      ],
+      visualAssetId: "71f6e588b0fb73e2047a",
+      source: "docs/characters/irmaos-yaa.md",
+      alias: "concept-maldicao-enokiti",
+    },
     true,
   ),
   entity(
@@ -223,6 +300,39 @@ pairs.push(
   ["yeti", "place-antartida", "habita"],
   ["masin", "place-lamprois", "atua em"],
   ["tsuuya", "place-lamprois", "atua em"],
+);
+pairs.push(
+  // Dualidade Ormuz/Hades
+  ["concept-dualidade-ormuz-hades", "ormuz", "fundamenta"],
+  ["concept-dualidade-ormuz-hades", "hades", "fundamenta"],
+  ["concept-dualidade-ormuz-hades", "artifact-lampiao", "fundamenta"],
+  ["concept-dualidade-ormuz-hades", "artifact-bracelete", "fundamenta"],
+  ["concept-dualidade-ormuz-hades", "faction-congregadores", "relacionado"],
+  ["concept-dualidade-ormuz-hades", "faction-alianca-demoniaca", "relacionado"],
+
+  // Metodologia Corporativo-Militar de Severum
+  ["concept-metodologia-severum", "arner", "fundamenta"],
+  ["concept-metodologia-severum", "place-severum", "fundamenta"],
+  ["concept-metodologia-severum", "faction-red-right-hand", "fundamenta"],
+  ["concept-metodologia-severum", "story-red-right-hand", "fundamenta"],
+  ["concept-metodologia-severum", "deroo-da", "relacionado"],
+
+  // Biotecnologia Deroo Da
+  ["concept-biotecnologia-deroo-da", "deroo-da", "fundamenta"],
+  ["concept-biotecnologia-deroo-da", "place-severum", "relacionado"],
+  ["concept-biotecnologia-deroo-da", "faction-red-right-hand", "relacionado"],
+  ["concept-biotecnologia-deroo-da", "story-red-right-hand", "relacionado"],
+
+  // Maldição Enokití
+  ["concept-enokiti", "masin", "fundamenta"],
+  ["concept-enokiti", "tsuuya", "fundamenta"],
+  ["concept-enokiti", "faction-red-right-hand", "relacionado"],
+  ["concept-enokiti", "story-red-right-hand", "relacionado"],
+
+  // Planetas Cegos
+  ["concept-planetas-cegos", "place-severum", "relacionado"],
+  ["concept-planetas-cegos", "faction-congregadores", "relacionado"],
+  ["concept-planetas-cegos", "story-red-right-hand", "relacionado"],
 );
 for (const c of characters)
   for (const s of series)

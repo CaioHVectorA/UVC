@@ -1882,6 +1882,7 @@ select {
 /* Private author tools: dense navigation, comfortable fields, quiet previews. */
 .studio-workspace-nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 20px 0;
   border-bottom: 1px solid var(--border);
@@ -3734,7 +3735,7 @@ select {
   color: var(--muted);
   margin: 20px 0 8px;
 }
-.db-editor input:not([type="checkbox"]),
+.db-editor input:not([type="checkbox"]):not([type="radio"]),
 .db-editor select,
 .db-editor textarea {
   display: block;
@@ -4069,7 +4070,7 @@ select {
   max-width: 900px;
   margin: 24px auto;
 }
-.db-editor input:not([type="checkbox"]),
+.db-editor input:not([type="checkbox"]):not([type="radio"]),
 .db-editor select,
 .db-editor textarea {
   font-size: 16px;

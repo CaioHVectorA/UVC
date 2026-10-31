@@ -1,8 +1,27 @@
 "use client";
 import { useEditor, EditorContent, useEditorState } from "@tiptap/react";
-import type { Editor, JSONContent } from "@tiptap/core";
+import { Mark, type Editor, type JSONContent } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { Bold, Italic, Undo2, Redo2, Quote, List } from "lucide-react";
+
+const Superscript = Mark.create({
+  name: "superscript",
+  parseHTML() {
+    return [{ tag: "sup" }];
+  },
+  renderHTML() {
+    return ["sup", 0];
+  },
+});
+const Subscript = Mark.create({
+  name: "subscript",
+  parseHTML() {
+    return [{ tag: "sub" }];
+  },
+  renderHTML() {
+    return ["sub", 0];
+  },
+});
 
 export function WritingEditor({
   content,
@@ -20,9 +39,10 @@ export function WritingEditor({
         link: { openOnClick: false, autolink: false },
         codeBlock: false,
         code: false,
-        horizontalRule: false,
         trailingNode: false,
       }),
+      Superscript,
+      Subscript,
     ],
     content,
     immediatelyRender: false,

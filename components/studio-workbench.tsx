@@ -1,7 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Save,
   Plus,
@@ -13,7 +13,17 @@ import {
   Map,
   Eye,
   FileText,
+  BookOpen,
+  Users,
 } from "lucide-react";
+import {
+  narrativeRoles,
+  type NarrativeRole,
+  isNarrativeRole,
+  getRoleBadgeStyle,
+  getCharacterParticipations,
+  getStoryCast,
+} from "@/lib/narrative-roles";
 import {
   kindLabels,
   kinds,
@@ -101,6 +111,43 @@ export function StudioWorkbench({
     setTagText(selectedTags);
   }, [draft?.id, selectedTags]);
   useUnsavedWork(dirty);
+  const [selectedStoryId, setSelectedStoryId] = useState("");
+  const [selectedRole, setSelectedRole] =
+    useState<NarrativeRole>("Protagonista");
+  const [rolePending, setRolePending] = useState(false);
+  const [newCastCharId, setNewCastCharId] = useState("");
+  const [newCastRole, setNewCastRole] = useState<NarrativeRole>("Protagonista");
+
+  const characterParticipations = useMemo(() => {
+    if (!draft || draft.kind !== "character") return [];
+    return getCharacterParticipations(
+      draft.id,
+      workspace.relations,
+      workspace.entities,
+    );
+  }, [draft, workspace.relations, workspace.entities]);
+
+  const storyCast = useMemo(() => {
+    if (!draft || draft.kind !== "story") return null;
+    return getStoryCast(draft.id, workspace.relations, workspace.entities);
+  }, [draft, workspace.relations, workspace.entities]);
+
+  const allStories = useMemo(
+    () =>
+      workspace.entities
+        .filter((e) => e.kind === "story")
+        .sort((a, b) => a.title.localeCompare(b.title, "pt-BR")),
+    [workspace.entities],
+  );
+
+  const allCharacters = useMemo(
+    () =>
+      workspace.entities
+        .filter((e) => e.kind === "character")
+        .sort((a, b) => a.title.localeCompare(b.title, "pt-BR")),
+    [workspace.entities],
+  );
+
   const query = search.toLocaleLowerCase("pt-BR").trim();
   const filtered = workspace.entities
     .filter(
@@ -308,6 +355,133 @@ export function StudioWorkbench({
       setError((error as Error).message);
     }
   }
+
+  async function handleAssignRole(storyId: string, role: NarrativeRole) {
+    if (!draft || draft.kind !== "character" || !storyId) return;
+    if (!workspace.entities.some((e) => e.id === draft.id) || !draft.version) {
+      setError(
+        "Salve o personagem no banco antes de atribuir papéis narrativos.",
+      );
+      return;
+    }
+    setRolePending(true);
+    setError("");
+    try {
+      const existing = workspace.relations.filter(
+        (r) =>
+          ((r.sourceId === draft.id && r.targetId === storyId) ||
+            (r.targetId === draft.id && r.sourceId === storyId)) &&
+          isNarrativeRole(r.label),
+      );
+
+      if (
+        existing.some(
+          (r) =>
+            r.sourceId === draft.id &&
+            r.targetId === storyId &&
+            r.label === role,
+        )
+      ) {
+        setFeedback(
+          `Este personagem já está atribuído como ${role} nesta história.`,
+        );
+        return;
+      }
+
+      for (const oldRel of existing) {
+        await api("/api/studio/relations", "DELETE", { id: oldRel.id });
+      }
+
+      const newRelation = await api<StudioRelation>(
+        "/api/studio/relations",
+        "POST",
+        {
+          id: crypto.randomUUID(),
+          sourceId: draft.id,
+          targetId: storyId,
+          label: role,
+        },
+      );
+
+      const existingIds = new Set(existing.map((r) => r.id));
+      setWorkspace((w) => ({
+        ...w,
+        relations: [
+          ...w.relations.filter((r) => !existingIds.has(r.id)),
+          newRelation,
+        ],
+      }));
+      setFeedback(`Papel de ${role} salvo no PostgreSQL.`);
+      setSelectedStoryId("");
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setRolePending(false);
+    }
+  }
+
+  async function handleRemoveRole(relationId: string) {
+    try {
+      await api("/api/studio/relations", "DELETE", { id: relationId });
+      setWorkspace((w) => ({
+        ...w,
+        relations: w.relations.filter((r) => r.id !== relationId),
+      }));
+      setFeedback("Papel narrativo removido.");
+      setError("");
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
+  async function handleAddStoryCast(characterId: string, role: NarrativeRole) {
+    if (!draft || draft.kind !== "story" || !characterId) return;
+    if (!workspace.entities.some((e) => e.id === draft.id) || !draft.version) {
+      setError("Salve a história antes de escalar personagens.");
+      return;
+    }
+    setRolePending(true);
+    setError("");
+    try {
+      const existing = workspace.relations.filter(
+        (r) =>
+          ((r.sourceId === characterId && r.targetId === draft.id) ||
+            (r.targetId === characterId && r.sourceId === draft.id)) &&
+          isNarrativeRole(r.label),
+      );
+
+      for (const oldRel of existing) {
+        await api("/api/studio/relations", "DELETE", { id: oldRel.id });
+      }
+
+      const newRelation = await api<StudioRelation>(
+        "/api/studio/relations",
+        "POST",
+        {
+          id: crypto.randomUUID(),
+          sourceId: characterId,
+          targetId: draft.id,
+          label: role,
+        },
+      );
+
+      const existingIds = new Set(existing.map((r) => r.id));
+      setWorkspace((w) => ({
+        ...w,
+        relations: [
+          ...w.relations.filter((r) => !existingIds.has(r.id)),
+          newRelation,
+        ],
+      }));
+      setFeedback(`Personagem escalado como ${role}.`);
+      setNewCastCharId("");
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setRolePending(false);
+    }
+  }
+
   async function importFile(file: File) {
     if (
       dirty &&
@@ -778,7 +952,291 @@ export function StudioWorkbench({
                         attr("aparicoes", e.target.value.split("\n"))
                       }
                     />
+
+                    {/* Bloco: Histórias em que participa e Papéis Narrativos */}
+                    <div className="mt-6 pt-5 border-t border-[#303c49]/80 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-semibold text-[#f5f1e8] flex items-center gap-2">
+                          <BookOpen
+                            size={16}
+                            className="text-[#91e3dc]"
+                            aria-hidden="true"
+                          />
+                          <span>Histórias em que participa</span>
+                        </h2>
+                        <span className="text-[11px] text-[#b0b8bf]">
+                          {characterParticipations.length}{" "}
+                          {characterParticipations.length === 1
+                            ? "história"
+                            : "histórias"}
+                        </span>
+                      </div>
+
+                      {/* Lista de participações ativas */}
+                      <div className="space-y-2">
+                        {characterParticipations.map((p) => {
+                          const style = getRoleBadgeStyle(p.role);
+                          return (
+                            <div
+                              key={p.relationId}
+                              className="flex items-center justify-between p-2.5 rounded-xl bg-[#10151c] border border-[#303c49] hover:border-[#91e3dc]/40 transition"
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <span
+                                  className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border shrink-0 ${style.badgeClass}`}
+                                >
+                                  {p.role}
+                                </span>
+                                <button
+                                  type="button"
+                                  className="text-xs font-medium text-[#f5f1e8] hover:text-[#91e3dc] truncate transition text-left cursor-pointer"
+                                  onClick={() => select(p.storyId)}
+                                  title={`Abrir história: ${p.storyTitle}`}
+                                >
+                                  {p.storyTitle}
+                                </button>
+                              </div>
+                              <button
+                                type="button"
+                                className="text-xs text-[#ff746a] hover:text-[#ff948b] transition px-2 py-1 shrink-0 cursor-pointer"
+                                aria-label={`Remover papel ${p.role} de ${draft.title} em ${p.storyTitle}`}
+                                onClick={() =>
+                                  void handleRemoveRole(p.relationId)
+                                }
+                              >
+                                Remover
+                              </button>
+                            </div>
+                          );
+                        })}
+
+                        {characterParticipations.length === 0 && (
+                          <p className="text-xs text-[#b0b8bf] italic py-2">
+                            Nenhuma participação atribuída ainda. Escolha uma
+                            história abaixo.
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Card para vincular a uma história */}
+                      <div className="p-3.5 rounded-xl bg-[#10151c]/60 border border-[#303c49] space-y-3">
+                        <div className="space-y-1">
+                          <label
+                            htmlFor="character-assign-story"
+                            className="text-xs font-semibold text-[#f5f1e8] block"
+                          >
+                            Vincular a uma História
+                          </label>
+                          <select
+                            id="character-assign-story"
+                            value={selectedStoryId}
+                            onChange={(e) => setSelectedStoryId(e.target.value)}
+                            className="w-full text-xs p-2 rounded-lg bg-[#18202a] border border-[#303c49] text-[#f5f1e8] focus:border-[#91e3dc] outline-none"
+                          >
+                            <option value="">Selecione uma história</option>
+                            {allStories.map((story) => (
+                              <option key={story.id} value={story.id}>
+                                {story.title}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <span className="text-[11px] font-semibold text-[#b0b8bf] uppercase tracking-wider block">
+                            Papel Narrativo
+                          </span>
+                          <div
+                            className="flex flex-wrap gap-1.5"
+                            role="radiogroup"
+                            aria-label="Papel Narrativo do Personagem"
+                          >
+                            {narrativeRoles.map((role) => {
+                              const isSelected = selectedRole === role;
+                              const style = getRoleBadgeStyle(role);
+                              return (
+                                <label
+                                  key={role}
+                                  className={`relative overflow-hidden text-xs px-2.5 py-1 rounded-full border transition cursor-pointer flex items-center gap-1.5 ${
+                                    isSelected
+                                      ? `${style.badgeClass} ring-1 ring-offset-1 ring-offset-[#10151c] ring-current font-bold`
+                                      : "bg-[#18202a] text-[#b0b8bf] border-[#303c49] hover:border-[#b0b8bf]/40"
+                                  }`}
+                                >
+                                  <input
+                                    type="radio"
+                                    name="character-narrative-role"
+                                    value={role}
+                                    checked={isSelected}
+                                    onChange={() => setSelectedRole(role)}
+                                    className="sr-only"
+                                    style={{
+                                      position: "absolute",
+                                      width: 1,
+                                      height: 1,
+                                      padding: 0,
+                                      margin: -1,
+                                      overflow: "hidden",
+                                      clip: "rect(0, 0, 0, 0)",
+                                      border: 0,
+                                    }}
+                                  />
+                                  <span>{role}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="button button-secondary w-full justify-center text-xs py-2 cursor-pointer"
+                          disabled={
+                            !selectedStoryId || !draft.version || rolePending
+                          }
+                          onClick={() =>
+                            void handleAssignRole(selectedStoryId, selectedRole)
+                          }
+                        >
+                          <Plus size={14} aria-hidden="true" />
+                          <span>Atribuir Papel à História</span>
+                        </button>
+                        {!draft.version && (
+                          <p className="text-[11px] text-[#edc993] italic">
+                            Salve o personagem antes de vincular papéis.
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </>
+                )}
+                {draft.kind === "story" && storyCast && (
+                  <div className="mt-6 pt-5 border-t border-[#303c49]/80 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-sm font-semibold text-[#f5f1e8] flex items-center gap-2">
+                        <Users
+                          size={16}
+                          className="text-[#edc993]"
+                          aria-hidden="true"
+                        />
+                        <span>Elenco da História por Papel Narrativo</span>
+                      </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {narrativeRoles.map((role) => {
+                        const members = storyCast[role] || [];
+                        const style = getRoleBadgeStyle(role);
+                        return (
+                          <div
+                            key={role}
+                            className="p-3 rounded-xl bg-[#10151c] border border-[#303c49] space-y-2"
+                          >
+                            <div className="flex items-center justify-between border-b border-[#303c49]/60 pb-1.5">
+                              <span
+                                className={`text-[11px] font-bold uppercase tracking-wider ${style.badgeClass} px-2 py-0.5 rounded border`}
+                              >
+                                {role}s ({members.length})
+                              </span>
+                            </div>
+                            <div className="space-y-1 max-h-40 overflow-y-auto">
+                              {members.map(({ character, relationId }) => (
+                                <div
+                                  key={character.id}
+                                  className="flex items-center justify-between text-xs py-1 px-1.5 rounded hover:bg-[#18202a] transition"
+                                >
+                                  <button
+                                    type="button"
+                                    className="text-[#f5f1e8] hover:text-[#91e3dc] truncate text-left cursor-pointer font-medium"
+                                    onClick={() => select(character.id)}
+                                  >
+                                    {character.title}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="text-[#ff746a] hover:text-[#ff948b] text-[11px] px-1 cursor-pointer"
+                                    aria-label={`Remover ${character.title} do elenco`}
+                                    onClick={() =>
+                                      void handleRemoveRole(relationId)
+                                    }
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              ))}
+                              {members.length === 0 && (
+                                <span className="text-[11px] text-[#b0b8bf] italic block py-1">
+                                  Nenhum personagem atribuído.
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Escalar novo personagem para a história */}
+                    <div className="p-3 rounded-xl bg-[#10151c]/60 border border-[#303c49] flex flex-wrap items-end gap-2.5">
+                      <div className="flex-1 min-w-[180px] space-y-1">
+                        <label
+                          htmlFor="story-add-cast-char"
+                          className="text-xs font-semibold text-[#f5f1e8] block"
+                        >
+                          Escalar Personagem
+                        </label>
+                        <select
+                          id="story-add-cast-char"
+                          value={newCastCharId}
+                          onChange={(e) => setNewCastCharId(e.target.value)}
+                          className="w-full text-xs p-2 rounded-lg bg-[#18202a] border border-[#303c49] text-[#f5f1e8] outline-none"
+                        >
+                          <option value="">Selecione um personagem</option>
+                          {allCharacters.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.title}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="w-[140px] space-y-1">
+                        <label
+                          htmlFor="story-add-cast-role"
+                          className="text-xs font-semibold text-[#f5f1e8] block"
+                        >
+                          Papel
+                        </label>
+                        <select
+                          id="story-add-cast-role"
+                          value={newCastRole}
+                          onChange={(e) =>
+                            setNewCastRole(e.target.value as NarrativeRole)
+                          }
+                          className="w-full text-xs p-2 rounded-lg bg-[#18202a] border border-[#303c49] text-[#f5f1e8] outline-none"
+                        >
+                          {narrativeRoles.map((r) => (
+                            <option key={r} value={r}>
+                              {r}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="button button-secondary text-xs py-2 px-3 shrink-0 cursor-pointer"
+                        disabled={
+                          !newCastCharId || !draft.version || rolePending
+                        }
+                        onClick={() =>
+                          void handleAddStoryCast(newCastCharId, newCastRole)
+                        }
+                      >
+                        <Plus size={14} aria-hidden="true" />
+                        <span>Escalar</span>
+                      </button>
+                    </div>
+                  </div>
                 )}
                 {draft.kind === "event" && (
                   <div className="db-field-row">

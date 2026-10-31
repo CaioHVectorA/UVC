@@ -16,6 +16,7 @@ const config = [
       "playwright-report/**",
       "test-results/**",
       "next-env.d.ts",
+      ".agents/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),

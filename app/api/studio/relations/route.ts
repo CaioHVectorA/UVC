@@ -18,6 +18,8 @@ export async function POST(request: Request) {
     return apiError(error);
   }
 }
+export const PUT = POST;
+
 export async function DELETE(request: Request) {
   try {
     const auth = await authorize(request, true);

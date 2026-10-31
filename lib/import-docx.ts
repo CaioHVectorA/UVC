@@ -162,6 +162,11 @@ const paragraph = (content: JSONContent[] = []): JSONContent => ({
   type: "paragraph",
   ...(content.length ? { content } : {}),
 });
+function isSceneBreakText(text: string): boolean {
+  return /^(\*{3,}|\*(\s*\*\s*){2,}|-{3,}|—{3,}|(—\s*){2,}—)$/.test(
+    text.trim(),
+  );
+}
 function inline(
   nodes: ChildNode[],
   marks: Mark[] = [],
@@ -195,6 +200,8 @@ function inline(
         u: "underline",
         s: "strike",
         del: "strike",
+        sup: "superscript",
+        sub: "subscript",
       } as Record<string, string>
     )[node.name];
     const next = [...marks];
@@ -204,15 +211,18 @@ function inline(
       node.name === "a" &&
       (node.attribs.href?.length ?? 0) <= 4096 &&
       /^(https?:\/\/|mailto:|#)/i.test(node.attribs.href ?? "")
-    )
+    ) {
+      const isInternal = (node.attribs.href ?? "").startsWith("#");
       next.push({
         type: "link",
         attrs: {
           href: node.attribs.href,
-          target: "_blank",
-          rel: "noopener noreferrer",
+          ...(isInternal
+            ? {}
+            : { target: "_blank", rel: "noopener noreferrer" }),
         },
       });
+    }
     return inline(node.children, next, depth + 1);
   });
 }
@@ -237,12 +247,33 @@ function blocks(
       );
       continue;
     }
+    if (node.name === "hr") {
+      out.push({ type: "horizontalRule" });
+      continue;
+    }
     if (node.name === "p" || /^h[1-6]$/.test(node.name)) {
       if (node.children.some((c) => isTag(c) && c.name === "img"))
         warnings.add(
           "Imagens permanecem no DOCX original e não são inseridas no editor nesta importação.",
         );
+      if (
+        node.name === "p" &&
+        node.children.some((c) => isTag(c) && c.name === "hr")
+      ) {
+        out.push({ type: "horizontalRule" });
+        continue;
+      }
       const content = inline(node.children);
+      if (
+        node.name === "p" &&
+        content.length === 1 &&
+        content[0].type === "text" &&
+        content[0].text &&
+        isSceneBreakText(content[0].text)
+      ) {
+        out.push({ type: "horizontalRule" });
+        continue;
+      }
       out.push(
         node.name === "p"
           ? paragraph(content)
@@ -301,6 +332,7 @@ function blocks(
 export function docxPlain(node: JSONContent): string {
   if (node.type === "text") return node.text ?? "";
   if (node.type === "hardBreak") return "\n";
+  if (node.type === "horizontalRule") return "\n* * *\n";
   return (node.content ?? [])
     .map(docxPlain)
     .join(["paragraph", "heading"].includes(node.type ?? "") ? "" : "\n");
@@ -347,8 +379,22 @@ export async function parseDocx(file: { name: string; bytes: Uint8Array }) {
         includeEmbeddedStyleMap: false,
         ignoreEmptyParagraphs: false,
         styleMap: [
-          "p[style-name='Title'] => p:fresh",
-          "p[style-name='Título'] => p:fresh",
+          "p[style-name='Heading 1'] => h1:fresh",
+          "p[style-name='heading 1'] => h1:fresh",
+          "p[style-name='Título 1'] => h1:fresh",
+          "p[style-name='Heading 2'] => h2:fresh",
+          "p[style-name='heading 2'] => h2:fresh",
+          "p[style-name='Título 2'] => h2:fresh",
+          "p[style-name='Heading 3'] => h3:fresh",
+          "p[style-name='heading 3'] => h3:fresh",
+          "p[style-name='Título 3'] => h3:fresh",
+          "p[style-name='Title'] => p.title:fresh",
+          "p[style-name='Título'] => p.title:fresh",
+          "p[style-name='Subtitle'] => p.subtitle:fresh",
+          "p[style-name='Subtítulo'] => p.subtitle:fresh",
+          "p[style-name='Quote'] => blockquote:fresh",
+          "p[style-name='Citação'] => blockquote:fresh",
+          "br[type='page'] => hr:fresh",
         ],
         convertImage: mammoth.images.imgElement(async () => ({
           src: "",
